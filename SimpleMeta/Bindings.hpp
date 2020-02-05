@@ -46,8 +46,15 @@ void BindPrimitiveTypeToLibrary(MetaLibrary& library, const std::string& classNa
   library.AddBoundType(boundType);
 }
 
-#define BindField(Library, boundType, Owner, FieldName) \
-  FromField<decltype(&Owner::FieldName), &Owner::FieldName>(library, boundType, #FieldName, &Owner::FieldName, offsetof(Owner, FieldName));
-#define BindPrimitiveType(Library, PrimitiveType) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, #PrimitiveType)
-#define BindType(Library, ClassType) BindClassType<ClassType, &ClassType::Bind>(Library, #ClassType)
-#define BindTypeExternal(Library, ClassType, BindingFn) BindClassType<ClassType, BindingFn>(Library, #ClassType)
+#define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
+  FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember));
+#define BindField(Library, boundType, Owner, FieldMember) BindFieldAs(Library, boundType, Owner, FieldMember, #FieldMember)
+
+#define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName)
+#define BindPrimitiveType(Library, PrimitiveType) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType)
+
+#define BindTypeAs(Library, ClassType, ClassTypeName) BindClassType<ClassType, &ClassType::Bind>(Library, ClassTypeName)
+#define BindType(Library, ClassType) BindTypeAs(Library, ClassType, #ClassType)
+
+#define BindTypeExternalAs(Library, ClassType, ClassTypeName, BindingFn) BindClassType<ClassType, BindingFn>(Library, ClassTypeName)
+#define BindTypeExternal(Library, ClassType, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, BindingFn)
