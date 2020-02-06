@@ -66,6 +66,22 @@ struct BinarySaver : public Serializer
     }
     return false;
   }
+  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
+  {
+    size_t count = adapter->GetCount(data);
+    mStream << count;
+    BoundType* subType = adapter->GetSubType(boundType);
+    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
+    for(size_t i = 0; i < count; ++i)
+    {
+      char* itemSrc = adapter->GetItem(data, i);
+      if(subTypeSerialization != nullptr)
+        subTypeSerialization->Serialize(*this, *subType, itemSrc);
+      else
+        SerializeObject(*subType, itemSrc);
+    }
+    return false;
+  }
 
   std::stringstream mStream;
 };
@@ -133,6 +149,25 @@ struct BinaryLoader : public Serializer
         SerializeObject(*subType, itemSrc);
     }
     return false;
+  }
+  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
+  {
+    size_t count = 0;
+    mStream >> count;
+
+    adapter->Initialize(data);
+    adapter->SetCount(data, count);
+    BoundType* subType = adapter->GetSubType(boundType);
+    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
+    for(size_t i = 0; i < count; ++i)
+    {
+      char* itemSrc = adapter->GetItem(data, i);
+      if(subTypeSerialization != nullptr)
+        subTypeSerialization->Serialize(*this, *subType, itemSrc);
+      else
+        SerializeObject(*subType, itemSrc);
+    }
+    return true;
   }
 
   std::stringstream mStream;

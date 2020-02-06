@@ -2,8 +2,30 @@
 
 enum class SerializerDirection
 {
-Saving,
-Loading
+  Saving,
+  Loading
+};
+
+struct ArrayAdapter
+{
+  virtual BoundType* GetSubType(BoundType& boundType)
+  {
+    return nullptr;
+  }
+  virtual void Initialize(char* data)
+  {
+  }
+  virtual size_t GetCount(char* data)
+  {
+    return 0;
+  }
+  virtual void SetCount(char* data, size_t count)
+  {
+  }
+  virtual char* GetItem(char* data, size_t index)
+  {
+    return nullptr;
+  }
 };
 
 struct Serializer
@@ -34,6 +56,11 @@ struct Serializer
     return false;
   }
   virtual bool SerializeArray(BoundType& boundType, char* data, size_t count)
+  {
+    return false;
+  }
+
+  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
   {
     return false;
   }

@@ -34,12 +34,32 @@ static void FromField(MetaLibrary& library, BoundType& owner, const std::string&
   owner.mFields.push_back(f);
 }
 
+template <typename MapPointer, MapPointer field, typename Class, typename KeyType, typename ValueType>
+static void FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::unordered_map<KeyType, ValueType> Class::*dummy, size_t offset)
+{
+  typedef std::unordered_map<KeyType, ValueType> MapType;
+  Field f = Field();
+  f.mName = name;
+  f.mOffset = offset;
+  f.mType = StaticTypeId<MapType>::GetBoundType();
+  f.mType->mMetaSerialization = new MapMetaSerialization<KeyType, ValueType>();
+
+  //BoundType* subType = StaticTypeId<FieldType>::GetBoundType();
+  //Field subField;
+  //subField.mType = subType;
+  //f.mType->mFields.push_back(subField);
+  //f.mType->mStride = sizeof(FieldType);
+
+  owner.mFields.push_back(f);
+}
+
 template <typename ClassType, void (*BindingFn)(MetaLibrary& library, BoundType&)>
-void BindClassType(MetaLibrary& library, const std::string& className)
+void BindClassType(MetaLibrary& library, const std::string& className, int id)
 {
   BoundType* boundType = StaticTypeId<ClassType>::GetBoundType();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeof(ClassType);
+  boundType->mId = id;
   BindingFn(library, *boundType);
   library.AddBoundType(boundType);
 }
@@ -68,10 +88,10 @@ void BindBaseType(MetaLibrary& library, BoundType& derrivedType)
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName)
 #define BindPrimitiveType(Library, PrimitiveType) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType)
 
-#define BindTypeAs(Library, ClassType, ClassTypeName) BindClassType<ClassType, &ClassType::Bind>(Library, ClassTypeName)
-#define BindType(Library, ClassType) BindTypeAs(Library, ClassType, #ClassType)
+#define BindTypeAs(Library, ClassType, ClassTypeName, Id) BindClassType<ClassType, &ClassType::Bind>(Library, ClassTypeName, Id)
+#define BindType(Library, ClassType, Id) BindTypeAs(Library, ClassType, #ClassType, Id)
 
-#define BindTypeExternalAs(Library, ClassType, ClassTypeName, BindingFn) BindClassType<ClassType, BindingFn>(Library, ClassTypeName)
-#define BindTypeExternal(Library, ClassType, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, BindingFn)
+#define BindTypeExternalAs(Library, ClassType, ClassTypeName, Id, BindingFn) BindClassType<ClassType, BindingFn>(Library, ClassTypeName, Id)
+#define BindTypeExternal(Library, ClassType, Id, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, Id, BindingFn)
 
 #define BindBase(Library, BoundType, BaseType) BindBaseType<BaseType>(Library, BoundType)

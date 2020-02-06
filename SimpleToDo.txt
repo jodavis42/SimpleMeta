@@ -1,5 +1,5 @@
-Arrays
+*Arrays
 Polymorphic (factory)
-InlineStruct
+*InlineStruct
 Json
 Maps

@@ -31,3 +31,14 @@ struct StaticTypeId<std::vector<T>> : public StaticTypeId<T>
     return sInstance;
   }
 };
+
+template <typename KeyType, typename ValueType>
+struct StaticTypeId<std::unordered_map<KeyType, ValueType>>// : public StaticTypeId<T>
+{
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = new BoundType();
+    sInstance->mPrimitiveType = BoundTypePrimitiveType::Array;
+    return sInstance;
+  }
+};
