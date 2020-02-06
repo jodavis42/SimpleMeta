@@ -141,3 +141,16 @@ struct PhysicsSpace
     BindField(library, boundType, PhysicsSpace, mColliders);
   }
 };
+
+struct Dictionary
+{
+  std::unordered_map<std::string, std::string> mData;
+  void Add(const std::string& key, const std::string& value)
+  {
+    mData.insert(std::make_pair(key, value));
+  }
+  static void Bind(MetaLibrary& library, BoundType& boundType)
+  {
+    BindField(library, boundType, Dictionary, mData);
+  }
+};

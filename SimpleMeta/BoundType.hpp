@@ -29,4 +29,5 @@ struct BoundType
   std::vector<Field> mFields;
   MetaSerialization* mMetaSerialization = nullptr;
   BoundType* mBaseType = nullptr;
+  int mId;
 };

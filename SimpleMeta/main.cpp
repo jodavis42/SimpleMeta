@@ -59,15 +59,16 @@ int main()
   BindPrimitiveType(library, Vec2);
   BindPrimitiveType(library, Vec3);
   BindPrimitiveTypeAs(library, std::string, "string");
-  BindTypeExternal(library, MyStruct, BindMyStruct);
-  BindType(library, Vertex);
-  BindType(library, Mesh);
-  BindType(library, NameId);
-  BindType(library, NameIdList);
-  BindType(library, Collider);
-  BindType(library, BoxCollider);
-  BindType(library, SphereCollider);
-  BindType(library, PhysicsSpace);
+  BindTypeExternal(library, MyStruct, 'myst', BindMyStruct);
+  BindType(library, Vertex, 'vtx');
+  BindType(library, Mesh, 'mesh');
+  BindType(library, NameId, 'nid');
+  BindType(library, NameIdList, 'idlt');
+  BindType(library, Collider, 'col');
+  BindType(library, BoxCollider, 'bcol');
+  BindType(library, SphereCollider, 'scol');
+  BindType(library, PhysicsSpace, 'phys');
+  BindType(library, Dictionary, 'dict');
 
   {
     Mesh outMesh;
@@ -100,6 +101,12 @@ int main()
     TestRoundTrip(input);
   }
 
+  {
+    Dictionary input;
+    input.Add("ohio", "good morning");
+
+    TestRoundTrip(input);
+  }
 
    {
     SphereCollider* sphere1 = new SphereCollider();
