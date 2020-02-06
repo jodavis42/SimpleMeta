@@ -4,6 +4,7 @@
 #include "StaticTypeId.hpp"
 #include "Bindings.hpp"
 #include "BinaryStream.hpp"
+#include "TestTypes.hpp"
 
 struct MyStruct
 {
@@ -26,16 +27,6 @@ struct MyStruct
   }
 };
 
-struct DynamicArray
-{
-  std::vector<int> mArray;
-
-  static void Bind(MetaLibrary& library, BoundType& boundType)
-  {
-    BindField(library, boundType, DynamicArray, mArray);
-  }
-};
-
 void BindMyStruct(MetaLibrary& library, BoundType& boundType)
 {
   BindField(library, boundType, MyStruct, mData);
@@ -46,6 +37,18 @@ void BindMyStruct(MetaLibrary& library, BoundType& boundType)
   BindField(library, boundType, MyStruct, mString1);
 }
 
+template <typename T>
+void TestRoundTrip(T& input)
+{
+  BinarySaver saver;
+  saver.Serialize(input);
+
+  T output;
+  BinaryLoader loader;
+  loader.mStream = std::move(saver.mStream);
+  loader.Serialize(output);
+}
+
 int main()
 {
   MetaLibrary library;
@@ -53,34 +56,64 @@ int main()
   BindPrimitiveType(library, int);
   BindPrimitiveType(library, float);
   BindPrimitiveType(library, double);
+  BindPrimitiveType(library, Vec2);
+  BindPrimitiveType(library, Vec3);
   BindPrimitiveTypeAs(library, std::string, "string");
   BindTypeExternal(library, MyStruct, BindMyStruct);
-  BindType(library, DynamicArray);
+  BindType(library, Vertex);
+  BindType(library, Mesh);
+  BindType(library, NameId);
+  BindType(library, NameIdList);
+  BindType(library, Collider);
+  BindType(library, BoxCollider);
+  BindType(library, SphereCollider);
+  BindType(library, PhysicsSpace);
 
   {
-	  MyStruct myData;
-	  myData.mChar1 = 1;
-	  myData.mChar2 = 15;
-	  myData.mFloat = 1.23f;
-	  myData.mData = -1;
-	  myData.mDouble1 = 0.000000001f;
-	  myData.mString1 = "MyString2";
+    Mesh outMesh;
+    outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
+    outMesh.mVertices.push_back(Vertex(Vec3(1, 0, 0), Vec2(1, 0)));
+    outMesh.mVertices.push_back(Vertex(Vec3(1, 1, 0), Vec2(1, 1)));
+    outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
+    outMesh.mName = "Quad";
 
-	  BinaryStream stream;
-	  std::vector<char> streamData;
-	  stream.Write(myData, streamData);
-	  MyStruct myNewData;
-	  myNewData.value = 1;
-	  stream.Read(streamData, myNewData);
+    TestRoundTrip(outMesh);
   }
 
   {
-	  DynamicArray testArray;
-	  testArray.mArray.push_back(1);
+    MyStruct myData;
+    myData.mChar1 = 1;
+    myData.mChar2 = 15;
+    myData.mFloat = 1.23f;
+    myData.mData = -1;
+    myData.mDouble1 = 0.123456789f;
+    myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
 
-      std::vector<char> streamData;
-      BinaryStream stream;
-	  stream.Write(testArray, streamData);
+    TestRoundTrip(myData);
+  }
+
+  {
+    NameIdList input;
+    input.mIds.push_back(NameId(0, "Zero"));
+    input.mIds.push_back(NameId(1, "One"));
+
+    TestRoundTrip(input);
+  }
+
+
+   {
+    SphereCollider* sphere1 = new SphereCollider();
+    sphere1->mId = 1;
+    sphere1->mRadius = 1.0f;
+    BoxCollider* box1 = new BoxCollider();
+    box1->mId = 3;
+    box1->mSize = Vec3(1, 2, 3);
+
+    PhysicsSpace input;
+    input.mColliders.push_back(sphere1);
+    input.mColliders.push_back(box1);
+
+    TestRoundTrip(input);
   }
 
   return 0;

@@ -13,6 +13,15 @@ struct StaticTypeId
 };
 
 template <typename T>
+struct StaticTypeId<T*> : public StaticTypeId<T>
+{
+  static BoundType*& GetBoundType()
+  {
+    return StaticTypeId<T>::GetBoundType();
+  }
+};
+
+template <typename T>
 struct StaticTypeId<std::vector<T>> : public StaticTypeId<T>
 {
   static BoundType*& GetBoundType()

@@ -2,6 +2,7 @@
 
 #include "BoundType.hpp"
 #include "MetaLibrary.hpp"
+#include "MetaSerialization.hpp"
 #include "StaticTypeId.hpp"
 
 template <typename FieldPointer, FieldPointer field, typename Class, typename FieldType>
@@ -22,6 +23,12 @@ static void FromField(MetaLibrary& library, BoundType& owner, const std::string&
   f.mName = name;
   f.mOffset = offset;
   f.mType = StaticTypeId<std::vector<FieldType>>::GetBoundType();
+  f.mType->mMetaSerialization = new ArrayMetaSerialization<FieldType>();
+
+  BoundType* subType = StaticTypeId<FieldType>::GetBoundType();
+  Field subField;
+  subField.mType = subType;
+  f.mType->mFields.push_back(subField);
   f.mType->mStride = sizeof(FieldType);
 
   owner.mFields.push_back(f);
@@ -43,7 +50,15 @@ void BindPrimitiveTypeToLibrary(MetaLibrary& library, const std::string& classNa
   BoundType* boundType = StaticTypeId<Type>::GetBoundType();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeof(Type);
+  boundType->mMetaSerialization = new PrimitiveMetaSerialization<Type>();
   library.AddBoundType(boundType);
+}
+
+template <typename BaseType>
+void BindBaseType(MetaLibrary& library, BoundType& derrivedType)
+{
+  BoundType* baseType = StaticTypeId<BaseType>::GetBoundType();
+  derrivedType.mBaseType = baseType;
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
@@ -58,3 +73,5 @@ void BindPrimitiveTypeToLibrary(MetaLibrary& library, const std::string& classNa
 
 #define BindTypeExternalAs(Library, ClassType, ClassTypeName, BindingFn) BindClassType<ClassType, BindingFn>(Library, ClassTypeName)
 #define BindTypeExternal(Library, ClassType, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, BindingFn)
+
+#define BindBase(Library, BoundType, BaseType) BindBaseType<BaseType>(Library, BoundType)

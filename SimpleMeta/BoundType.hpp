@@ -4,6 +4,7 @@
 #include <vector>
 
 struct BoundType;
+struct MetaSerialization;
 
 enum class BoundTypePrimitiveType
 {
@@ -26,4 +27,6 @@ struct BoundType
   size_t mSizeInBytes = 0;
   size_t mStride = 0;
   std::vector<Field> mFields;
+  MetaSerialization* mMetaSerialization = nullptr;
+  BoundType* mBaseType = nullptr;
 };

@@ -27,7 +27,10 @@
     <ClInclude Include="Bindings.hpp" />
     <ClInclude Include="BoundType.hpp" />
     <ClInclude Include="MetaLibrary.hpp" />
+    <ClInclude Include="MetaSerialization.hpp" />
+    <ClInclude Include="Serializer.hpp" />
     <ClInclude Include="StaticTypeId.hpp" />
+    <ClInclude Include="TestTypes.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -38,5 +38,14 @@
     <ClInclude Include="BinaryStream.hpp">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="MetaSerialization.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Serializer.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TestTypes.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
