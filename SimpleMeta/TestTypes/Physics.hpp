@@ -9,6 +9,10 @@ struct Collider
     return mId == rhs.mId;
   }
 
+  virtual BoundType* VirtualGetBoundType() const
+  {
+    return StaticTypeId<Collider>::GetBoundType();
+  }
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Collider, mId);
@@ -24,8 +28,13 @@ struct BoxCollider : public Collider
     return __super::operator==(rhs) && mSize == rhs.mSize;
   }
 
+  virtual BoundType* VirtualGetBoundType() const
+  {
+    return StaticTypeId<BoxCollider>::GetBoundType();
+  }
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
+    boundType.mMetaSerialization = new ObjectMetaSerialization<BoxCollider>();
     BindBase(library, boundType, Collider);
     BindField(library, boundType, BoxCollider, mSize);
   }
@@ -39,8 +48,13 @@ struct SphereCollider : public Collider
   {
     return __super::operator==(rhs) && mRadius == rhs.mRadius;
   }
+  virtual BoundType* VirtualGetBoundType() const
+  {
+    return StaticTypeId<SphereCollider>::GetBoundType();
+  }
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
+    boundType.mMetaSerialization = new ObjectMetaSerialization<SphereCollider>();
     BindBase(library, boundType, Collider);
     BindField(library, boundType, SphereCollider, mRadius);
   }
@@ -51,11 +65,20 @@ struct PhysicsSpace
 {
   bool operator==(const PhysicsSpace& rhs) const
   {
-    return false;
+    if(mColliders.size() != rhs.mColliders.size())
+      return false;
+
+    bool isEqual = true;
+    for(size_t i = 0; i < mColliders.size(); ++i)
+    {
+      isEqual |= (*mColliders[i] == *rhs.mColliders[i]);
+    }
+    return isEqual;
   }
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, PhysicsSpace, mColliders);
+    Field* field = BindField(library, boundType, PhysicsSpace, mColliders);
+    field->mType->mMetaSerialization = new PolymorphicArrayMetaSerialization<Collider*>();
   }
 
   std::vector<Collider*> mColliders;

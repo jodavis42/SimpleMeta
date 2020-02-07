@@ -6,7 +6,7 @@
 #include "StaticTypeId.hpp"
 
 template <typename FieldPointer, FieldPointer field, typename Class, typename FieldType>
-static void FromField(MetaLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
+static Field* FromField(MetaLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
 {
   Field f = Field();
   f.mName = name;
@@ -14,10 +14,11 @@ static void FromField(MetaLibrary& library, BoundType& owner, const std::string&
   f.mType = StaticTypeId<FieldType>::GetBoundType();
 
   owner.mFields.push_back(f);
+  return &owner.mFields.back();
 }
 
 template <typename ArrayPointer, ArrayPointer field, typename Class, typename FieldType>
-static void FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::vector<FieldType> Class::*dummy, size_t offset)
+static Field* FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::vector<FieldType> Class::*dummy, size_t offset)
 {
   Field f = Field();
   f.mName = name;
@@ -32,10 +33,11 @@ static void FromField(MetaLibrary& library, BoundType& owner, const std::string&
   f.mType->mStride = sizeof(FieldType);
 
   owner.mFields.push_back(f);
+  return &owner.mFields.back();
 }
 
 template <typename MapPointer, MapPointer field, typename Class, typename KeyType, typename ValueType>
-static void FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::unordered_map<KeyType, ValueType> Class::*dummy, size_t offset)
+static Field* FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::unordered_map<KeyType, ValueType> Class::*dummy, size_t offset)
 {
   typedef std::unordered_map<KeyType, ValueType> MapType;
   Field f = Field();
@@ -51,6 +53,7 @@ static void FromField(MetaLibrary& library, BoundType& owner, const std::string&
   //f.mType->mStride = sizeof(FieldType);
 
   owner.mFields.push_back(f);
+  return &owner.mFields.back();
 }
 
 template <typename ClassType, void (*BindingFn)(MetaLibrary& library, BoundType&)>
@@ -60,6 +63,8 @@ void BindClassType(MetaLibrary& library, const std::string& className, int id)
   boundType->mName = className;
   boundType->mSizeInBytes = sizeof(ClassType);
   boundType->mId = id;
+
+  boundType->mMetaSerialization = new ObjectMetaSerialization<ClassType>();
   BindingFn(library, *boundType);
   library.AddBoundType(boundType);
 }
@@ -79,6 +84,7 @@ void BindBaseType(MetaLibrary& library, BoundType& derrivedType)
 {
   BoundType* baseType = StaticTypeId<BaseType>::GetBoundType();
   derrivedType.mBaseType = baseType;
+  derrivedType.mFields = baseType->mFields;
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \

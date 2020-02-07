@@ -14,6 +14,10 @@ struct ArrayAdapter
   {
     return nullptr;
   }
+  virtual BoundType* GetPolymorphicItemType(char* data, size_t index)
+  {
+    return nullptr;
+  }
   virtual void Initialize(char* data)
   {
   }
@@ -27,6 +31,10 @@ struct ArrayAdapter
   virtual char* GetItem(char* data, size_t index)
   {
     return nullptr;
+  }
+  virtual void SetItem(char* data, size_t index, char* itemData)
+  {
+    return;
   }
 };
 
@@ -84,4 +92,20 @@ struct Serializer
   {
     return false;
   }
+  virtual bool SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter)
+  {
+    return false;
+  }
 };
+
+template <typename SerializerType, typename DataType>
+bool SerializationPolicy(SerializerType& serializer, BoundType& boundType, DataType& data)
+{
+  serializer.Serialize(boundType, data);
+}
+
+template <typename SerializerType, typename DataType>
+bool SerializationPolicy(SerializerType& serializer, Field& field, DataType& data)
+{
+  serializer.Serialize(field, data);
+}

@@ -23,6 +23,7 @@ public:
   virtual bool SerializeObject(const Field& field, char* data) override;
   virtual bool SerializeString(const Field& field, std::string& data) override;
   virtual bool SerializeArray(const Field& field, char* data, ArrayAdapter* adapter) override;
+  virtual bool SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter) override;
 
   virtual bool SerializeObject(BoundType& boundType, char* data) override;
 
@@ -48,6 +49,7 @@ public:
   virtual bool SerializeObject(const Field& field, char* data) override;
   virtual bool SerializeString(const Field& field, std::string& data) override;
   virtual bool SerializeArray(const Field& field, char* data, ArrayAdapter* adapter) override;
+  virtual bool SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter) override;
 
   virtual bool SerializeObject(BoundType& boundType, char* data) override;
 

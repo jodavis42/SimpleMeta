@@ -69,47 +69,47 @@ int main()
   BindType(library, PhysicsSpace, 'phys');
   BindType(library, Dictionary, 'dict');
 
-  {
-    Mesh outMesh;
-    outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
-    outMesh.mVertices.push_back(Vertex(Vec3(1, 0, 0), Vec2(1, 0)));
-    outMesh.mVertices.push_back(Vertex(Vec3(1, 1, 0), Vec2(1, 1)));
-    outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
-    outMesh.mName = "Quad";
-
-    TestJsonRoundTrip(outMesh.mVertices[2]);
-    TestJsonRoundTrip(outMesh);
-    TestBinaryRoundTrip(outMesh);
-  }
-
-  {
-    MyStruct myData;
-    myData.mChar1 = 1;
-    myData.mChar2 = 15;
-    myData.mFloat = 1.23f;
-    myData.mData = -1;
-    myData.mDouble1 = 0.123456789f;
-    myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
-
-    TestJsonRoundTrip(myData);
-    TestBinaryRoundTrip(myData);
-  }
-
-  {
-    NameIdList input;
-    input.mIds.push_back(NameId(0, "Zero"));
-    input.mIds.push_back(NameId(1, "One"));
-
-    TestJsonRoundTrip(input);
-    TestBinaryRoundTrip(input);
-  }
-
-  {
-    Dictionary input;
-    input.Add("ohio", "good morning");
-
-    TestBinaryRoundTrip(input);
-  }
+  //{
+  //  Mesh outMesh;
+  //  outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
+  //  outMesh.mVertices.push_back(Vertex(Vec3(1, 0, 0), Vec2(1, 0)));
+  //  outMesh.mVertices.push_back(Vertex(Vec3(1, 1, 0), Vec2(1, 1)));
+  //  outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
+  //  outMesh.mName = "Quad";
+  //
+  //  TestJsonRoundTrip(outMesh.mVertices[2]);
+  //  TestJsonRoundTrip(outMesh);
+  //  TestBinaryRoundTrip(outMesh);
+  //}
+  //
+  //{
+  //  MyStruct myData;
+  //  myData.mChar1 = 1;
+  //  myData.mChar2 = 15;
+  //  myData.mFloat = 1.23f;
+  //  myData.mData = -1;
+  //  myData.mDouble1 = 0.123456789f;
+  //  myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
+  //
+  //  TestJsonRoundTrip(myData);
+  //  TestBinaryRoundTrip(myData);
+  //}
+  //
+  //{
+  //  NameIdList input;
+  //  input.mIds.push_back(NameId(0, "Zero"));
+  //  input.mIds.push_back(NameId(1, "One"));
+  //
+  //  TestJsonRoundTrip(input);
+  //  TestBinaryRoundTrip(input);
+  //}
+  //
+  //{
+  //  Dictionary input;
+  //  input.Add("ohio", "good morning");
+  //
+  //  TestBinaryRoundTrip(input);
+  //}
 
   {
     SphereCollider* sphere1 = new SphereCollider();
@@ -123,6 +123,7 @@ int main()
     input.mColliders.push_back(sphere1);
     input.mColliders.push_back(box1);
 
+    TestJsonRoundTrip(input);
     TestBinaryRoundTrip(input);
   }
 

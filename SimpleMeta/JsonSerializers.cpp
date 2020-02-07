@@ -121,6 +121,34 @@ bool JsonSaver::SerializeArray(const Field& field, char* data, ArrayAdapter* ada
   return true;
 }
 
+bool JsonSaver::SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter)
+{
+  size_t count = adapter->GetCount(data);
+
+  mData->mWriter.Key(field.mName.c_str());
+  mData->mWriter.StartArray();
+  for(size_t i = 0; i < count; ++i)
+  {
+    BoundType* subType = adapter->GetPolymorphicItemType(data, i);
+    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
+
+    mData->mWriter.StartObject();
+    mData->mWriter.Key("TypeName");
+    mData->mWriter.String(subType->mName.c_str());
+    mData->mWriter.Key("Value");
+
+    char* itemSrc = adapter->GetItem(data, i);
+    if(subTypeSerialization != nullptr)
+      subTypeSerialization->Serialize(*this, *subType, itemSrc);
+    else
+      SerializeObject(*subType, itemSrc);
+
+    mData->mWriter.EndObject();
+  }
+  mData->mWriter.EndArray();
+  return true;
+}
+
 bool JsonSaver::SerializeObject(BoundType& boundType, char* data)
 {
   mData->mWriter.StartObject();
@@ -193,7 +221,7 @@ bool JsonLoader::SerializeArray(const Field& field, char* data, ArrayAdapter* ad
   size_t count = array.Size();
 
   adapter->SetCount(data, count);
-  
+
   BoundType& boundType = *field.mType;
   BoundType* subType = boundType.mFields[0].mType;
   MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
@@ -214,6 +242,43 @@ bool JsonLoader::SerializeArray(const Field& field, char* data, ArrayAdapter* ad
   return true;
 }
 
+bool JsonLoader::SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter)
+{
+  auto arrayNode = mData->mStack.top();
+  auto array = arrayNode->GetArray();
+  size_t count = array.Size();
+
+  adapter->SetCount(data, count);
+
+  BoundType& boundType = *field.mType;
+  for(size_t i = 0; i < count; ++i)
+  {
+    auto itemNode = &array[i];
+    mData->mStack.push(itemNode);
+
+    auto it = itemNode->FindMember("TypeName");
+    std::string typeName = it->value.GetString();
+    it = itemNode->FindMember("Value");
+    mData->mStack.push(&it->value);
+
+
+    BoundType* subType = MetaLibrary::FindBoundType(typeName);
+    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
+    char* itemSrc = subTypeSerialization->Allocate();
+    if(subTypeSerialization != nullptr)
+      subTypeSerialization->Serialize(*this, *subType, itemSrc);
+    else
+      SerializeObject(*subType, itemSrc);
+
+    adapter->SetItem(data, i, itemSrc);
+
+    mData->mStack.pop();
+    mData->mStack.pop();
+  }
+
+  return true;
+}
+
 bool JsonLoader::SerializeObject(BoundType& boundType, char* data)
 {
   auto objNode = mData->mStack.top();
@@ -224,10 +289,10 @@ bool JsonLoader::SerializeObject(BoundType& boundType, char* data)
 
     if(!objNode->HasMember(field.mName.c_str()))
       continue;
-    
+
     auto it = objNode->FindMember(field.mName.c_str());
     mData->mStack.push(&it->value);
-    
+
     BoundType* fieldType = field.mType;
     char* fieldSrc = data + field.mOffset;
     MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;

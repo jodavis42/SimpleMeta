@@ -172,3 +172,9 @@ struct BinaryLoader : public Serializer
 
   std::stringstream mStream;
 };
+
+template <>
+bool SerializationPolicy(BinarySaver& serializer, BoundType& boundType, std::string& data)
+{
+  return serializer.SerializeString(boundType, data);
+}

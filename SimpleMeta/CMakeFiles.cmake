@@ -7,6 +7,7 @@ target_sources(SimpleMeta
     ${CMAKE_CURRENT_LIST_DIR}/JsonSerializers.cpp
     ${CMAKE_CURRENT_LIST_DIR}/JsonSerializers.hpp
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.cpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
