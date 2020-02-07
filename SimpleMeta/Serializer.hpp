@@ -1,5 +1,7 @@
 #pragma once
 
+#include "BoundType.hpp"
+
 enum class SerializerDirection
 {
   Saving,

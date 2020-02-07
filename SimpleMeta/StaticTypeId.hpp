@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BoundType.hpp"
+#include <vector>
+#include <unordered_map>
 
 template <typename T>
 struct StaticTypeId

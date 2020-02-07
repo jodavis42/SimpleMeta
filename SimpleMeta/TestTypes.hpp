@@ -195,7 +195,7 @@ struct MyStruct
   bool operator==(const MyStruct& rhs) const = default;
 };
 
-void BindMyStruct(MetaLibrary& library, BoundType& boundType)
+inline void BindMyStruct(MetaLibrary& library, BoundType& boundType)
 {
   BindField(library, boundType, MyStruct, mData);
   BindField(library, boundType, MyStruct, mFloat);
