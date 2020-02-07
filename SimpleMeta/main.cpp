@@ -6,37 +6,6 @@
 #include "BinaryStream.hpp"
 #include "TestTypes.hpp"
 
-struct MyStruct
-{
-  int mData;
-  float mFloat;
-  char mChar1;
-  int value = 5;
-  char mChar2;
-  double mDouble1;
-  std::string mString1;
-
-  static void Bind(MetaLibrary& library, BoundType& boundType)
-  {
-    BindField(library, boundType, MyStruct, mData);
-    BindField(library, boundType, MyStruct, mFloat);
-    BindField(library, boundType, MyStruct, mChar1);
-    BindField(library, boundType, MyStruct, mChar2);
-    BindField(library, boundType, MyStruct, mDouble1);
-    BindField(library, boundType, MyStruct, mString1);
-  }
-};
-
-void BindMyStruct(MetaLibrary& library, BoundType& boundType)
-{
-  BindField(library, boundType, MyStruct, mData);
-  BindField(library, boundType, MyStruct, mFloat);
-  BindField(library, boundType, MyStruct, mChar1);
-  BindField(library, boundType, MyStruct, mChar2);
-  BindField(library, boundType, MyStruct, mDouble1);
-  BindField(library, boundType, MyStruct, mString1);
-}
-
 template <typename T>
 void TestRoundTrip(T& input)
 {
@@ -47,6 +16,13 @@ void TestRoundTrip(T& input)
   BinaryLoader loader;
   loader.mStream = std::move(saver.mStream);
   loader.Serialize(output);
+
+  if(!(input == output))
+  {
+    BoundType* boundType = StaticTypeId<T>::GetBoundType();
+    printf("Type '%s' failed to serialize correctly\n", boundType->mName.c_str());
+    __debugbreak();
+  }
 }
 
 int main()
@@ -108,7 +84,7 @@ int main()
     TestRoundTrip(input);
   }
 
-   {
+  {
     SphereCollider* sphere1 = new SphereCollider();
     sphere1->mId = 1;
     sphere1->mRadius = 1.0f;
