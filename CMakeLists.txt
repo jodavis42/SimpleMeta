@@ -14,8 +14,10 @@ project(SimpleMeta CXX)
 include(CMake/CommonCompileOptions.cmake)
 
 #paths
+set(CurrentDirectory ${CMAKE_CURRENT_LIST_DIR})
 set(SupportedConfigs $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 
+set(RapidJsonLocation ${CurrentDirectory}/RapidJson)
 add_subdirectory(SimpleMeta)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT SimpleMeta)

@@ -5,9 +5,10 @@
 #include "Bindings.hpp"
 #include "BinaryStream.hpp"
 #include "TestTypes.hpp"
+#include "JsonSerializers.hpp"
 
 template <typename T>
-void TestRoundTrip(T& input)
+void TestBinaryRoundTrip(T& input)
 {
   BinarySaver saver;
   saver.Serialize(input);
@@ -25,6 +26,25 @@ void TestRoundTrip(T& input)
   }
 }
 
+template <typename T>
+void TestJsonRoundTrip(T& input)
+{
+  JsonSaver saver;
+  saver.Serialize(input);
+  std::string jsonData = saver.ToString();
+
+  T output;
+  JsonLoader loader;
+  loader.Serialize(jsonData, output);
+
+  if(!(input == output))
+  {
+    BoundType* boundType = StaticTypeId<T>::GetBoundType();
+    printf("Type '%s' failed to serialize correctly\n", boundType->mName.c_str());
+    __debugbreak();
+  }
+}
+
 int main()
 {
   MetaLibrary library;
@@ -32,8 +52,8 @@ int main()
   BindPrimitiveType(library, int);
   BindPrimitiveType(library, float);
   BindPrimitiveType(library, double);
-  BindPrimitiveType(library, Vec2);
-  BindPrimitiveType(library, Vec3);
+  BindType(library, Vec2, 'vec2');
+  BindType(library, Vec3, 'vec3');
   BindPrimitiveTypeAs(library, std::string, "string");
   BindTypeExternal(library, MyStruct, 'myst', BindMyStruct);
   BindType(library, Vertex, 'vtx');
@@ -54,7 +74,9 @@ int main()
     outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
     outMesh.mName = "Quad";
 
-    TestRoundTrip(outMesh);
+    TestJsonRoundTrip(outMesh.mVertices[2]);
+    TestJsonRoundTrip(outMesh);
+    TestBinaryRoundTrip(outMesh);
   }
 
   {
@@ -66,7 +88,8 @@ int main()
     myData.mDouble1 = 0.123456789f;
     myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
 
-    TestRoundTrip(myData);
+    TestJsonRoundTrip(myData);
+    TestBinaryRoundTrip(myData);
   }
 
   {
@@ -74,14 +97,15 @@ int main()
     input.mIds.push_back(NameId(0, "Zero"));
     input.mIds.push_back(NameId(1, "One"));
 
-    TestRoundTrip(input);
+    TestJsonRoundTrip(input);
+    TestBinaryRoundTrip(input);
   }
 
   {
     Dictionary input;
     input.Add("ohio", "good morning");
 
-    TestRoundTrip(input);
+    TestBinaryRoundTrip(input);
   }
 
   {
@@ -96,7 +120,7 @@ int main()
     input.mColliders.push_back(sphere1);
     input.mColliders.push_back(box1);
 
-    TestRoundTrip(input);
+    TestBinaryRoundTrip(input);
   }
 
   return 0;
