@@ -1,0 +1,13 @@
+target_sources(SimpleMeta
+  PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundType.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes.hpp
+)
