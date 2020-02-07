@@ -66,4 +66,22 @@ struct Serializer
   {
     return false;
   }
+
+  virtual bool SerializePrimitive(const Field& field, char* data)
+  {
+    return false;
+  }
+
+  virtual bool SerializeObject(const Field& field, char* data)
+  {
+    return false;
+  }
+  virtual bool SerializeString(const Field& field, std::string& data)
+  {
+    return false;
+  }
+  virtual bool SerializeArray(const Field& field, char* data, ArrayAdapter* adapter)
+  {
+    return false;
+  }
 };

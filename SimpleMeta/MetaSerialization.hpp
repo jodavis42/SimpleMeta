@@ -6,6 +6,10 @@ struct MetaSerialization
 {
 public:
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) = 0;
+  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) 
+  {
+    return false;
+  }
 };
 
 template <typename T>
@@ -15,6 +19,11 @@ public:
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
   {
     return serializer.SerializePrimitive(boundType, data);
+  }
+
+  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
+  {
+    return serializer.SerializePrimitive(field, data);
   }
 };
 
@@ -27,6 +36,12 @@ public:
     std::string* str = reinterpret_cast<std::string*>(data);
     return serializer.SerializeString(boundType, *str);
   }
+
+  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
+  {
+    std::string* str = reinterpret_cast<std::string*>(data);
+    return serializer.SerializeString(field, *str);
+  }
 };
 
 template <typename T>
@@ -37,6 +52,10 @@ public:
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
   {
     return serializer.SerializeArray(boundType, data, this);
+  }
+  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
+  {
+    return serializer.SerializeArray(field, data, this);
   }
 
   virtual BoundType* GetSubType(BoundType& boundType)
@@ -92,13 +111,13 @@ public:
   virtual void SetCount(char* data, size_t count) override
   {
     MapType& map = *reinterpret_cast<MapType*>(data);
-    //map.resize(count);
+    // map.resize(count);
   }
   virtual char* GetItem(char* data, size_t index) override
   {
     MapType& map = *reinterpret_cast<MapType*>(data);
-    
+
     return nullptr;
-    //return (char*)&map[index];
+    // return (char*)&map[index];
   }
 };
