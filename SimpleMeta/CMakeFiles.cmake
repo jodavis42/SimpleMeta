@@ -11,5 +11,8 @@ target_sources(SimpleMeta
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestTypes.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Physics.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Math.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Mesh.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Misc.hpp
 )

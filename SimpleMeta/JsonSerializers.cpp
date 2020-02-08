@@ -2,7 +2,7 @@
 #include "StaticTypeId.hpp"
 
 #include "rapidjson.h"
-#include "TestTypes.hpp"
+#include "TestTypes/Math.hpp"
 
 #include "rapidjson.h"
 #include "document.h"

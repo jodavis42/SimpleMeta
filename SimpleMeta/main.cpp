@@ -4,7 +4,10 @@
 #include "StaticTypeId.hpp"
 #include "Bindings.hpp"
 #include "BinaryStream.hpp"
-#include "TestTypes.hpp"
+#include "TestTypes/Physics.hpp"
+#include "TestTypes/Math.hpp"
+#include "TestTypes/Mesh.hpp"
+#include "TestTypes/Misc.hpp"
 #include "JsonSerializers.hpp"
 
 template <typename T>
