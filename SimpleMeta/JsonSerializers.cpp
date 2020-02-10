@@ -6,6 +6,7 @@
 
 #include "rapidjson.h"
 #include "document.h"
+#include "prettywriter.h"
 #include "writer.h"
 #include "stringbuffer.h"
 #include <stack>
@@ -18,7 +19,7 @@ public:
   }
   rapidjson::Document mDocument;
   rapidjson::StringBuffer mBuffer;
-  rapidjson::Writer<rapidjson::StringBuffer> mWriter;
+  rapidjson::PrettyWriter<rapidjson::StringBuffer> mWriter;
   rapidjson::Writer<rapidjson::StringBuffer> mReader;
   std::stack<rapidjson::Value*> mStack;
 };
@@ -38,134 +39,122 @@ std::string JsonSaver::ToString()
   return mData->mBuffer.GetString();
 }
 
-bool JsonSaver::SerializePrimitive(const Field& field, char* data)
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, char* data)
 {
-  BoundType* boundType = field.mType;
-  mData->mWriter.Key(field.mName.c_str());
-  if(boundType == StaticTypeId<char>::GetBoundType())
-    mData->mWriter.Int(*data);
-  else if(boundType == StaticTypeId<int>::GetBoundType())
-    mData->mWriter.Int(*(int*)data);
-  else if(boundType == StaticTypeId<float>::GetBoundType())
-    mData->mWriter.Double(*(float*)data);
-  else if(boundType == StaticTypeId<double>::GetBoundType())
-    mData->mWriter.Double(*(double*)data);
-  else if(boundType == StaticTypeId<Vec2>::GetBoundType())
-  {
-    Vec2* v2 = (Vec2*)data;
-    mData->mWriter.StartObject();
-    mData->mWriter.Key("x");
-    mData->mWriter.Double(v2->x);
-    mData->mWriter.Key("y");
-    mData->mWriter.Double(v2->y);
-    mData->mWriter.EndObject();
-  }
-  else if(boundType == StaticTypeId<Vec3>::GetBoundType())
-  {
-    Vec3* v3 = (Vec3*)data;
-    mData->mWriter.StartArray();
-    mData->mWriter.Double(v3->x);
-    mData->mWriter.Double(v3->y);
-    mData->mWriter.Double(v3->z);
-    mData->mWriter.EndArray();
-  }
-  return true;
-}
-
-bool JsonSaver::SerializeObject(const Field& field, char* data)
-{
-  mData->mWriter.Key(field.mName.c_str());
-  mData->mWriter.StartObject();
-
-  BoundType& boundType = *field.mType;
-  for(size_t i = 0; i < boundType.mFields.size(); ++i)
-  {
-    const Field& field = boundType.mFields[i];
-    BoundType* fieldType = field.mType;
-    char* fieldSrc = data + field.mOffset;
-    MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
-    if(fieldSerialization != nullptr)
-      fieldSerialization->Serialize(*this, field, fieldSrc);
-    else
-      SerializeObject(field, fieldSrc);
-  }
-  mData->mWriter.EndObject();
-
-  return true;
-}
-
-bool JsonSaver::SerializeString(const Field& field, std::string& data)
-{
-  mData->mWriter.Key(field.mName.c_str());
-  mData->mWriter.String(data.c_str());
+  __debugbreak();
   return false;
 }
 
-bool JsonSaver::SerializeArray(const Field& field, char* data, ArrayAdapter* adapter)
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, bool& data)
 {
-  size_t count = adapter->GetCount(data);
+  return WritePrimitive(data);
+}
 
-  mData->mWriter.Key(field.mName.c_str());
-  mData->mWriter.StartArray();
-  BoundType* subType = adapter->GetSubType(*field.mType);
-  MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-  for(size_t i = 0; i < count; ++i)
-  {
-    char* itemSrc = adapter->GetItem(data, i);
-    if(subTypeSerialization != nullptr)
-      subTypeSerialization->Serialize(*this, *subType, itemSrc);
-    else
-      SerializeObject(*subType, itemSrc);
-  }
-  mData->mWriter.EndArray();
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, char& data)
+{
+  return WritePrimitive(data);
+}
+
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, int& data)
+{
+  return WritePrimitive(data);
+}
+
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, float& data)
+{
+  return WritePrimitive(data);
+}
+
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, double& data)
+{
+  return WritePrimitive(data);
+}
+
+bool JsonSaver::SerializePrimitive(const BoundType& boundType, std::string& data)
+{
+  return WritePrimitive(data);
+}
+
+bool JsonSaver::BeginObject()
+{
+  return mData->mWriter.StartObject();
+}
+
+bool JsonSaver::BeginObject(PolymorphicInfo& info)
+{
+  BeginObject();
+  WriteKey("Typename");
+  WritePrimitive(info.mName);
+  WriteKey("Value");
   return true;
 }
 
-bool JsonSaver::SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter)
+bool JsonSaver::BeginMember(const std::string& name)
 {
-  size_t count = adapter->GetCount(data);
+  return WriteKey(name);
+}
 
-  mData->mWriter.Key(field.mName.c_str());
-  mData->mWriter.StartArray();
-  for(size_t i = 0; i < count; ++i)
-  {
-    BoundType* subType = adapter->GetPolymorphicItemType(data, i);
-    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
+bool JsonSaver::BeginArray(size_t& count)
+{
+  return mData->mWriter.StartArray();
+}
 
-    mData->mWriter.StartObject();
-    mData->mWriter.Key("TypeName");
-    mData->mWriter.String(subType->mName.c_str());
-    mData->mWriter.Key("Value");
+bool JsonSaver::EndObject()
+{
+  return mData->mWriter.EndObject();
+}
 
-    char* itemSrc = adapter->GetItem(data, i);
-    if(subTypeSerialization != nullptr)
-      subTypeSerialization->Serialize(*this, *subType, itemSrc);
-    else
-      SerializeObject(*subType, itemSrc);
-
-    mData->mWriter.EndObject();
-  }
-  mData->mWriter.EndArray();
+bool JsonSaver::EndMember()
+{
   return true;
+}
+
+bool JsonSaver::EndArray()
+{
+  return mData->mWriter.EndArray();
 }
 
 bool JsonSaver::SerializeObject(BoundType& boundType, char* data)
 {
-  mData->mWriter.StartObject();
-
-  for(size_t i = 0; i < boundType.mFields.size(); ++i)
-  {
-    const Field& field = boundType.mFields[i];
-    BoundType* fieldType = field.mType;
-    char* fieldSrc = data + field.mOffset;
-    MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
-    if(fieldSerialization != nullptr)
-      fieldSerialization->Serialize(*this, field, fieldSrc);
-    else
-      SerializeObject(field, fieldSrc);
-  }
-  mData->mWriter.EndObject();
+  BeginObject();
+  SerializeProperties(boundType, data);
+  EndObject();
   return true;
+}
+
+bool JsonSaver::WriteKey(const std::string& name)
+{
+  return mData->mWriter.Key(name.c_str());
+}
+
+bool JsonSaver::WritePrimitive(bool data)
+{
+  return mData->mWriter.Bool(data);
+}
+
+bool JsonSaver::WritePrimitive(char data)
+{
+  return mData->mWriter.Int(data);
+}
+
+bool JsonSaver::WritePrimitive(int data)
+{
+  return mData->mWriter.Int(data);
+}
+
+bool JsonSaver::WritePrimitive(float data)
+{
+  return mData->mWriter.Double(data);
+}
+
+bool JsonSaver::WritePrimitive(double data)
+{
+  return mData->mWriter.Double(data);
+}
+
+bool JsonSaver::WritePrimitive(const std::string& data)
+{
+  return mData->mWriter.String(data.c_str());
 }
 
 JsonLoader::JsonLoader()
@@ -185,123 +174,188 @@ void JsonLoader::SetJson(const std::string& jsonData)
   mData->mStack.push(&mData->mDocument);
 }
 
-bool JsonLoader::SerializePrimitive(const Field& field, char* data)
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, char* data)
 {
-  auto valueNode = mData->mStack.top();
+  __debugbreak();
+  return false;
+}
 
-  BoundType* boundType = field.mType;
-  if(boundType == StaticTypeId<char>::GetBoundType())
-    *data = valueNode->GetInt();
-  else if(boundType == StaticTypeId<int>::GetBoundType())
-    *(int*)data = valueNode->GetInt();
-  else if(boundType == StaticTypeId<float>::GetBoundType())
-    *(float*)data = valueNode->GetFloat();
-  else if(boundType == StaticTypeId<double>::GetBoundType())
-    *(double*)data = valueNode->GetDouble();
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, bool& data)
+{
+  return ReadPrimitive(data);
+}
+
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, char& data)
+{
+  return ReadPrimitive(data);
+}
+
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, int& data)
+{
+  return ReadPrimitive(data);
+}
+
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, float& data)
+{
+  return ReadPrimitive(data);
+}
+
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, double& data)
+{
+  return ReadPrimitive(data);
+}
+
+bool JsonLoader::SerializePrimitive(const BoundType& boundType, std::string& data)
+{
+  return ReadPrimitive(data);
+}
+
+bool JsonLoader::BeginObject()
+{
+  return BeginMember();
+}
+
+bool JsonLoader::BeginObject(PolymorphicInfo& info)
+{
+  auto node = mData->mStack.top();
+  info.mName = node->FindMember("Typename")->value.GetString();
+
+  mData->mStack.push(&node->FindMember("Value")->value);
   return true;
 }
 
-bool JsonLoader::SerializeObject(const Field& field, char* data)
+bool JsonLoader::BeginMember(const std::string& name)
 {
-  SerializeObject(*field.mType, data);
+  auto node = mData->mStack.top();
+  auto it = node->FindMember(name.c_str());
+  if(it == node->MemberEnd())
+    return false;
+
+  mData->mStack.push(&it->value);
   return true;
 }
 
-bool JsonLoader::SerializeString(const Field& field, std::string& data)
-{
-  auto valueNode = mData->mStack.top();
-  data = valueNode->GetString();
-  return true;
-}
-
-bool JsonLoader::SerializeArray(const Field& field, char* data, ArrayAdapter* adapter)
+bool JsonLoader::BeginArray(size_t& count)
 {
   auto arrayNode = mData->mStack.top();
   auto array = arrayNode->GetArray();
-  size_t count = array.Size();
+  count = array.Size();
+  return false;
+}
 
-  adapter->SetCount(data, count);
+bool JsonLoader::BeginArrayItem(const BoundType& boundType, size_t index, char* data)
+{
+  return BeginArrayItem(index);
+}
 
-  BoundType& boundType = *field.mType;
-  BoundType* subType = boundType.mFields[0].mType;
-  MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-  for(size_t i = 0; i < count; ++i)
-  {
-    auto itemNode = &array[i];
-    mData->mStack.push(itemNode);
+bool JsonLoader::EndObject()
+{
+  return End();
+}
 
-    char* itemSrc = adapter->GetItem(data, i);
-    if(subTypeSerialization != nullptr)
-      subTypeSerialization->Serialize(*this, *subType, itemSrc);
-    else
-      SerializeObject(*subType, itemSrc);
+bool JsonLoader::EndMember()
+{
+  return End();
+}
 
-    mData->mStack.pop();
-  }
+bool JsonLoader::EndArrayItem()
+{
+  return EndObject();
+}
 
+bool JsonLoader::EndArray()
+{
   return true;
 }
 
-bool JsonLoader::SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter)
+bool JsonLoader::ReadPrimitive(bool& data)
+{
+  auto node = mData->mStack.top();
+  if(!node->IsBool())
+    return false;
+
+  data = node->GetBool();
+  return true;
+}
+
+bool JsonLoader::ReadPrimitive(char& data)
+{
+  auto node = mData->mStack.top();
+  if(!node->IsInt())
+    return false;
+
+  data = node->GetInt();
+  return true;
+}
+
+bool JsonLoader::ReadPrimitive(int& data)
+{
+  auto node = mData->mStack.top();
+  if(!node->IsInt())
+    return false;
+
+  data = node->GetInt();
+  return true;
+}
+
+bool JsonLoader::ReadPrimitive(float& data)
+{
+  auto node = mData->mStack.top();
+  if(!node->IsFloat())
+    return false;
+
+  data = node->GetFloat();
+  return true;
+}
+
+bool JsonLoader::ReadPrimitive(double& data)
+{
+  auto node = mData->mStack.top();
+  if(!node->IsDouble())
+    return false;
+
+  data = node->GetDouble();
+  return true;
+}
+
+bool JsonLoader::ReadPrimitive(std::string& data)
+{
+  auto node = mData->mStack.top();
+  if(!node->IsString())
+    return false;
+
+  data = node->GetString();
+  return true;
+}
+
+bool JsonLoader::BeginMember()
+{
+  auto node = mData->mStack.top();
+
+  auto& it = node->MemberBegin();
+  if(it == node->MemberEnd())
+    return false;
+
+  mData->mStack.push(&it->value);
+  return true;
+}
+
+bool JsonLoader::BeginArrayItem(size_t index)
 {
   auto arrayNode = mData->mStack.top();
   auto array = arrayNode->GetArray();
-  size_t count = array.Size();
+  if(index >= array.Size())
+    return false;
 
-  adapter->SetCount(data, count);
-
-  BoundType& boundType = *field.mType;
-  for(size_t i = 0; i < count; ++i)
-  {
-    auto itemNode = &array[i];
-    mData->mStack.push(itemNode);
-
-    auto it = itemNode->FindMember("TypeName");
-    std::string typeName = it->value.GetString();
-    it = itemNode->FindMember("Value");
-    mData->mStack.push(&it->value);
-
-
-    BoundType* subType = MetaLibrary::FindBoundType(typeName);
-    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-    char* itemSrc = subTypeSerialization->Allocate();
-    if(subTypeSerialization != nullptr)
-      subTypeSerialization->Serialize(*this, *subType, itemSrc);
-    else
-      SerializeObject(*subType, itemSrc);
-
-    adapter->SetItem(data, i, itemSrc);
-
-    mData->mStack.pop();
-    mData->mStack.pop();
-  }
-
+  auto&& arrayItemNode = array[(int)index];
+  mData->mStack.push(&arrayItemNode);
   return true;
 }
 
-bool JsonLoader::SerializeObject(BoundType& boundType, char* data)
+bool JsonLoader::End()
 {
-  auto objNode = mData->mStack.top();
-
-  for(size_t i = 0; i < boundType.mFields.size(); ++i)
-  {
-    const Field& field = boundType.mFields[i];
-
-    if(!objNode->HasMember(field.mName.c_str()))
-      continue;
-
-    auto it = objNode->FindMember(field.mName.c_str());
-    mData->mStack.push(&it->value);
-
-    BoundType* fieldType = field.mType;
-    char* fieldSrc = data + field.mOffset;
-    MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
-    if(fieldSerialization != nullptr)
-      fieldSerialization->Serialize(*this, field, fieldSrc);
-    else
-      SerializeObject(field, fieldSrc);
-    mData->mStack.pop();
-  }
-
+  if(mData->mStack.empty())
+    return false;
+  mData->mStack.pop();
   return true;
 }

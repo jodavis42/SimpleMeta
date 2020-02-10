@@ -6,10 +6,7 @@
 
 struct BinarySaver : public Serializer
 {
-  BinarySaver()
-  {
-    mDirection = SerializerDirection::Saving;
-  }
+  BinarySaver(std::ostream& stream);
 
   template <typename T>
   void Serialize(const T& data)
@@ -18,80 +15,22 @@ struct BinarySaver : public Serializer
     SerializeObject(*boundType, (char*)(&data));
   }
 
-  virtual bool SerializePrimitive(BoundType& boundType, char* data) override
-  {
-    mStream.write(data, boundType.mSizeInBytes);
-    return true;
-  }
+  virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
-  virtual bool SerializeObject(BoundType& boundType, char* data) override
-  {
-    for(size_t i = 0; i < boundType.mFields.size(); ++i)
-    {
-      const Field& field = boundType.mFields[i];
-      BoundType* fieldType = field.mType;
-      char* fieldSrc = data + field.mOffset;
-      MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
-      if(fieldSerialization != nullptr)
-        fieldSerialization->Serialize(*this, *fieldType, fieldSrc);
-      else
-        SerializeObject(*fieldType, fieldSrc);
-    }
-    return true;
-  }
+  virtual bool BeginObject(PolymorphicInfo& info) override;
+  virtual bool BeginArray(size_t& count) override;
 
-  virtual bool SerializeString(BoundType& boundType, std::string& data) override
-  {
-    mStream << data.size();
-    mStream.write(data.data(), data.size());
-    return false;
-  }
+  bool Write(char* data, size_t sizeInBytes);
+  bool Write(size_t data, size_t sizeInBytes);
+  bool Write(size_t data);
 
-  virtual bool SerializeArrayCount(BoundType& boundType, size_t& count) override
-  {
-    mStream << count;
-    return true;
-  }
-  virtual bool SerializeArray(BoundType& boundType, char* data, size_t count) override
-  {
-    BoundType* subType = boundType.mFields[0].mType;
-    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-    for(size_t i = 0; i < count; ++i)
-    {
-      char* itemSrc = data + i * subType->mSizeInBytes;
-      if(subTypeSerialization != nullptr)
-        subTypeSerialization->Serialize(*this, *subType, itemSrc);
-      else
-        SerializeObject(*subType, itemSrc);
-    }
-    return false;
-  }
-  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
-  {
-    size_t count = adapter->GetCount(data);
-    mStream << count;
-    BoundType* subType = adapter->GetSubType(boundType);
-    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-    for(size_t i = 0; i < count; ++i)
-    {
-      char* itemSrc = adapter->GetItem(data, i);
-      if(subTypeSerialization != nullptr)
-        subTypeSerialization->Serialize(*this, *subType, itemSrc);
-      else
-        SerializeObject(*subType, itemSrc);
-    }
-    return false;
-  }
-
-  std::stringstream mStream;
+  std::ostream mStream;
 };
 
 struct BinaryLoader : public Serializer
 {
-  BinaryLoader()
-  {
-    mDirection = SerializerDirection::Loading;
-  }
+  BinaryLoader(std::istream& stream);
 
   template <typename T>
   void Serialize(T& data)
@@ -100,81 +39,25 @@ struct BinaryLoader : public Serializer
     SerializeObject(*boundType, (char*)(&data));
   }
 
-  virtual bool SerializePrimitive(BoundType& boundType, char* data) override
-  {
-    mStream.read(data, boundType.mSizeInBytes);
-    return true;
-  }
+  virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
-  virtual bool SerializeObject(BoundType& boundType, char* data) override
-  {
-    for(size_t i = 0; i < boundType.mFields.size(); ++i)
-    {
-      const Field& field = boundType.mFields[i];
-      BoundType* fieldType = field.mType;
-      char* fieldSrc = data + field.mOffset;
-      MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
-      if(fieldSerialization != nullptr)
-        fieldSerialization->Serialize(*this, *fieldType, fieldSrc);
-      else
-        SerializeObject(*fieldType, fieldSrc);
-    }
-    return true;
-  }
+  virtual bool BeginObject() override;
+  virtual bool BeginObject(PolymorphicInfo& info) override;
+  virtual bool BeginArray(size_t& count) override;
+  virtual bool BeginArrayItem(const BoundType& boundType, size_t index, char* data) override;
+  virtual bool EndArray() override;
+  virtual bool EndObject() override;
+  virtual bool EndArrayItem() override;
+  virtual bool SerializeObject(BoundType& boundType, char* data) override;
 
-  virtual bool SerializeString(BoundType& boundType, std::string& data) override
-  {
-    new(&data) std::string();
-    size_t sizeInBytes = 0;
-    mStream >> sizeInBytes;
-    data.resize(sizeInBytes);
-    mStream.read((char*)data.data(), sizeInBytes);
-    return false;
-  }
-  virtual bool SerializeArrayCount(BoundType& boundType, size_t& count) override
-  {
-    mStream >> count;
-    return true;
-  }
-  virtual bool SerializeArray(BoundType& boundType, char* data, size_t count) override
-  {
-    BoundType* subType = boundType.mFields[0].mType;
-    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-    for(size_t i = 0; i < count; ++i)
-    {
-      char* itemSrc = data + i * subType->mSizeInBytes;
-      if(subTypeSerialization != nullptr)
-        subTypeSerialization->Serialize(*this, *subType, itemSrc);
-      else
-        SerializeObject(*subType, itemSrc);
-    }
-    return false;
-  }
-  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
-  {
-    size_t count = 0;
-    mStream >> count;
+  virtual bool SerializeArrayCount(BoundType& boundType, size_t& count) override;
+  virtual bool SerializeArray(BoundType& boundType, char* data, size_t count) override;
+  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter);
 
-    adapter->Initialize(data);
-    adapter->SetCount(data, count);
-    BoundType* subType = adapter->GetSubType(boundType);
-    MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-    for(size_t i = 0; i < count; ++i)
-    {
-      char* itemSrc = adapter->GetItem(data, i);
-      if(subTypeSerialization != nullptr)
-        subTypeSerialization->Serialize(*this, *subType, itemSrc);
-      else
-        SerializeObject(*subType, itemSrc);
-    }
-    return true;
-  }
+  bool Read(char* data, size_t sizeInBytes);
+  bool Read(size_t& data, size_t sizeInBytes);
+  bool Read(size_t& data);
 
-  std::stringstream mStream;
+  std::istream mStream;
 };
-
-template <>
-bool SerializationPolicy(BinarySaver& serializer, BoundType& boundType, std::string& data)
-{
-  return serializer.SerializeString(boundType, data);
-}

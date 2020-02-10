@@ -18,14 +18,31 @@ public:
     SerializeObject(*boundType, (char*)(&data));
   }
 
+  virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, bool& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, char& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, int& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, float& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, double& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
-  virtual bool SerializePrimitive(const Field& field, char* data) override;
-  virtual bool SerializeObject(const Field& field, char* data) override;
-  virtual bool SerializeString(const Field& field, std::string& data) override;
-  virtual bool SerializeArray(const Field& field, char* data, ArrayAdapter* adapter) override;
-  virtual bool SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter) override;
-
+  virtual bool BeginObject() override;
+  virtual bool BeginObject(PolymorphicInfo& info) override;
+  virtual bool BeginMember(const std::string& name) override;
+  virtual bool BeginArray(size_t& count) override;
+  virtual bool EndObject() override;
+  virtual bool EndMember() override;
+  virtual bool EndArray() override;
+  
   virtual bool SerializeObject(BoundType& boundType, char* data) override;
+
+  bool WriteKey(const std::string& name);
+  bool WritePrimitive(bool data);
+  bool WritePrimitive(char data);
+  bool WritePrimitive(int data);
+  bool WritePrimitive(float data);
+  bool WritePrimitive(double data);
+  bool WritePrimitive(const std::string& data);
 
   JsonInternalData* mData;
 };
@@ -45,13 +62,35 @@ public:
   }
 
   void SetJson(const std::string& jsonData);
-  virtual bool SerializePrimitive(const Field& field, char* data) override;
-  virtual bool SerializeObject(const Field& field, char* data) override;
-  virtual bool SerializeString(const Field& field, std::string& data) override;
-  virtual bool SerializeArray(const Field& field, char* data, ArrayAdapter* adapter) override;
-  virtual bool SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter) override;
 
-  virtual bool SerializeObject(BoundType& boundType, char* data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, bool& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, char& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, int& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, float& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, double& data) override;
+  virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
+
+  virtual bool BeginObject() override;
+  virtual bool BeginObject(PolymorphicInfo& info) override;
+  virtual bool BeginMember(const std::string& name) override;
+  virtual bool BeginArray(size_t& count) override;
+  virtual bool BeginArrayItem(const BoundType& boundType, size_t index, char* data) override;
+  virtual bool EndObject() override;
+  virtual bool EndMember() override;
+  virtual bool EndArray() override;
+  virtual bool EndArrayItem() override;
+
+  bool ReadPrimitive(bool& data);
+  bool ReadPrimitive(char& data);
+  bool ReadPrimitive(int& data);
+  bool ReadPrimitive(float& data);
+  bool ReadPrimitive(double& data);
+  bool ReadPrimitive(std::string& data);
+
+  bool BeginMember();
+  bool BeginArrayItem(size_t index);
+  bool End();
 
   JsonInternalData* mData;
 };

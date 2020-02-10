@@ -44,3 +44,23 @@ struct StaticTypeId<std::unordered_map<KeyType, ValueType>>// : public StaticTyp
     return sInstance;
   }
 };
+
+template <typename T>
+struct RuntimeTypeId
+{
+  static BoundType* GetVirtualBoundType(char* data)
+  {
+    T typedObj = (T)data;
+    return typedObj->VirtualGetBoundType();
+  }
+
+  static char* Allocate()
+  {
+    return new T();
+  }
+
+  static void AllocateInPlace(char* data)
+  {
+    new(data) T();
+  }
+};

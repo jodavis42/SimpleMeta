@@ -9,16 +9,24 @@
 #include "TestTypes/Mesh.hpp"
 #include "TestTypes/Misc.hpp"
 #include "JsonSerializers.hpp"
+#include <fstream>
 
 template <typename T>
 void TestBinaryRoundTrip(T& input)
 {
-  BinarySaver saver;
+  BoundType* boundType = StaticTypeId<T>::GetBoundType();
+
+  std::ofstream outStream;
+  outStream.open(boundType->mName, std::ofstream::binary | std::ofstream::out);
+  BinarySaver saver(outStream);
   saver.Serialize(input);
+  outStream.close();
+
+  std::ifstream inStream;
+  inStream.open(boundType->mName, std::ifstream::binary | std::ifstream::in);
 
   T output;
-  BinaryLoader loader;
-  loader.mStream = std::move(saver.mStream);
+  BinaryLoader loader(inStream);
   loader.Serialize(output);
 
   if(!(input == output))
@@ -69,41 +77,40 @@ int main()
   BindType(library, PhysicsSpace, 'phys');
   BindType(library, Dictionary, 'dict');
 
-  //{
-  //  Mesh outMesh;
-  //  outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
-  //  outMesh.mVertices.push_back(Vertex(Vec3(1, 0, 0), Vec2(1, 0)));
-  //  outMesh.mVertices.push_back(Vertex(Vec3(1, 1, 0), Vec2(1, 1)));
-  //  outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
-  //  outMesh.mName = "Quad";
-  //
-  //  TestJsonRoundTrip(outMesh.mVertices[2]);
-  //  TestJsonRoundTrip(outMesh);
-  //  TestBinaryRoundTrip(outMesh);
-  //}
-  //
-  //{
-  //  MyStruct myData;
-  //  myData.mChar1 = 1;
-  //  myData.mChar2 = 15;
-  //  myData.mFloat = 1.23f;
-  //  myData.mData = -1;
-  //  myData.mDouble1 = 0.123456789f;
-  //  myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
-  //
-  //  TestJsonRoundTrip(myData);
-  //  TestBinaryRoundTrip(myData);
-  //}
-  //
-  //{
-  //  NameIdList input;
-  //  input.mIds.push_back(NameId(0, "Zero"));
-  //  input.mIds.push_back(NameId(1, "One"));
-  //
-  //  TestJsonRoundTrip(input);
-  //  TestBinaryRoundTrip(input);
-  //}
-  //
+  {
+    Mesh outMesh;
+    outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
+    outMesh.mVertices.push_back(Vertex(Vec3(1, 0, 0), Vec2(1, 0)));
+    outMesh.mVertices.push_back(Vertex(Vec3(1, 1, 0), Vec2(1, 1)));
+    outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
+    outMesh.mName = "Quad";
+  
+    TestJsonRoundTrip(outMesh);
+    TestBinaryRoundTrip(outMesh);
+  }
+  
+  {
+    MyStruct myData;
+    myData.mChar1 = 1;
+    myData.mChar2 = 15;
+    myData.mFloat = 1.23f;
+    myData.mData = -1;
+    myData.mDouble1 = 0.123456789f;
+    myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
+  
+    TestJsonRoundTrip(myData);
+    TestBinaryRoundTrip(myData);
+  }
+  
+  {
+    NameIdList input;
+    input.mIds.push_back(NameId(0, "Zero"));
+    input.mIds.push_back(NameId(1, "One"));
+  
+    TestJsonRoundTrip(input);
+    TestBinaryRoundTrip(input);
+  }
+  
   //{
   //  Dictionary input;
   //  input.Add("ohio", "good morning");

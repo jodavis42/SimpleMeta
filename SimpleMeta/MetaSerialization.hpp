@@ -2,6 +2,8 @@
 
 #include "Serializer.hpp"
 
+#include <unordered_map>
+
 struct MetaSerialization
 {
 public:
@@ -24,10 +26,6 @@ struct ObjectMetaSerialization : public MetaSerialization
     return serializer.SerializeObject(boundType, data);
   }
 
-  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
-  {
-    return serializer.SerializeObject(field, data);
-  }
   virtual char* Allocate() const override
   {
     return (char*)new T();
@@ -40,12 +38,12 @@ struct PrimitiveMetaSerialization : public MetaSerialization
 public:
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
   {
-    return serializer.SerializePrimitive(boundType, data);
+    return serializer.SerializePrimitive(boundType, *(T*)data);
   }
 
   virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
   {
-    return serializer.SerializePrimitive(field, data);
+    return serializer.SerializePrimitive(*field.mType, *(T*)data);
   }
 };
 
@@ -56,103 +54,134 @@ public:
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
   {
     std::string* str = reinterpret_cast<std::string*>(data);
-    // return SerializationPolicy(serializer, boundType, *str);
-    return serializer.SerializeString(boundType, *str);
+    return serializer.SerializePrimitive(boundType, *str);
   }
 
   virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
   {
     std::string* str = reinterpret_cast<std::string*>(data);
-    // return SerializationPolicy(serializer, field, *str);
-    return serializer.SerializeString(field, *str);
+    return serializer.SerializePrimitive(*field.mType, *str);
+  }
+};
+
+inline bool SerializeArrayItems(Serializer& serializer, size_t count, BoundType& subType, char* arrayData)
+{
+  for(size_t i = 0; i < count; ++i)
+  {
+    serializer.BeginArrayItem(subType, i, arrayData);
+    subType.mMetaSerialization->Serialize(serializer, subType, arrayData + subType.mSizeInBytes * i);
+    serializer.EndArrayItem();
+  }
+  return true;
+}
+
+template <typename T>
+struct PolymorphicReflection
+{
+  static BoundType* BeginPolymorphicObject(Serializer& serializer)
+  {
+    PolymorphicInfo info;
+    serializer.BeginObject(info);
+    if(!info.mName.empty())
+      return MetaLibrary::FindBoundType(info.mName);
+    else
+      return MetaLibrary::FindBoundType(info.mId);
+  }
+
+  static bool Save(Serializer& serializer, BoundType& boundType, char* objData)
+  {
+    PolymorphicInfo info{boundType.mName, boundType.mId};
+    serializer.BeginObject(info);
+    boundType.mMetaSerialization->Serialize(serializer, boundType, objData);
+    serializer.EndObject();
+    return true;
+  }
+
+  static bool Load(Serializer& serializer, char*& objData)
+  {
+    BoundType& boundType = *BeginPolymorphicObject(serializer);
+    objData = boundType.mMetaSerialization->Allocate();
+    boundType.mMetaSerialization->Serialize(serializer, boundType, objData);
+    serializer.EndObject();
+    return true;
   }
 };
 
 template <typename T>
-struct ArrayMetaSerialization : public MetaSerialization, public ArrayAdapter
+struct ArrayMetaSerialization : public MetaSerialization
+{
+public:
+  typedef std::vector<T> ArrayType;
+
+  virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
+  {
+    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
+    BoundType& subType = *StaticTypeId<T>::GetBoundType();
+    if(serializer.mDirection == SerializerDirection::Saving)
+    {
+      size_t count = array.size();
+      serializer.BeginArray(count);
+      SerializeArrayItems(serializer, count, subType, (char*)array.data());
+      serializer.EndArray();
+    }
+    else
+    {
+      size_t count;
+      serializer.BeginArray(count);
+      array.resize(count);
+      SerializeArrayItems(serializer, count, subType, (char*)array.data());
+      serializer.EndArray();
+    }
+    
+    return true;
+  }
+};
+
+template <typename T>
+struct PolymorphicArrayMetaSerialization : public MetaSerialization
 {
 public:
   typedef std::vector<T> ArrayType;
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
   {
-    return serializer.SerializeArray(boundType, data, this);
-  }
-  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
-  {
-    return serializer.SerializeArray(field, data, this);
-  }
-
-  virtual BoundType* GetSubType(BoundType& boundType)
-  {
-    return StaticTypeId<T>::GetBoundType();
-  }
-  virtual void Initialize(char* data) override
-  {
-    new(data) ArrayType();
-  }
-  virtual size_t GetCount(char* data) override
-  {
     ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    return array.size();
+    BoundType& subType = *StaticTypeId<T>::GetBoundType();
+    if(serializer.mDirection == SerializerDirection::Saving)
+    {
+      size_t count = array.size();
+      serializer.BeginArray(count);
+      for(size_t i = 0; i < count; ++i)
+      {
+        char* itemData = GetItem(data, i);
+        BoundType* subType = RuntimeTypeId<T>::GetVirtualBoundType(itemData);
+        serializer.BeginArrayItem(*subType, i, itemData);
+        PolymorphicReflection<T>::Save(serializer, *subType, itemData);
+        serializer.EndArrayItem();
+      }
+      serializer.EndArray();
+      
+    }
+    else
+    {
+      size_t count;
+      serializer.BeginArray(count);
+      array.resize(count);
+      for(size_t i = 0; i < count; ++i)
+      {
+        serializer.BeginArrayItem(boundType, i, GetItem(data, i));
+        char* itemData = nullptr;
+        PolymorphicReflection<typename T>::Load(serializer, itemData);
+        array[i] = (T)itemData;
+        serializer.EndArrayItem();
+      }
+      serializer.EndArray();
+    }
+    return true;
   }
-  virtual void SetCount(char* data, size_t count) override
-  {
-    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    array.resize(count);
-  }
-  virtual char* GetItem(char* data, size_t index) override
-  {
-    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    return (char*)&array[index];
-  }
-};
-
-template <typename T>
-struct PolymorphicArrayMetaSerialization : public MetaSerialization, public ArrayAdapter
-{
-public:
-  typedef std::vector<T> ArrayType;
-  virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
-  {
-    return serializer.SerializeArray(boundType, data, this);
-  }
-  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
-  {
-    return serializer.SerializePolymorphicArray(field, data, this);
-  }
-  virtual BoundType* GetPolymorphicItemType(char* data, size_t index)
-  {
-    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    return array[index]->VirtualGetBoundType();
-  }
-
-  virtual BoundType* GetSubType(BoundType& boundType)
-  {
-    return StaticTypeId<T>::GetBoundType();
-  }
-  virtual void Initialize(char* data) override
-  {
-    new(data) ArrayType();
-  }
-  virtual size_t GetCount(char* data) override
-  {
-    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    return array.size();
-  }
-  virtual void SetCount(char* data, size_t count) override
-  {
-    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    array.resize(count);
-  }
-  virtual char* GetItem(char* data, size_t index) override
+  char* GetItem(char* data, size_t index)
   {
     ArrayType& array = *reinterpret_cast<ArrayType*>(data);
     return (char*)array[index];
-  }
-  virtual void SetItem(char* data, size_t index, char* itemData)
-  {
-    ArrayType& array = *reinterpret_cast<ArrayType*>(data);
-    array[index] = (T)itemData;
   }
 };
 

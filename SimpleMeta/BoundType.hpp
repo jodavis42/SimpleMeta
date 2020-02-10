@@ -6,6 +6,13 @@
 struct BoundType;
 struct MetaSerialization;
 
+struct TypeId
+{
+  TypeId() : mId(0) {}
+  TypeId(int id) : mId(id) {}
+  size_t mId;
+};
+
 enum class BoundTypePrimitiveType
 {
 Primitive,
@@ -29,5 +36,5 @@ struct BoundType
   std::vector<Field> mFields;
   MetaSerialization* mMetaSerialization = nullptr;
   BoundType* mBaseType = nullptr;
-  int mId;
+  TypeId mId;
 };

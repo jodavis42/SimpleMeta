@@ -38,6 +38,12 @@ struct ArrayAdapter
   }
 };
 
+struct PolymorphicInfo
+{
+  std::string mName;
+  TypeId mId;
+};
+
 struct Serializer
 {
   SerializerDirection mDirection = SerializerDirection::Saving;
@@ -46,21 +52,31 @@ struct Serializer
   {
   }
 
-  virtual bool SerializePrimitive(BoundType& boundType, char* data)
-  {
-    return false;
-  }
+  virtual bool SerializePrimitive(const BoundType& boundType, char* data) { return false; }
+  virtual bool SerializePrimitive(const BoundType& boundType, bool& data) { return SerializePrimitive(boundType, (char*)&data); }
+  virtual bool SerializePrimitive(const BoundType& boundType, char& data) { return SerializePrimitive(boundType, &data); }
+  virtual bool SerializePrimitive(const BoundType& boundType, int& data) { return SerializePrimitive(boundType, (char*)&data); }
+  virtual bool SerializePrimitive(const BoundType& boundType, float& data) { return SerializePrimitive(boundType, (char*)&data); }
+  virtual bool SerializePrimitive(const BoundType& boundType, double& data) { return SerializePrimitive(boundType, (char*)&data); }
+  virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) { return false; }
 
+  virtual bool BeginObject() { return true; }
+  virtual bool BeginObject(PolymorphicInfo& info) { return true; }
+  virtual bool BeginMember(const std::string& name) { return true; }
+  virtual bool BeginArray(size_t& count) { return true; }
+  virtual bool BeginArrayItem(const BoundType& boundType, size_t index, char* data) { return true; }
+  virtual bool EndArray() { return true; }
+  virtual bool EndObject() { return true; }
+  virtual bool EndMember() { return true; }
+  virtual bool EndArrayItem() { return true; }
+  virtual bool SerializeProperties(BoundType& boundType, char* data);
+  virtual bool SerializeArrayElements(BoundType& boundType, char* data) { return true; }
+
+  
   virtual bool SerializeObject(BoundType& boundType, char* data)
   {
-    return false;
+    return SerializeProperties(boundType, data);
   }
-
-  virtual bool SerializeString(BoundType& boundType, std::string& data)
-  {
-    return false;
-  }
-
   virtual bool SerializeArrayCount(BoundType& boundType, size_t& count)
   {
     return false;
@@ -74,38 +90,5 @@ struct Serializer
   {
     return false;
   }
-
-  virtual bool SerializePrimitive(const Field& field, char* data)
-  {
-    return false;
-  }
-
-  virtual bool SerializeObject(const Field& field, char* data)
-  {
-    return false;
-  }
-  virtual bool SerializeString(const Field& field, std::string& data)
-  {
-    return false;
-  }
-  virtual bool SerializeArray(const Field& field, char* data, ArrayAdapter* adapter)
-  {
-    return false;
-  }
-  virtual bool SerializePolymorphicArray(const Field& field, char* data, ArrayAdapter* adapter)
-  {
-    return false;
-  }
 };
 
-template <typename SerializerType, typename DataType>
-bool SerializationPolicy(SerializerType& serializer, BoundType& boundType, DataType& data)
-{
-  serializer.Serialize(boundType, data);
-}
-
-template <typename SerializerType, typename DataType>
-bool SerializationPolicy(SerializerType& serializer, Field& field, DataType& data)
-{
-  serializer.Serialize(field, data);
-}

@@ -1,5 +1,6 @@
 target_sources(SimpleMeta
   PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp
@@ -10,6 +11,7 @@ target_sources(SimpleMeta
     ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.cpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Serializer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
     ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Physics.hpp
