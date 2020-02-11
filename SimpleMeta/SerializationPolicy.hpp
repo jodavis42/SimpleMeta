@@ -32,7 +32,7 @@ DeclarePrimitivePolicy(double)
 DeclarePrimitivePolicy(std::string)
 
 template <typename T>
-bool SerializeArrayItems(Serializer& serializer, std::vector<T>& arrayData, size_t count)
+bool SerializeArrayItems(Serializer& serializer, T* arrayData, size_t count)
 {
   for(size_t i = 0; i < count; ++i)
   {
@@ -42,6 +42,19 @@ bool SerializeArrayItems(Serializer& serializer, std::vector<T>& arrayData, size
   }
   return true;
 }
+
+template <typename T>
+bool SerializeArrayItems(Serializer& serializer, std::vector<T>& arrayData, size_t count)
+{
+  return SerializeArrayItems(serializer, arrayData.data(), count);
+}
+
+template <typename T, size_t FixedSize>
+bool SerializeArrayItems(Serializer& serializer, T (&arrayData)[FixedSize])
+{
+  return SerializeArrayItems(serializer, arrayData, FixedSize);
+}
+
 
 template <typename T, typename ... Extra>
 struct SerializationPolicy<std::vector<T, Extra...>>
