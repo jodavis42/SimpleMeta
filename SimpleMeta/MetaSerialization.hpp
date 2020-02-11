@@ -171,7 +171,7 @@ public:
 };
 
 template <typename KeyType, typename ValueType>
-struct MapMetaSerialization : public MetaSerialization, public ArrayAdapter
+struct MapMetaSerialization : public MetaSerialization
 {
 public:
   typedef std::unordered_map<KeyType, ValueType> MapType;
@@ -179,32 +179,11 @@ public:
 
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
   {
-    return serializer.SerializeArray(boundType, data, this);
+    return false;
   }
 
   virtual BoundType* GetSubType(BoundType& boundType)
   {
     return StaticTypeId<PairType>::GetBoundType();
-  }
-  virtual void Initialize(char* data) override
-  {
-    new(data) MapType();
-  }
-  virtual size_t GetCount(char* data) override
-  {
-    MapType& map = *reinterpret_cast<MapType*>(data);
-    return map.size();
-  }
-  virtual void SetCount(char* data, size_t count) override
-  {
-    MapType& map = *reinterpret_cast<MapType*>(data);
-    // map.resize(count);
-  }
-  virtual char* GetItem(char* data, size_t index) override
-  {
-    MapType& map = *reinterpret_cast<MapType*>(data);
-
-    return nullptr;
-    // return (char*)&map[index];
   }
 };

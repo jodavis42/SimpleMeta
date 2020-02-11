@@ -20,3 +20,8 @@ bool Serializer::SerializeProperties(BoundType& boundType, char* data)
 
   return true;
 }
+
+bool Serializer::SerializeObject(BoundType& boundType, char* data)
+{
+  return SerializeProperties(boundType, data);
+}

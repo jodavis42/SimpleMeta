@@ -8,36 +8,6 @@ enum class SerializerDirection
   Loading
 };
 
-struct ArrayAdapter
-{
-  virtual BoundType* GetSubType(BoundType& boundType)
-  {
-    return nullptr;
-  }
-  virtual BoundType* GetPolymorphicItemType(char* data, size_t index)
-  {
-    return nullptr;
-  }
-  virtual void Initialize(char* data)
-  {
-  }
-  virtual size_t GetCount(char* data)
-  {
-    return 0;
-  }
-  virtual void SetCount(char* data, size_t count)
-  {
-  }
-  virtual char* GetItem(char* data, size_t index)
-  {
-    return nullptr;
-  }
-  virtual void SetItem(char* data, size_t index, char* itemData)
-  {
-    return;
-  }
-};
-
 struct PolymorphicInfo
 {
   std::string mName;
@@ -70,25 +40,6 @@ struct Serializer
   virtual bool EndMember() { return true; }
   virtual bool EndArrayItem() { return true; }
   virtual bool SerializeProperties(BoundType& boundType, char* data);
-  virtual bool SerializeArrayElements(BoundType& boundType, char* data) { return true; }
-
-  
-  virtual bool SerializeObject(BoundType& boundType, char* data)
-  {
-    return SerializeProperties(boundType, data);
-  }
-  virtual bool SerializeArrayCount(BoundType& boundType, size_t& count)
-  {
-    return false;
-  }
-  virtual bool SerializeArray(BoundType& boundType, char* data, size_t count)
-  {
-    return false;
-  }
-
-  virtual bool SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
-  {
-    return false;
-  }
+  virtual bool SerializeObject(BoundType& boundType, char* data);
 };
 

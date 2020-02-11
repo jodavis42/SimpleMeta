@@ -4,7 +4,6 @@
 #include "rapidjson.h"
 #include "TestTypes/Math.hpp"
 
-#include "rapidjson.h"
 #include "document.h"
 #include "prettywriter.h"
 #include "writer.h"

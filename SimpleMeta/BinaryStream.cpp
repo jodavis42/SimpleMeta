@@ -89,55 +89,29 @@ bool BinaryLoader::BeginArray(size_t& count)
   return true;
 }
 
-bool BinaryLoader::BeginArrayItem(const BoundType& boundType, size_t index, char* data) { return true; }
-bool BinaryLoader::EndArray() { return true; }
-bool BinaryLoader::EndObject() { return true; }
-bool BinaryLoader::EndArrayItem() { return true; }
+bool BinaryLoader::BeginArrayItem(const BoundType& boundType, size_t index, char* data)
+{
+  return true;
+}
+
+bool BinaryLoader::EndArray()
+{
+  return true;
+}
+
+bool BinaryLoader::EndObject()
+{
+  return true;
+}
+
+bool BinaryLoader::EndArrayItem()
+{
+  return true;
+}
 
 bool BinaryLoader::SerializeObject(BoundType& boundType, char* data)
 {
   return SerializeProperties(boundType, data);
-}
-
-bool BinaryLoader::SerializeArrayCount(BoundType& boundType, size_t& count)
-{
-  Read(count);
-  return true;
-}
-
-bool BinaryLoader::SerializeArray(BoundType& boundType, char* data, size_t count)
-{
-  BoundType* subType = boundType.mFields[0].mType;
-  MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-  for(size_t i = 0; i < count; ++i)
-  {
-    char* itemSrc = data + i * subType->mSizeInBytes;
-    if(subTypeSerialization != nullptr)
-      subTypeSerialization->Serialize(*this, *subType, itemSrc);
-    else
-      SerializeObject(*subType, itemSrc);
-  }
-  return false;
-}
-
-bool BinaryLoader::SerializeArray(BoundType& boundType, char* data, ArrayAdapter* adapter)
-{
-  size_t count = 0;
-  Read(count);
-
-  adapter->Initialize(data);
-  adapter->SetCount(data, count);
-  BoundType* subType = adapter->GetSubType(boundType);
-  MetaSerialization* subTypeSerialization = subType->mMetaSerialization;
-  for(size_t i = 0; i < count; ++i)
-  {
-    char* itemSrc = adapter->GetItem(data, i);
-    if(subTypeSerialization != nullptr)
-      subTypeSerialization->Serialize(*this, *subType, itemSrc);
-    else
-      SerializeObject(*subType, itemSrc);
-  }
-  return true;
 }
 
 bool BinaryLoader::Read(char* data, size_t sizeInBytes)
