@@ -14,8 +14,8 @@ bool Serializer::SerializeProperties(BoundType& boundType, char* data)
     if(fieldSerialization != nullptr && BeginMember(field.mName))
     {
       fieldSerialization->Serialize(*this, *fieldType, fieldSrc);
+      EndMember();
     }
-    EndMember();
   }
 
   return true;
