@@ -8,10 +8,6 @@ struct MetaSerialization
 {
 public:
   virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) = 0;
-  virtual bool Serialize(Serializer& serializer, const Field& field, char* data)
-  {
-    return false;
-  }
   virtual char* Allocate() const
   {
     return nullptr;
@@ -40,11 +36,6 @@ public:
   {
     return serializer.SerializePrimitive(boundType, *(T*)data);
   }
-
-  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
-  {
-    return serializer.SerializePrimitive(*field.mType, *(T*)data);
-  }
 };
 
 template <>
@@ -55,12 +46,6 @@ public:
   {
     std::string* str = reinterpret_cast<std::string*>(data);
     return serializer.SerializePrimitive(boundType, *str);
-  }
-
-  virtual bool Serialize(Serializer& serializer, const Field& field, char* data) override
-  {
-    std::string* str = reinterpret_cast<std::string*>(data);
-    return serializer.SerializePrimitive(*field.mType, *str);
   }
 };
 

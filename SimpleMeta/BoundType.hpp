@@ -29,10 +29,8 @@ struct Field
 
 struct BoundType
 {
-  BoundTypePrimitiveType mPrimitiveType = BoundTypePrimitiveType::Primitive;
   std::string mName;
   size_t mSizeInBytes = 0;
-  size_t mStride = 0;
   std::vector<Field> mFields;
   MetaSerialization* mMetaSerialization = nullptr;
   BoundType* mBaseType = nullptr;

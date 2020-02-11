@@ -30,7 +30,6 @@ static Field* FromField(MetaLibrary& library, BoundType& owner, const std::strin
   Field subField;
   subField.mType = subType;
   f.mType->mFields.push_back(subField);
-  f.mType->mStride = sizeof(FieldType);
 
   owner.mFields.push_back(f);
   return &owner.mFields.back();

@@ -29,7 +29,6 @@ struct StaticTypeId<std::vector<T>> : public StaticTypeId<T>
   static BoundType*& GetBoundType()
   {
     static BoundType* sInstance = new BoundType();
-    sInstance->mPrimitiveType = BoundTypePrimitiveType::Array;
     return sInstance;
   }
 };
@@ -40,7 +39,6 @@ struct StaticTypeId<std::unordered_map<KeyType, ValueType>>// : public StaticTyp
   static BoundType*& GetBoundType()
   {
     static BoundType* sInstance = new BoundType();
-    sInstance->mPrimitiveType = BoundTypePrimitiveType::Array;
     return sInstance;
   }
 };
