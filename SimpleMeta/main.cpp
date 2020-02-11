@@ -75,6 +75,7 @@ int main()
   BindType(library, BoxCollider, 'bcol');
   BindType(library, SphereCollider, 'scol');
   BindType(library, PhysicsSpace, 'phys');
+  BindType(library, NumberList, 'nmls');
   BindType(library, Dictionary, 'dict');
 
   {
@@ -103,6 +104,17 @@ int main()
   }
   
   {
+    NumberList input;
+    input.mData.push_back(1);
+    input.mData.push_back(2);
+    input.mData.push_back(1);
+    input.mData.push_back(5);
+
+    TestJsonRoundTrip(input);
+    TestBinaryRoundTrip(input);
+  }
+
+  {
     NameIdList input;
     input.mIds.push_back(NameId(0, "Zero"));
     input.mIds.push_back(NameId(1, "One"));
@@ -111,12 +123,15 @@ int main()
     TestBinaryRoundTrip(input);
   }
   
-  //{
-  //  Dictionary input;
-  //  input.Add("ohio", "good morning");
-  //
-  //  TestBinaryRoundTrip(input);
-  //}
+  {
+    Dictionary input;
+    input.Add("ohio", "good morning");
+    input.Add("konbanwa", "good evening");
+    input.Add("taberu", "to eat");
+    input.Add("tanoshi", "fun");
+  
+    TestJsonRoundTrip(input);
+  }
 
   {
     SphereCollider* sphere1 = new SphereCollider();

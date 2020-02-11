@@ -45,10 +45,8 @@ struct BinaryLoader : public Serializer
   virtual bool BeginObject() override;
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginArray(size_t& count) override;
-  virtual bool BeginArrayItem(const BoundType& boundType, size_t index, char* data) override;
   virtual bool EndArray() override;
   virtual bool EndObject() override;
-  virtual bool EndArrayItem() override;
   virtual bool SerializeObject(BoundType& boundType, char* data) override;
 
   bool Read(char* data, size_t sizeInBytes);

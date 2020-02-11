@@ -34,7 +34,6 @@ struct BoxCollider : public Collider
   }
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
-    boundType.mMetaSerialization = new ObjectMetaSerialization<BoxCollider>();
     BindBase(library, boundType, Collider);
     BindField(library, boundType, BoxCollider, mSize);
   }
@@ -54,7 +53,6 @@ struct SphereCollider : public Collider
   }
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
-    boundType.mMetaSerialization = new ObjectMetaSerialization<SphereCollider>();
     BindBase(library, boundType, Collider);
     BindField(library, boundType, SphereCollider, mRadius);
   }
@@ -78,7 +76,6 @@ struct PhysicsSpace
   static void Bind(MetaLibrary& library, BoundType& boundType)
   {
     Field* field = BindField(library, boundType, PhysicsSpace, mColliders);
-    field->mType->mMetaSerialization = new PolymorphicArrayMetaSerialization<Collider*>();
   }
 
   std::vector<Collider*> mColliders;

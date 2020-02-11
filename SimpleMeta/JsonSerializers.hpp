@@ -30,9 +30,11 @@ public:
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginMember(const std::string& name) override;
   virtual bool BeginArray(size_t& count) override;
+  virtual bool BeginArrayItem(size_t index) override;
   virtual bool EndObject() override;
   virtual bool EndMember() override;
   virtual bool EndArray() override;
+  virtual bool EndArrayItem() override;
   
   virtual bool SerializeObject(BoundType& boundType, char* data) override;
 
@@ -75,7 +77,7 @@ public:
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginMember(const std::string& name) override;
   virtual bool BeginArray(size_t& count) override;
-  virtual bool BeginArrayItem(const BoundType& boundType, size_t index, char* data) override;
+  virtual bool BeginArrayItem(size_t index) override;
   virtual bool EndObject() override;
   virtual bool EndMember() override;
   virtual bool EndArray() override;
@@ -89,7 +91,6 @@ public:
   bool ReadPrimitive(std::string& data);
 
   bool BeginMember();
-  bool BeginArrayItem(size_t index);
   bool End();
 
   JsonInternalData* mData;

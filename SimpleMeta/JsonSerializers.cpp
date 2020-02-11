@@ -98,6 +98,12 @@ bool JsonSaver::BeginArray(size_t& count)
   return mData->mWriter.StartArray();
 }
 
+bool JsonSaver::BeginArrayItem(size_t index)
+{
+  //return BeginObject();
+  return true;
+}
+
 bool JsonSaver::EndObject()
 {
   return mData->mWriter.EndObject();
@@ -111,6 +117,12 @@ bool JsonSaver::EndMember()
 bool JsonSaver::EndArray()
 {
   return mData->mWriter.EndArray();
+}
+
+bool JsonSaver::EndArrayItem()
+{
+  //return EndObject();
+  return true;
 }
 
 bool JsonSaver::SerializeObject(BoundType& boundType, char* data)
@@ -242,9 +254,16 @@ bool JsonLoader::BeginArray(size_t& count)
   return false;
 }
 
-bool JsonLoader::BeginArrayItem(const BoundType& boundType, size_t index, char* data)
+bool JsonLoader::BeginArrayItem(size_t index)
 {
-  return BeginArrayItem(index);
+  auto arrayNode = mData->mStack.top();
+  auto array = arrayNode->GetArray();
+  if(index >= array.Size())
+    return false;
+
+  auto&& arrayItemNode = array[(int)index];
+  mData->mStack.push(&arrayItemNode);
+  return true;
 }
 
 bool JsonLoader::EndObject()
@@ -336,18 +355,6 @@ bool JsonLoader::BeginMember()
     return false;
 
   mData->mStack.push(&it->value);
-  return true;
-}
-
-bool JsonLoader::BeginArrayItem(size_t index)
-{
-  auto arrayNode = mData->mStack.top();
-  auto array = arrayNode->GetArray();
-  if(index >= array.Size())
-    return false;
-
-  auto&& arrayItemNode = array[(int)index];
-  mData->mStack.push(&arrayItemNode);
   return true;
 }
 

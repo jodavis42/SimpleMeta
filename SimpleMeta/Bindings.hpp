@@ -12,44 +12,10 @@ static Field* FromField(MetaLibrary& library, BoundType& owner, const std::strin
   f.mName = name;
   f.mOffset = offset;
   f.mType = StaticTypeId<FieldType>::GetBoundType();
-
-  owner.mFields.push_back(f);
-  return &owner.mFields.back();
-}
-
-template <typename ArrayPointer, ArrayPointer field, typename Class, typename FieldType>
-static Field* FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::vector<FieldType> Class::*dummy, size_t offset)
-{
-  Field f = Field();
-  f.mName = name;
-  f.mOffset = offset;
-  f.mType = StaticTypeId<std::vector<FieldType>>::GetBoundType();
-  f.mType->mMetaSerialization = new ArrayMetaSerialization<FieldType>();
-
-  BoundType* subType = StaticTypeId<FieldType>::GetBoundType();
-  Field subField;
-  subField.mType = subType;
-  f.mType->mFields.push_back(subField);
-
-  owner.mFields.push_back(f);
-  return &owner.mFields.back();
-}
-
-template <typename MapPointer, MapPointer field, typename Class, typename KeyType, typename ValueType>
-static Field* FromField(MetaLibrary& library, BoundType& owner, const std::string& name, std::unordered_map<KeyType, ValueType> Class::*dummy, size_t offset)
-{
-  typedef std::unordered_map<KeyType, ValueType> MapType;
-  Field f = Field();
-  f.mName = name;
-  f.mOffset = offset;
-  f.mType = StaticTypeId<MapType>::GetBoundType();
-  f.mType->mMetaSerialization = new MapMetaSerialization<KeyType, ValueType>();
-
-  //BoundType* subType = StaticTypeId<FieldType>::GetBoundType();
-  //Field subField;
-  //subField.mType = subType;
-  //f.mType->mFields.push_back(subField);
-  //f.mType->mStride = sizeof(FieldType);
+  if(f.mType->mMetaSerialization == nullptr)
+  {
+    f.mType->mMetaSerialization = new TypedMetaSerialization<FieldType>();
+  }
 
   owner.mFields.push_back(f);
   return &owner.mFields.back();
@@ -63,7 +29,7 @@ void BindClassType(MetaLibrary& library, const std::string& className, int id)
   boundType->mSizeInBytes = sizeof(ClassType);
   boundType->mId = id;
 
-  boundType->mMetaSerialization = new ObjectMetaSerialization<ClassType>();
+  boundType->mMetaSerialization = new TypedMetaSerialization<ClassType>();
   BindingFn(library, *boundType);
   library.AddBoundType(boundType);
 }
@@ -74,7 +40,7 @@ void BindPrimitiveTypeToLibrary(MetaLibrary& library, const std::string& classNa
   BoundType* boundType = StaticTypeId<Type>::GetBoundType();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeof(Type);
-  boundType->mMetaSerialization = new PrimitiveMetaSerialization<Type>();
+  boundType->mMetaSerialization = new TypedMetaSerialization<Type>();
   library.AddBoundType(boundType);
 }
 

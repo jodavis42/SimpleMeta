@@ -41,6 +41,20 @@ struct NameIdList
   std::vector<NameId> mIds;
 };
 
+struct NumberList
+{
+  bool operator==(const NumberList& rhs) const
+  {
+    return mData == rhs.mData;
+  }
+  static void Bind(MetaLibrary& library, BoundType& boundType)
+  {
+    BindField(library, boundType, NumberList, mData);
+  }
+
+  std::vector<int> mData;
+};
+
 struct Dictionary
 {
   bool operator==(const Dictionary& rhs) const

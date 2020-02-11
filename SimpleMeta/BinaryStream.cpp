@@ -89,22 +89,12 @@ bool BinaryLoader::BeginArray(size_t& count)
   return true;
 }
 
-bool BinaryLoader::BeginArrayItem(const BoundType& boundType, size_t index, char* data)
-{
-  return true;
-}
-
 bool BinaryLoader::EndArray()
 {
   return true;
 }
 
 bool BinaryLoader::EndObject()
-{
-  return true;
-}
-
-bool BinaryLoader::EndArrayItem()
 {
   return true;
 }

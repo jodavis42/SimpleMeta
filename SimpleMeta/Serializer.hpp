@@ -34,7 +34,7 @@ struct Serializer
   virtual bool BeginObject(PolymorphicInfo& info) { return true; }
   virtual bool BeginMember(const std::string& name) { return true; }
   virtual bool BeginArray(size_t& count) { return true; }
-  virtual bool BeginArrayItem(const BoundType& boundType, size_t index, char* data) { return true; }
+  virtual bool BeginArrayItem(size_t index) { return true; }
   virtual bool EndArray() { return true; }
   virtual bool EndObject() { return true; }
   virtual bool EndMember() { return true; }
