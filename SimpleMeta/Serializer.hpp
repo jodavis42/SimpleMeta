@@ -39,7 +39,32 @@ struct Serializer
   virtual bool EndObject() { return true; }
   virtual bool EndMember() { return true; }
   virtual bool EndArrayItem() { return true; }
-  virtual bool SerializeProperties(BoundType& boundType, char* data);
   virtual bool SerializeObject(BoundType& boundType, char* data);
 };
+
+template <typename SerializerType>
+bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char* data)
+{
+  for(size_t i = 0; i < boundType.mFields.size(); ++i)
+  {
+    const Field& field = boundType.mFields[i];
+    BoundType* fieldType = field.mType;
+    char* fieldSrc = data + field.mOffset;
+
+    MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
+    if(fieldSerialization != nullptr && serializer.BeginMember(field.mName))
+    {
+      fieldSerialization->Serialize(serializer, *fieldType, fieldSrc);
+      serializer.EndMember();
+    }
+  }
+
+  return true;
+}
+
+template <typename SerializerType>
+bool SerializeObject(SerializerType& serializer, BoundType& boundType, char* data)
+{
+  return SerializeProperties(serializer, boundType, data);
+}
 

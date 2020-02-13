@@ -101,7 +101,7 @@ bool BinaryLoader::EndObject()
 
 bool BinaryLoader::SerializeObject(BoundType& boundType, char* data)
 {
-  return SerializeProperties(boundType, data);
+  return SerializeProperties(*this, boundType, data);
 }
 
 bool BinaryLoader::Read(char* data, size_t sizeInBytes)

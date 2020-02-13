@@ -128,7 +128,7 @@ bool JsonSaver::EndArrayItem()
 bool JsonSaver::SerializeObject(BoundType& boundType, char* data)
 {
   BeginObject();
-  SerializeProperties(boundType, data);
+  SerializeProperties(*this, boundType, data);
   EndObject();
   return true;
 }

@@ -1,25 +1,39 @@
 #pragma once
 
 #include "Serializer.hpp"
-#include "SerializationPolicy.hpp"
+#include "JsonSerializers.hpp"
+#include "BinaryStream.hpp"
 
-#include <unordered_map>
+#include "SerializationPolicy.hpp"
 
 struct MetaSerialization
 {
 public:
-  virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) = 0;
+  virtual bool SerializeBase(Serializer& serializer, BoundType& boundType, char* data) = 0;
+  virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data);
+  virtual bool Serialize(JsonSaver& serializer, BoundType& boundType, char* data);
+  virtual bool Serialize(JsonLoader& serializer, BoundType& boundType, char* data);
+  virtual bool Serialize(BinarySaver& serializer, BoundType& boundType, char* data);
+  virtual bool Serialize(BinaryLoader& serializer, BoundType& boundType, char* data);
   virtual char* Allocate() const = 0;
 };
 
 template <typename T>
 struct TypedMetaSerialization : public MetaSerialization
 {
-  virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) override
+  template <typename SerializerType>
+  bool SerializeTyped(SerializerType& serializer, char* data)
   {
     T* typedData = (T*)data;
-    return SerializationPolicy<T>::Serialize(serializer, *typedData);
+    return SerializationPolicy<SerializerType, T>::Serialize(serializer, *typedData);
   }
+
+  virtual bool SerializeBase(Serializer& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
+  virtual bool Serialize(Serializer& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
+  virtual bool Serialize(JsonSaver& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
+  virtual bool Serialize(JsonLoader& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
+  virtual bool Serialize(BinarySaver& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
+  virtual bool Serialize(BinaryLoader& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
 
   virtual char* Allocate() const override
   {

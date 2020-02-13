@@ -6,18 +6,23 @@
 
 struct BinarySaver : public Serializer
 {
+public:
+  using Serializer::SerializePrimitive;
+
   BinarySaver(std::ostream& stream);
 
   template <typename T>
   void Serialize(const T& data)
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeObject(*boundType, (char*)(&data));
+    SerializeProperties(*this, *boundType, (char*)(&data));
   }
 
+  
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
+  using Serializer::BeginObject;
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginArray(size_t& count) override;
 
@@ -36,9 +41,10 @@ struct BinaryLoader : public Serializer
   void Serialize(T& data)
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeObject(*boundType, (char*)(&data));
+    SerializeProperties(*this, *boundType, (char*)(&data));
   }
 
+  using Serializer::SerializePrimitive;
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 

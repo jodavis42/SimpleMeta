@@ -60,7 +60,7 @@ public:
   {
     SetJson(jsonData);
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeObject(*boundType, (char*)(&data));
+    SerializeProperties(*this, *boundType, (char*)(&data));
   }
 
   void SetJson(const std::string& jsonData);

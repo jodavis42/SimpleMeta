@@ -1,8 +1,6 @@
 #pragma once
 
 #include "BoundType.hpp"
-#include <vector>
-#include <unordered_map>
 
 template <typename T>
 struct StaticTypeId
@@ -20,26 +18,6 @@ struct StaticTypeId<T*> : public StaticTypeId<T>
   static BoundType*& GetBoundType()
   {
     return StaticTypeId<T>::GetBoundType();
-  }
-};
-
-template <typename T>
-struct StaticTypeId<std::vector<T>> : public StaticTypeId<T>
-{
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = new BoundType();
-    return sInstance;
-  }
-};
-
-template <typename KeyType, typename ValueType>
-struct StaticTypeId<std::unordered_map<KeyType, ValueType>>// : public StaticTypeId<T>
-{
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = new BoundType();
-    return sInstance;
   }
 };
 
