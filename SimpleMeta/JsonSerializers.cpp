@@ -74,6 +74,23 @@ bool JsonSaver::SerializePrimitive(const BoundType& boundType, std::string& data
   return WritePrimitive(data);
 }
 
+bool JsonSaver::BeginStringTable(int& count) {
+    return BeginObject();
+}
+
+bool JsonSaver::EndStringTable() {
+    return EndObject();
+}
+
+bool JsonSaver::BeginStringTableEntry(std::string& name) {
+    return BeginMember(name);
+}
+
+bool JsonSaver::EndStringTableEntry() {
+    return EndMember();
+}
+
+
 bool JsonSaver::BeginObject()
 {
   return mData->mWriter.StartObject();
@@ -219,6 +236,35 @@ bool JsonLoader::SerializePrimitive(const BoundType& boundType, double& data)
 bool JsonLoader::SerializePrimitive(const BoundType& boundType, std::string& data)
 {
   return ReadPrimitive(data);
+}
+
+bool JsonLoader::BeginStringTable(int& count) {
+    return true; // BeginObject();
+}
+
+bool JsonLoader::EndStringTable() {
+    return true; // EndObject();
+}
+
+bool JsonLoader::BeginStringTableEntry(std::string& name) {
+    return BeginMember(name);
+}
+
+bool JsonLoader::EndStringTableEntry() {
+    return EndMember();
+}
+
+
+bool JsonLoader::ForAllMembers(int size, std::function<void(Serializer&, const std::string&)> callback) {
+    auto node = mData->mStack.top();
+    auto& iterator = node->MemberBegin();
+    while (iterator != node->MemberEnd()) {
+        std::string name(iterator->name.GetString());
+        callback(*this, name);
+        ++iterator;
+    }
+
+    return true;
 }
 
 bool JsonLoader::BeginObject()

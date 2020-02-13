@@ -22,6 +22,26 @@ bool BinarySaver::SerializePrimitive(const BoundType& boundType, std::string& da
   return true;
 }
 
+bool BinarySaver::BeginStringTable(int& count) {
+    mStream.write((char*)&count, sizeof(count));
+    return true;
+}
+
+bool BinarySaver::EndStringTable() {
+    return true;
+}
+
+bool BinarySaver::BeginStringTableEntry(std::string& name) {
+    Write(name.size());
+    mStream.write(name.data(), name.size());
+    return true;
+}
+
+bool BinarySaver::EndStringTableEntry() {
+    return true;
+}
+
+
 bool BinarySaver::BeginObject(PolymorphicInfo& info)
 {
   Write(info.mId.mId);
@@ -71,6 +91,36 @@ bool BinaryLoader::SerializePrimitive(const BoundType& boundType, std::string& d
   data.resize(sizeInBytes);
   mStream.read((char*)data.data(), sizeInBytes);
   return false;
+}
+
+bool BinaryLoader::BeginStringTable(int& count) {
+    char* data = (char*)&count;
+    mStream.read(data, sizeof(count));
+    return true;
+}
+
+bool BinaryLoader::EndStringTable() {
+    return true;
+}
+
+bool BinaryLoader::BeginStringTableEntry(std::string& name) {
+    size_t sizeInBytes = 0;
+    Read(sizeInBytes);
+    name.resize(sizeInBytes);
+    mStream.read((char*)name.data(), sizeInBytes);
+    return true;
+}
+
+bool BinaryLoader::EndStringTableEntry() {
+    return true;
+}
+
+bool BinaryLoader::ForAllMembers(int size, std::function<void(Serializer&, const std::string&)> callback) {
+    for (int i = 0; i < size; ++i) {
+        std::string memberName("");
+        callback(*this, memberName);
+    }
+    return true;
 }
 
 bool BinaryLoader::BeginObject()

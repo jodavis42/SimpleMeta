@@ -86,31 +86,16 @@ struct SerializationPolicy<std::vector<T, Extra...>>
 template <typename T>
 struct PolymorphicReflection
 {
-  static BoundType* BeginPolymorphicObject(Serializer& serializer)
-  {
-    PolymorphicInfo info;
-    serializer.BeginObject(info);
-    if(!info.mName.empty())
-      return MetaLibrary::FindBoundType(info.mName);
-    else
-      return MetaLibrary::FindBoundType(info.mId);
-  }
-
   static bool Save(Serializer& serializer, BoundType& boundType, char* objData)
   {
-    PolymorphicInfo info{boundType.mName, boundType.mId};
-    serializer.BeginObject(info);
     boundType.mMetaSerialization->Serialize(serializer, boundType, objData);
-    serializer.EndObject();
     return true;
   }
 
-  static bool Load(Serializer& serializer, char*& objData)
+  static bool Load(Serializer& serializer, BoundType& boundType, char*& objData)
   {
-    BoundType& boundType = *BeginPolymorphicObject(serializer);
     objData = boundType.mMetaSerialization->Allocate();
     boundType.mMetaSerialization->Serialize(serializer, boundType, objData);
-    serializer.EndObject();
     return true;
   }
 };
@@ -123,38 +108,82 @@ struct SerializationPolicy<std::vector<T*, Extra...>>
   {
     BoundType& boundType = *StaticTypeId<T>::GetBoundType();
     BoundType& subType = *StaticTypeId<T>::GetBoundType();
-    if(serializer.mDirection == SerializerDirection::Saving)
-    {
-      size_t count = array.size();
-      serializer.BeginArray(count);
-      for(size_t i = 0; i < count; ++i)
-      {
-        char* itemData = (char*)array[i];
-        BoundType* subType = RuntimeTypeId<T*>::GetVirtualBoundType(itemData);
-        serializer.BeginArrayItem(i);
-        PolymorphicReflection<T*>::Save(serializer, *subType, itemData);
-        serializer.EndArrayItem();
-      }
-      serializer.EndArray();
 
+    if (serializer.mDirection == SerializerDirection::Saving)
+    {
+        int size = (int)array.size();
+        serializer.BeginStringTable(size);
+        for (size_t i = 0; i < size; ++i)
+        {
+            char* itemData = (char*)array[i];
+            BoundType* subType = RuntimeTypeId<T*>::GetVirtualBoundType(itemData);
+            serializer.BeginStringTableEntry(subType->mName);
+            PolymorphicReflection<T*>::Save(serializer, *subType, itemData);
+            serializer.EndStringTableEntry();
+        }
+        serializer.EndStringTable();
     }
     else
     {
-      size_t count;
-      serializer.BeginArray(count);
-      array.resize(count);
-      for(size_t i = 0; i < count; ++i)
-      {
-        serializer.BeginArrayItem(i);
-        char* itemData = nullptr;
-        PolymorphicReflection<T*>::Load(serializer, itemData);
-        array[i] = (T*)itemData;
-        serializer.EndArrayItem();
-      }
-      serializer.EndArray();
+        int size = 0;
+        array.clear();
+        serializer.BeginStringTable(size);
+        serializer.ForAllMembers(size, [&array](Serializer& serializer, const std::string& memberName) {
+            std::string name(memberName);
+            serializer.BeginStringTableEntry(name);
+            char* itemData = nullptr;
+            BoundType* boundType = MetaLibrary::FindBoundType(name);
+            if (boundType != nullptr) {
+                if (PolymorphicReflection<T*>::Load(serializer, *boundType, itemData)) {
+                    array.push_back((T*)itemData);
+                }
+            }
+            serializer.EndStringTableEntry();
+        });
+        serializer.EndStringTable();
     }
+
     return true;
   }
+};
+
+template <typename Value, typename ... Extra>
+struct SerializationPolicy<std::unordered_map<std::string, Value, Extra...>>
+{
+    typedef std::unordered_map<std::string, Value, Extra...> MapType;
+    static bool Serialize(Serializer& serializer, MapType& data)
+    {
+        if (serializer.mDirection == SerializerDirection::Saving)
+        {
+            int size = (int)data.size();
+            serializer.BeginStringTable(size);
+            int i = 0;
+            for (auto it = data.begin(); it != data.end(); ++it, ++i)
+            {
+                std::string name(it->first);
+                serializer.BeginStringTableEntry(name);
+                SerializationPolicy<Value>::Serialize(serializer, it->second);
+                serializer.EndStringTableEntry();
+            }
+            serializer.EndStringTable();
+        }
+        else
+        {
+            int size = 0;
+            serializer.BeginStringTable(size);
+            serializer.ForAllMembers(size, [&data](Serializer& serializer, const std::string& memberName) {
+                std::string name(memberName);
+                serializer.BeginStringTableEntry(name);
+                Value v;
+                SerializationPolicy<Value>::Serialize(serializer, v);
+                data[name] = v;
+                serializer.EndStringTableEntry();
+            });
+            serializer.EndStringTable();
+        }
+
+        return true;
+    }
 };
 
 template <typename Key, typename Value, typename ... Extra>

@@ -8,26 +8,36 @@
 #include "TestTypes/Math.hpp"
 #include "TestTypes/Mesh.hpp"
 #include "TestTypes/Misc.hpp"
+#include "TestTypes/Actor.hpp"
+#include "TestTypes/ActorComponents.hpp"
 #include "JsonSerializers.hpp"
 #include <fstream>
+#include <chrono>
+#include <iterator>
+#include <iostream>
 
 template <typename T>
-void TestBinaryRoundTrip(T& input)
+void TestBinaryRoundTrip(T& input, const std::string& filename)
 {
   BoundType* boundType = StaticTypeId<T>::GetBoundType();
 
   std::ofstream outStream;
-  outStream.open(boundType->mName, std::ofstream::binary | std::ofstream::out);
+  outStream.open(filename, std::ofstream::binary | std::ofstream::out);
   BinarySaver saver(outStream);
   saver.Serialize(input);
   outStream.close();
 
   std::ifstream inStream;
-  inStream.open(boundType->mName, std::ifstream::binary | std::ifstream::in);
+  inStream.open(filename, std::ifstream::binary | std::ifstream::in);
+  std::stringstream inMemoryStream;
+  inMemoryStream << inStream.rdbuf();
 
   T output;
-  BinaryLoader loader(inStream);
+  BinaryLoader loader(inMemoryStream);
+  auto currentTime = std::chrono::steady_clock::now();
   loader.Serialize(output);
+  auto deltaTime = std::chrono::steady_clock::now() - currentTime;
+  std::cout << "Time to load " << filename << " " << deltaTime.count() << "\n";
 
   if(!(input == output))
   {
@@ -38,15 +48,23 @@ void TestBinaryRoundTrip(T& input)
 }
 
 template <typename T>
-void TestJsonRoundTrip(T& input)
+void TestJsonRoundTrip(T& input, const std::string& filename)
 {
   JsonSaver saver;
   saver.Serialize(input);
   std::string jsonData = saver.ToString();
 
+  std::ofstream outStream;
+  outStream.open(filename, std::ofstream::out);
+  outStream << jsonData;
+  outStream.close();
+
   T output;
   JsonLoader loader;
+  auto currentTime = std::chrono::steady_clock::now();
   loader.Serialize(jsonData, output);
+  auto deltaTime = std::chrono::steady_clock::now() - currentTime;
+  std::cout << "Time to load " << filename << " " << deltaTime.count() << "\n";
 
   if(!(input == output))
   {
@@ -72,22 +90,40 @@ int main()
   BindType(library, NameId, 'nid');
   BindType(library, NameIdList, 'idlt');
   BindType(library, Collider, 'col');
-  BindType(library, BoxCollider, 'bcol');
-  BindType(library, SphereCollider, 'scol');
+  BindTypeAs(library, BoxCollider, "minecraft:box_collision", 'bcol');
+  BindTypeAs(library, SphereCollider, "minecraft:sphere_collision", 'scol');
   BindType(library, PhysicsSpace, 'phys');
   BindType(library, NumberList, 'nmls');
   BindType(library, Dictionary, 'dict');
+  BindType(library, AnimationKeyFrame, 'keyf');
+  BindType(library, AnimationBone, 'bone');
+  BindType(library, AnimationEffect, 'effe');
+  BindType(library, Animation, 'anim');
+  BindType(library, AnimationDictionary, 'anid');
+
+  BindType(library, ActorDefinitionAsset, 'acta');
+  BindType(library, ActorDefinition, 'actr');
+  BindType(library, ActorDescription, 'desc');
+  BindType(library, ActorComponent, 'acom');
+  BindTypeAs(library, BreedableComponent, "minecraft:breedable", 'bred');
+  BindTypeAs(library, FamilyComponent, "minecraft:type_family", 'fami');
+  BindTypeAs(library, AttackDamageComponent, "minecraft:attack_damage", 'dmg ');
+  BindTypeAs(library, CollisionBoxComponent, "minecraft:collision_box", 'coll');
+  BindTypeAs(library, VariantComponent, "minecraft:variant", 'var ');
 
   {
     Mesh outMesh;
-    outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
-    outMesh.mVertices.push_back(Vertex(Vec3(1, 0, 0), Vec2(1, 0)));
-    outMesh.mVertices.push_back(Vertex(Vec3(1, 1, 0), Vec2(1, 1)));
-    outMesh.mVertices.push_back(Vertex(Vec3(0, 1, 0), Vec2(0, 1)));
+    for (int vertIndex = 0; vertIndex < 15000; ++vertIndex) {
+        outMesh.mVertices.push_back(
+            Vertex(
+                Vec3(rand()/static_cast<float>(RAND_MAX), rand()/static_cast<float>(RAND_MAX), rand()/static_cast<float>(RAND_MAX)),
+                Vec2(rand() / static_cast<float>(RAND_MAX), rand() / static_cast<float>(RAND_MAX))));
+    }
+
     outMesh.mName = "Quad";
   
-    TestJsonRoundTrip(outMesh);
-    TestBinaryRoundTrip(outMesh);
+    TestJsonRoundTrip(outMesh, "mesh.json");
+    TestBinaryRoundTrip(outMesh, "mesh.bed");
   }
   
   {
@@ -99,8 +135,8 @@ int main()
     myData.mDouble1 = 0.123456789f;
     myData.mString1 = "MyString290as9gy0a9sdhg0asdhng0ashdg09ahsd0gahsg";
   
-    TestJsonRoundTrip(myData);
-    TestBinaryRoundTrip(myData);
+    TestJsonRoundTrip(myData, "mystruct.json");
+    TestBinaryRoundTrip(myData, "mystruct.bed");
   }
   
   {
@@ -110,8 +146,8 @@ int main()
     input.mData.push_back(1);
     input.mData.push_back(5);
 
-    TestJsonRoundTrip(input);
-    TestBinaryRoundTrip(input);
+    TestJsonRoundTrip(input, "numberlist.json");
+    TestBinaryRoundTrip(input, "numberlist.bed");
   }
 
   {
@@ -119,8 +155,8 @@ int main()
     input.mIds.push_back(NameId(0, "Zero"));
     input.mIds.push_back(NameId(1, "One"));
   
-    TestJsonRoundTrip(input);
-    TestBinaryRoundTrip(input);
+    TestJsonRoundTrip(input, "nameidlist.json");
+    TestBinaryRoundTrip(input, "nameidlist.bed");
   }
   
   {
@@ -130,7 +166,7 @@ int main()
     input.Add("taberu", "to eat");
     input.Add("tanoshi", "fun");
   
-    TestJsonRoundTrip(input);
+    TestJsonRoundTrip(input, "dictionary.json");
   }
 
   {
@@ -145,9 +181,71 @@ int main()
     input.mColliders.push_back(sphere1);
     input.mColliders.push_back(box1);
 
-    TestJsonRoundTrip(input);
-    TestBinaryRoundTrip(input);
+    TestJsonRoundTrip(input, "polymorphic.json");
+    TestBinaryRoundTrip(input, "polymorphic.bed");
   }
+
+  {
+      AnimationKeyFrame key1;
+      key1.lerpMode = "catmullrom";
+      key1.postTransform.push_back(0.1f);
+      key1.postTransform.push_back(0.3f);
+      key1.postTransform.push_back(1.0f);
+
+      AnimationBone boneBody, boneHead;
+      boneBody.positions["0.0"] = key1;
+      boneBody.positions["0.6"] = key1;
+      boneHead.rotations["0.0"] = key1;
+      boneHead.rotations["1.0"] = key1;
+
+      AnimationDictionary animations;
+      Animation wolfAttack;
+      wolfAttack.blendWeight = 0.5f;
+      wolfAttack.animTimeUpdate = "query.anim_time";
+      wolfAttack.looping = true;
+      wolfAttack.overridePreviousAnimation = true;
+      wolfAttack.bones["body"] = boneBody;
+      wolfAttack.bones["head"] = boneHead;
+
+      animations.formatVersion = "1.8.0";
+      animations.animations["wolf.attack"] = wolfAttack;
+      animations.animations["wolf.beg"] = wolfAttack;
+
+      TestJsonRoundTrip(animations, "animations.json");
+      TestBinaryRoundTrip(animations, "animations.bed");
+  }
+
+  //{
+  //    AnimationDictionary wolfAnimations;
+  //    JsonLoader loader;
+
+  //    std::fstream stream;
+  //    stream.open("wolf.animations.json", std::ofstream::in);
+
+  //    std::ostringstream ss;
+  //    ss << stream.rdbuf(); // reading data
+  //    std::string jsonData = ss.str();
+  //    stream.close();
+
+  //    loader.Serialize(jsonData, wolfAnimations);
+
+  //    TestJsonRoundTrip(wolfAnimations, "wolf_animations_generated.json");
+  //    TestBinaryRoundTrip(wolfAnimations, "wolf_animations.bed");
+  //}
+
+  //{
+  //    ActorDefinitionAsset catDefinition;
+  //    JsonLoader loader;
+
+  //    std::fstream stream;
+  //    stream.open("cat.entity.json", std::ofstream::in);
+
+  //    std::ostringstream ss;
+  //    ss << stream.rdbuf();
+  //    std::string jsonData = ss.str();
+
+  //    loader.Serialize(jsonData, catDefinition);
+  //}
 
   return 0;
 }

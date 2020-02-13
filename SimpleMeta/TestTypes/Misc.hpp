@@ -105,3 +105,69 @@ inline void BindMyStruct(MetaLibrary& library, BoundType& boundType)
   BindField(library, boundType, MyStruct, mDouble1);
   BindField(library, boundType, MyStruct, mString1);
 }
+
+struct AnimationKeyFrame {
+    std::string lerpMode;
+    std::vector<float> postTransform;
+
+    static void Bind(MetaLibrary& library, BoundType& boundType)
+    {
+        BindFieldAs(library, boundType, AnimationKeyFrame, lerpMode, "lerp_mode");
+        BindFieldAs(library, boundType, AnimationKeyFrame, postTransform, "post");
+    }
+};
+
+struct AnimationBone {
+    std::unordered_map<std::string, AnimationKeyFrame> positions;
+    std::unordered_map<std::string, AnimationKeyFrame> rotations;
+
+    static void Bind(MetaLibrary& library, BoundType& boundType)
+    {
+        BindFieldAs(library, boundType, AnimationBone, positions, "position");
+        BindFieldAs(library, boundType, AnimationBone, rotations, "rotation");
+    }
+};
+
+struct AnimationEffect {
+    std::string effectName;
+    bool enabled;
+
+    static void Bind(MetaLibrary& library, BoundType& boundType)
+    {
+        BindFieldAs(library, boundType, AnimationEffect, effectName, "effect_name");
+        BindFieldAs(library, boundType, AnimationEffect, enabled, "enabled");
+    }
+};
+
+struct Animation {
+    bool looping = false;
+    std::string animTimeUpdate;
+    float blendWeight = 1.0f;
+    bool overridePreviousAnimation = false;
+    std::unordered_map<std::string, AnimationBone> bones;
+    std::unordered_map<std::string, std::vector<AnimationEffect> > effects;
+
+    static void Bind(MetaLibrary& library, BoundType& boundType) {
+        BindFieldAs(library, boundType, Animation, looping, "looping");
+        BindFieldAs(library, boundType, Animation, animTimeUpdate, "anim_time_update");
+        BindFieldAs(library, boundType, Animation, blendWeight, "blend_weight");
+        BindFieldAs(library, boundType, Animation, overridePreviousAnimation, "override_previous_animation");
+        BindFieldAs(library, boundType, Animation, bones, "bones");
+        BindFieldAs(library, boundType, Animation, effects, "sound_effects");
+    }
+};
+
+struct AnimationDictionary {
+    std::string formatVersion;
+    std::unordered_map<std::string, Animation> animations;
+
+    static void Bind(MetaLibrary& library, BoundType& boundType)
+    {
+        BindFieldAs(library, boundType, AnimationDictionary, formatVersion, "format_version");
+        BindFieldAs(library, boundType, AnimationDictionary, animations, "animations");
+    }
+
+    bool operator==(const AnimationDictionary& rhs) const {
+        return true;
+    }
+};

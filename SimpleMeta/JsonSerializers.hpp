@@ -15,7 +15,9 @@ public:
   void Serialize(const T& data)
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeObject(*boundType, (char*)(&data));
+    BeginObject();
+    SerializeProperties(*boundType, (char*)(&data));
+    EndObject();
   }
 
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
@@ -25,6 +27,11 @@ public:
   virtual bool SerializePrimitive(const BoundType& boundType, float& data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, double& data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
+
+  virtual bool BeginStringTable(int& count) override;
+  virtual bool EndStringTable() override;
+  virtual bool BeginStringTableEntry(std::string& name) override;
+  virtual bool EndStringTableEntry() override;
 
   virtual bool BeginObject() override;
   virtual bool BeginObject(PolymorphicInfo& info) override;
@@ -60,7 +67,8 @@ public:
   {
     SetJson(jsonData);
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeObject(*boundType, (char*)(&data));
+
+    SerializeProperties(*boundType, (char*)(&data));
   }
 
   void SetJson(const std::string& jsonData);
@@ -72,6 +80,12 @@ public:
   virtual bool SerializePrimitive(const BoundType& boundType, float& data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, double& data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
+
+  virtual bool BeginStringTable(int& count) override;
+  virtual bool EndStringTable() override;
+  virtual bool BeginStringTableEntry(std::string& name) override;
+  virtual bool EndStringTableEntry() override;
+  virtual bool ForAllMembers(int size, std::function<void(Serializer&, const std::string&)> callback) override;
 
   virtual bool BeginObject() override;
   virtual bool BeginObject(PolymorphicInfo& info) override;
