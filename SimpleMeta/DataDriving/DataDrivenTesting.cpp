@@ -79,21 +79,23 @@ void BuildType(ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeN
   if (!type.mBaseType.empty())
   {
     boundType->mBaseType = FindOrCreateBoundType(library, typeMap, type.mBaseType);
-    for (Field& baseField : boundType->mBaseType->mFields)
+    for (Field* baseField : boundType->mBaseType->mFields)
     {
-      boundType->mFields.push_back(baseField);
-      fieldOffset += baseField.mOffset;
+      Field* newField = new Field();
+      *newField = *baseField;
+      boundType->mFields.push_back(newField);
+      fieldOffset += baseField->mOffset;
     }
   }
   
   // Build all of the fields for this type
   for (DataDrivenField& dataDrivenField : type.mFields)
   {
-    Field newField;
-    newField.mName = dataDrivenField.mName;
-    newField.mType = FindOrCreateBoundType(library, typeMap, dataDrivenField.mType);
-    newField.mOffset = fieldOffset;
-    fieldOffset += newField.mType->mSizeInBytes;
+    Field* newField = new Field();
+    newField->mName = dataDrivenField.mName;
+    newField->mType = FindOrCreateBoundType(library, typeMap, dataDrivenField.mType);
+    newField->mOffset = fieldOffset;
+    fieldOffset += newField->mType->mSizeInBytes;
     boundType->mFields.push_back(newField);
   }
   boundType->mSizeInBytes = fieldOffset;

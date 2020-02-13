@@ -3,28 +3,29 @@
 #include <string>
 #include <vector>
 
+#include "TypeId.hpp"
+#include "ReflectionComposition.hpp"
+
 struct BoundType;
 struct MetaSerialization;
 
-struct TypeId
+struct Field : public ReflectionComposition
 {
-  TypeId() : mId(0) {}
-  TypeId(int id) : mId(id) {}
-  size_t mId;
-};
+  char* GetFieldData(char* instanceData)
+  {
+    return instanceData + mOffset;
+  }
 
-struct Field
-{
   std::string mName;
   size_t mOffset = 0;
   BoundType* mType = nullptr;
 };
 
-struct BoundType
+struct BoundType : public ReflectionComposition
 {
   std::string mName;
   size_t mSizeInBytes = 0;
-  std::vector<Field> mFields;
+  std::vector<Field*> mFields;
   MetaSerialization* mMetaSerialization = nullptr;
   BoundType* mBaseType = nullptr;
   TypeId mId;

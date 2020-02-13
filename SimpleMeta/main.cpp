@@ -2,6 +2,7 @@
 #include "MetaLibrary.hpp"
 #include "StaticTypeId.hpp"
 #include "Bindings.hpp"
+#include "Attributes.hpp"
 #include "TestTypes/Physics.hpp"
 #include "TestTypes/Math.hpp"
 #include "TestTypes/Mesh.hpp"
@@ -18,6 +19,9 @@ int main()
   BindPrimitiveType(coreLibrary, int);
   BindPrimitiveType(coreLibrary, float);
   BindPrimitiveType(coreLibrary, double);
+  BindType(coreLibrary, ReflectionComponent, 'rcmp');
+  BindType(coreLibrary, Attribute, 'att');
+  BindType(coreLibrary, SerializedAttribute, 'attS');
   BindType(coreLibrary, Vec2, 'vec2');
   BindType(coreLibrary, Vec3, 'vec3');
   BindPrimitiveTypeAs(coreLibrary, std::string, "string");

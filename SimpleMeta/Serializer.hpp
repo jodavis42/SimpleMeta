@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BoundType.hpp"
+#include "Attributes.hpp"
 
 enum class SerializerDirection
 {
@@ -50,12 +51,16 @@ bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char*
 {
   for(size_t i = 0; i < boundType.mFields.size(); ++i)
   {
-    const Field& field = boundType.mFields[i];
-    BoundType* fieldType = field.mType;
-    char* fieldSrc = data + field.mOffset;
+    const Field* field = boundType.mFields[i];
+    // Only serialize fields with the correct attribute
+    if(!field->QueryComponentType<SerializedAttribute>())
+      continue;
+    
+    BoundType* fieldType = field->mType;
+    char* fieldSrc = data + field->mOffset;
 
     MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
-    if(fieldSerialization != nullptr && serializer.BeginMember(field.mName))
+    if(fieldSerialization != nullptr && serializer.BeginMember(field->mName))
     {
       fieldSerialization->Serialize(serializer, *fieldType, fieldSrc);
       serializer.EndMember();

@@ -18,8 +18,8 @@ struct Vertex
 
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, Vertex, mUv);
-    BindField(library, boundType, Vertex, mPosition);
+    BindProperty(library, boundType, Vertex, mUv);
+    BindProperty(library, boundType, Vertex, mPosition);
   }
 
   Vec2 mUv;
@@ -35,8 +35,8 @@ struct Mesh
 
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, Mesh, mVertices);
-    BindField(library, boundType, Mesh, mName);
+    BindProperty(library, boundType, Mesh, mVertices);
+    BindProperty(library, boundType, Mesh, mName);
   }
 
   std::vector<Vertex> mVertices;

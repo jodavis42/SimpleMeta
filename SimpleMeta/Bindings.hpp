@@ -4,25 +4,26 @@
 #include "MetaLibrary.hpp"
 #include "MetaSerialization.hpp"
 #include "StaticTypeId.hpp"
+#include "Attributes.hpp"
 
 template <typename FieldPointer, FieldPointer field, typename Class, typename FieldType>
 static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
 {
-  Field f = Field();
-  f.mName = name;
-  f.mOffset = offset;
-  f.mType = StaticTypeId<FieldType>::GetBoundType();
-  if(f.mType->mMetaSerialization == nullptr)
+  Field* f = new Field();
+  f->mName = name;
+  f->mOffset = offset;
+  f->mType = StaticTypeId<FieldType>::GetBoundType();
+  if(f->mType->mMetaSerialization == nullptr)
   {
-    f.mType->mMetaSerialization = new TypedMetaSerialization<FieldType>();
+    f->mType->mMetaSerialization = new TypedMetaSerialization<FieldType>();
   }
 
   owner.mFields.push_back(f);
-  return &owner.mFields.back();
+  return f;
 }
 
 template <typename ClassType, void (*BindingFn)(ReflectionLibrary& library, BoundType&)>
-void BindClassType(ReflectionLibrary& library, const std::string& className, int id)
+BoundType* BindClassType(ReflectionLibrary& library, const std::string& className, int id)
 {
   BoundType* boundType = StaticTypeId<ClassType>::GetBoundType();
   boundType->mName = className;
@@ -32,16 +33,18 @@ void BindClassType(ReflectionLibrary& library, const std::string& className, int
   boundType->mMetaSerialization = new TypedMetaSerialization<ClassType>();
   BindingFn(library, *boundType);
   library.AddBoundType(boundType);
+  return boundType;
 }
 
 template <typename Type>
-void BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className)
+BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className)
 {
   BoundType* boundType = StaticTypeId<Type>::GetBoundType();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeof(Type);
   boundType->mMetaSerialization = new TypedMetaSerialization<Type>();
   library.AddBoundType(boundType);
+  return boundType;
 }
 
 template <typename BaseType>
@@ -53,8 +56,11 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
-  FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember));
+  FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember))
 #define BindField(Library, boundType, Owner, FieldMember) BindFieldAs(Library, boundType, Owner, FieldMember, #FieldMember)
+
+#define BindPropertyAs(Library, boundType, Owner, FieldMember, FieldName) BindFieldAs(Library, boundType, Owner, FieldMember, FieldName)->AddComponentTypeChainable<SerializedAttribute>()
+#define BindProperty(Library, boundType, Owner, FieldMember) BindPropertyAs(Library, boundType, Owner, FieldMember, #FieldMember)
 
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName)
 #define BindPrimitiveType(Library, PrimitiveType) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType)

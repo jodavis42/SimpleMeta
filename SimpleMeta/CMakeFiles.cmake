@@ -1,5 +1,7 @@
 target_sources(SimpleMeta
   PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/Attributes.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Attributes.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
@@ -12,11 +14,15 @@ target_sources(SimpleMeta
     ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.cpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComponent.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.hpp
     ${CMAKE_CURRENT_LIST_DIR}/SerializationPolicy.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ContainerSerializationPolicies.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp
     ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.cpp
     ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.hpp
     ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTesting.cpp

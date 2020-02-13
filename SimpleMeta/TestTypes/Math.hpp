@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Bindings.hpp"
+#include "Attributes.hpp"
 
 struct Vec2
 {
@@ -21,8 +22,8 @@ struct Vec2
 
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, Vec2, x);
-    BindField(library, boundType, Vec2, y);
+    BindProperty(library, boundType, Vec2, x);
+    BindProperty(library, boundType, Vec2, y);
   }
 
   float x;
@@ -48,9 +49,9 @@ struct Vec3
 
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, Vec3, x);
-    BindField(library, boundType, Vec3, y);
-    BindField(library, boundType, Vec3, z);
+    BindProperty(library, boundType, Vec3, x);
+    BindProperty(library, boundType, Vec3, y);
+    BindProperty(library, boundType, Vec3, z);
   }
 
   float x;

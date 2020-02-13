@@ -17,8 +17,8 @@ struct NameId
   }
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, NameId, mId);
-    BindField(library, boundType, NameId, mName);
+    BindProperty(library, boundType, NameId, mId);
+    BindProperty(library, boundType, NameId, mName);
   }
 
   int mId;
@@ -33,7 +33,7 @@ struct NameIdList
   }
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, NameIdList, mIds);
+    BindProperty(library, boundType, NameIdList, mIds);
   }
 
   std::vector<NameId> mIds;
@@ -47,7 +47,7 @@ struct NumberList
   }
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, NumberList, mData);
+    BindProperty(library, boundType, NumberList, mData);
   }
 
   std::vector<int> mData;
@@ -61,7 +61,7 @@ struct Dictionary
   }
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, Dictionary, mData);
+    BindProperty(library, boundType, Dictionary, mData);
   }
   
   void Add(const std::string& key, const std::string& value)
@@ -96,10 +96,10 @@ struct MyStruct
 
 inline void BindMyStruct(ReflectionLibrary& library, BoundType& boundType)
 {
-  BindField(library, boundType, MyStruct, mData);
-  BindField(library, boundType, MyStruct, mFloat);
-  BindField(library, boundType, MyStruct, mChar1);
-  BindField(library, boundType, MyStruct, mChar2);
-  BindField(library, boundType, MyStruct, mDouble1);
-  BindField(library, boundType, MyStruct, mString1);
+  BindProperty(library, boundType, MyStruct, mData);
+  BindProperty(library, boundType, MyStruct, mFloat);
+  BindProperty(library, boundType, MyStruct, mChar1);
+  BindProperty(library, boundType, MyStruct, mChar2);
+  BindProperty(library, boundType, MyStruct, mDouble1);
+  BindProperty(library, boundType, MyStruct, mString1);
 }

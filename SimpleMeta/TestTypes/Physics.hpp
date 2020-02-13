@@ -15,7 +15,7 @@ struct Collider
   }
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    BindField(library, boundType, Collider, mId);
+    BindProperty(library, boundType, Collider, mId);
   }
 
   int mId;
@@ -35,7 +35,7 @@ struct BoxCollider : public Collider
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
-    BindField(library, boundType, BoxCollider, mSize);
+    BindProperty(library, boundType, BoxCollider, mSize);
   }
 
   Vec3 mSize;
@@ -54,7 +54,7 @@ struct SphereCollider : public Collider
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
-    BindField(library, boundType, SphereCollider, mRadius);
+    BindProperty(library, boundType, SphereCollider, mRadius);
   }
   float mRadius;
 };
@@ -75,7 +75,7 @@ struct PhysicsSpace
   }
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
-    Field* field = BindField(library, boundType, PhysicsSpace, mColliders);
+    BindProperty(library, boundType, PhysicsSpace, mColliders);
   }
 
   std::vector<Collider*> mColliders;
