@@ -3,9 +3,10 @@
 #include "StaticTypeId.hpp"
 #include <unordered_map>
 
-template <typename SerializerType, typename T>
+template <typename T>
 struct SerializationPolicy
 {
+  template <typename SerializerType>
   static bool Serialize(SerializerType& serializer, T& obj)
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
@@ -14,9 +15,10 @@ struct SerializationPolicy
 };
 
 #define DeclarePrimitivePolicy(PrimitiveType)                           \
-template <typename SerializerType>                                      \
-struct SerializationPolicy<SerializerType, PrimitiveType>               \
+template <>                                                             \
+struct SerializationPolicy<PrimitiveType>                               \
 {                                                                       \
+  template <typename SerializerType>                                    \
   static bool Serialize(SerializerType& serializer, PrimitiveType& obj) \
   {                                                                     \
     BoundType* boundType = StaticTypeId<PrimitiveType>::GetBoundType(); \
@@ -37,7 +39,7 @@ bool SerializeArrayItems(SerializerType& serializer, T* arrayData, size_t count)
   for(size_t i = 0; i < count; ++i)
   {
     serializer.BeginArrayItem(i);
-    SerializationPolicy<SerializerType, T>::Serialize(serializer, arrayData[i]);
+    SerializationPolicy<T>::Serialize<SerializerType>(serializer, arrayData[i]);
     serializer.EndArrayItem();
   }
   return true;
@@ -55,56 +57,47 @@ bool SerializeArrayItems(SerializerType& serializer, T (&arrayData)[FixedSize])
   return SerializeArrayItems(serializer, arrayData, FixedSize);
 }
 
-template <typename SerializerType, typename ArrayType, typename T>
-struct ArraySerializationPolicy
-{
-  static bool Serialize(SerializerType& serializer, ArrayType& data)
-  {
-    BoundType& subType = *StaticTypeId<T>::GetBoundType();
-    if(serializer.mDirection == SerializerDirection::Saving)
-    {
-      size_t count = data.size();
-      serializer.BeginArray(count);
-      SerializeArrayItems(serializer, data, count);
-      serializer.EndArray();
-    }
-    else
-    {
-      size_t count;
-      serializer.BeginArray(count);
-      data.resize(count);
-      SerializeArrayItems(serializer, data, count);
-      serializer.EndArray();
-    }
-    
-    return true;
-  }
-};
-
-template <typename ArrayType, typename T>
-struct ArraySerializationPolicy<BinarySaver, ArrayType, T>
-{
-  static bool Serialize(BinarySaver& serializer, ArrayType& data)
-  {
-    BoundType& subType = *StaticTypeId<T>::GetBoundType();
-    size_t count = data.size();
-    serializer.BeginArray(count);
-    SerializeArrayItems(serializer, data, count);
-    serializer.EndArray();
-    return true;
-  }
-};
-
-template <typename SerializerType, typename T, typename ... Extra>
-struct SerializationPolicy<SerializerType, std::vector<T, Extra...>>
+template <typename T, typename ... Extra>
+struct SerializationPolicy<std::vector<T, Extra...>>
 {
   typedef std::vector<T, Extra...> ArrayType;
+
+ 
+  template <typename SerializerType>
   static bool Serialize(SerializerType& serializer, ArrayType& data)
   {
-    return ArraySerializationPolicy<SerializerType, ArrayType, T>::Serialize(serializer, data);
-  }
-};
+	  BoundType& subType = *StaticTypeId<T>::GetBoundType();
+	  if (serializer.mDirection == SerializerDirection::Saving)
+	  {
+		  size_t count = data.size();
+		  serializer.BeginArray(count);
+		  SerializeArrayItems(serializer, data, count);
+		  serializer.EndArray();
+	  }
+	  else
+	  {
+		  size_t count;
+		  serializer.BeginArray(count);
+		  data.resize(count);
+		  SerializeArrayItems(serializer, data, count);
+		  serializer.EndArray();
+	  }
 
+	  return true;
+  }
+
+  template <>
+  static bool Serialize<BinarySaver>(BinarySaver& serializer, ArrayType& data)
+  {
+	  BoundType& subType = *StaticTypeId<T>::GetBoundType();
+	  size_t count = data.size();
+	  serializer.BeginArray(count);
+	  SerializeArrayItems(serializer, data, count);
+	  serializer.EndArray();
+	  return true;
+  }
+
+};
 
 template <typename SerializerType, typename T>
 struct PolymorphicReflection
@@ -138,10 +131,12 @@ struct PolymorphicReflection
   }
 };
 
-template <typename SerializerType, typename T, typename ... Extra>
-struct SerializationPolicy<SerializerType, std::vector<T*, Extra...>>
+template <typename T, typename ... Extra>
+struct SerializationPolicy<std::vector<T*, Extra...>>
 {
   typedef std::vector<T*, Extra...> ArrayType;
+
+  template <typename SerializerType>
   static bool Serialize(SerializerType& serializer, ArrayType& array)
   {
     BoundType& boundType = *StaticTypeId<T>::GetBoundType();
@@ -180,10 +175,12 @@ struct SerializationPolicy<SerializerType, std::vector<T*, Extra...>>
   }
 };
 
-template <typename SerializerType, typename Key, typename Value, typename ... Extra>
-struct SerializationPolicy<SerializerType, std::unordered_map<Key, Value, Extra...>>
+template <typename Key, typename Value, typename ... Extra>
+struct SerializationPolicy<std::unordered_map<Key, Value, Extra...>>
 {
   typedef std::unordered_map<Key, Value, Extra...> MapType;
+
+  template <typename SerializerType>
   static bool Serialize(SerializerType& serializer, MapType& data)
   {
     BoundType* keyBoundType = StaticTypeId<Key>::GetBoundType();
@@ -200,11 +197,11 @@ struct SerializationPolicy<SerializerType, std::unordered_map<Key, Value, Extra.
 
         serializer.BeginMember("Key");
         Key key = it->first;
-        SerializationPolicy<SerializerType, Key>::Serialize(serializer, key);
+        SerializationPolicy<Key>::Serialize<SerializerType>(serializer, key);
         serializer.EndMember();
 
         serializer.BeginMember("Value");
-        SerializationPolicy<SerializerType, Value>::Serialize(serializer, it->second);
+        SerializationPolicy<Value>::Serialize<SerializerType>(serializer, it->second);
         serializer.EndMember();
 
         serializer.EndObject();
@@ -224,11 +221,11 @@ struct SerializationPolicy<SerializerType, std::unordered_map<Key, Value, Extra.
         //serializer.BeginObject();
 
         serializer.BeginMember("Key");
-        SerializationPolicy<SerializerType, Key>::Serialize(serializer, key);
+        SerializationPolicy<Key>::Serialize<SerializerType>(serializer, key);
         serializer.EndMember();
 
         serializer.BeginMember("Value");
-        SerializationPolicy<SerializerType, Value>::Serialize(serializer, value);
+        SerializationPolicy<Value>::Serialize<SerializerType>(serializer, value);
         serializer.EndMember();
         data[key] = value;
 
@@ -240,39 +237,35 @@ struct SerializationPolicy<SerializerType, std::unordered_map<Key, Value, Extra.
 
     return true;
   }
-};
 
-template <typename Key, typename Value, typename ... Extra>
-struct SerializationPolicy<JsonSaver, std::unordered_map<Key, Value, Extra...>>
-{
-  typedef std::unordered_map<Key, Value, Extra...> MapType;
-  static bool Serialize(JsonSaver& serializer, MapType& data)
+  template <>
+  static bool Serialize<JsonSaver>(JsonSaver& serializer, MapType& data)
   {
-    BoundType* keyBoundType = StaticTypeId<Key>::GetBoundType();
-    BoundType* valueBoundType = StaticTypeId<Value>::GetBoundType();
-   
-    size_t count = data.size();
-    serializer.BeginArray(count);
-    int i = 0;
-    for(auto it = data.begin(); it != data.end(); ++it, ++i)
-    {
-      serializer.BeginArrayItem(i);
-      serializer.BeginObject();
+	  BoundType* keyBoundType = StaticTypeId<Key>::GetBoundType();
+	  BoundType* valueBoundType = StaticTypeId<Value>::GetBoundType();
 
-      serializer.BeginMember("Key");
-      Key key = it->first;
-      SerializationPolicy<JsonSaver, Key>::Serialize(serializer, key);
-      serializer.EndMember();
+	  size_t count = data.size();
+	  serializer.BeginArray(count);
+	  int i = 0;
+	  for (auto it = data.begin(); it != data.end(); ++it, ++i)
+	  {
+		  serializer.BeginArrayItem(i);
+		  serializer.BeginObject();
 
-      serializer.BeginMember("Value");
-      SerializationPolicy<JsonSaver, Value>::Serialize(serializer, it->second);
-      serializer.EndMember();
+		  serializer.BeginMember("Key");
+		  Key key = it->first;
+		  SerializationPolicy<Key>::Serialize<JsonSaver>(serializer, key);
+		  serializer.EndMember();
 
-      serializer.EndObject();
-      serializer.EndArrayItem();
-    }
-    serializer.EndArray();
+		  serializer.BeginMember("Value");
+		  SerializationPolicy<Value>::Serialize<JsonSaver>(serializer, it->second);
+		  serializer.EndMember();
 
-    return true;
+		  serializer.EndObject();
+		  serializer.EndArrayItem();
+	  }
+	  serializer.EndArray();
+
+	  return true;
   }
 };

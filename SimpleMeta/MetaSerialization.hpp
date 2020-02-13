@@ -25,7 +25,7 @@ struct TypedMetaSerialization : public MetaSerialization
   bool SerializeTyped(SerializerType& serializer, char* data)
   {
     T* typedData = (T*)data;
-    return SerializationPolicy<SerializerType, T>::Serialize(serializer, *typedData);
+    return SerializationPolicy<T>::Serialize<SerializerType>(serializer, *typedData);
   }
 
   virtual bool SerializeBase(Serializer& serializer, BoundType& boundType, char* data) { return SerializeTyped(serializer, data); }
