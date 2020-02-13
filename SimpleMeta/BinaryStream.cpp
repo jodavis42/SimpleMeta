@@ -20,6 +20,16 @@ bool BinarySaver::SerializePrimitive(const BoundType& boundType, std::string& da
   return true;
 }
 
+bool BinarySaver::BeginMembers(size_t& count)
+{
+  return Write(count);
+}
+
+bool BinarySaver::BeginMember(size_t index, std::string& name)
+{
+  return SerializePrimitive(*StaticTypeId<std::string>::GetBoundType(), name);
+}
+
 bool BinarySaver::BeginObject(PolymorphicInfo& info)
 {
   Write(info.mId.mId);
@@ -69,6 +79,16 @@ bool BinaryLoader::SerializePrimitive(const BoundType& boundType, std::string& d
   data.resize(sizeInBytes);
   mStream.read((char*)data.data(), sizeInBytes);
   return false;
+}
+
+bool BinaryLoader::BeginMembers(size_t& count)
+{
+  return Read(count);
+}
+
+bool BinaryLoader::BeginMember(size_t index, std::string& name)
+{
+  return SerializePrimitive(*StaticTypeId<std::string>::GetBoundType(), name);
 }
 
 bool BinaryLoader::BeginObject()

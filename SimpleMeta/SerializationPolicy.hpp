@@ -269,3 +269,52 @@ struct SerializationPolicy<std::unordered_map<Key, Value, Extra...>>
 	  return true;
   }
 };
+
+template <typename Value, typename ... Extra>
+struct SerializationPolicy<std::unordered_map<std::string, Value, Extra...>>
+{
+  typedef std::string Key;
+  typedef std::unordered_map<std::string, Value, Extra...> MapType;
+
+  template <typename SerializerType>
+  static bool Serialize(Serializer& serializer, MapType& data)
+  {
+    BoundType* keyBoundType = StaticTypeId<Key>::GetBoundType();
+    BoundType* valueBoundType = StaticTypeId<Value>::GetBoundType();
+    if(serializer.mDirection == SerializerDirection::Saving)
+    {
+      size_t count = data.size();
+      serializer.BeginMembers(count);
+      size_t i = 0;
+      for(auto it = data.begin(); it != data.end(); ++it, ++i)
+      {
+        std::string key = it->first;
+        serializer.BeginMember(i, key);
+        SerializationPolicy<Value>::Serialize(serializer, it->second);
+        serializer.EndMember();
+      }
+      serializer.EndMembers();
+    }
+    else
+    {
+      size_t count;
+      serializer.BeginMembers(count);
+      for(size_t i = 0; i < count; ++i)
+      {
+        std::string key;
+        serializer.BeginMember(i, key);
+
+        Value value;
+        SerializationPolicy<Value>::Serialize(serializer, value);
+
+        data[key] = value;
+
+        serializer.EndMember();
+
+      }
+      serializer.EndMembers();
+    }
+
+    return true;
+  }
+};

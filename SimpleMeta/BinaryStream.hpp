@@ -12,6 +12,7 @@ public:
   // Force all overloads to be included
   using Serializer::SerializePrimitive;
   using Serializer::BeginObject;
+  using Serializer::BeginMember;
 
   BinarySaver(std::ostream& stream);
 
@@ -25,6 +26,8 @@ public:
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
+  virtual bool BeginMembers(size_t& count) override;
+  virtual bool BeginMember(size_t index, std::string& name) override;
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginArray(size_t& count) override;
 
@@ -40,6 +43,7 @@ struct BinaryLoader : public Serializer
   // Force all overloads to be included
   using Serializer::SerializePrimitive;
   using Serializer::BeginObject;
+  using Serializer::BeginMember;
 
   BinaryLoader(std::istream& stream);
 
@@ -53,6 +57,8 @@ struct BinaryLoader : public Serializer
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
+  virtual bool BeginMembers(size_t& count) override;
+  virtual bool BeginMember(size_t index, std::string& name) override;
   virtual bool BeginObject() override;
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginArray(size_t& count) override;

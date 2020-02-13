@@ -131,6 +131,7 @@ int main()
     input.Add("tanoshi", "fun");
   
     TestJsonRoundTrip(input);
+    TestBinaryRoundTrip(input);
   }
 
   {

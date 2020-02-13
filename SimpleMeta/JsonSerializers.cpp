@@ -88,7 +88,17 @@ bool JsonSaver::BeginObject(PolymorphicInfo& info)
   return true;
 }
 
+bool JsonSaver::BeginMembers(size_t& count)
+{
+  return BeginObject();
+}
+
 bool JsonSaver::BeginMember(const std::string& name)
+{
+  return WriteKey(name);
+}
+
+bool JsonSaver::BeginMember(size_t index, std::string& name)
 {
   return WriteKey(name);
 }
@@ -107,6 +117,11 @@ bool JsonSaver::BeginArrayItem(size_t index)
 bool JsonSaver::EndObject()
 {
   return mData->mWriter.EndObject();
+}
+
+bool JsonSaver::EndMembers()
+{
+  return EndObject();
 }
 
 bool JsonSaver::EndMember()
@@ -235,6 +250,13 @@ bool JsonLoader::BeginObject(PolymorphicInfo& info)
   return true;
 }
 
+bool JsonLoader::BeginMembers(size_t& count)
+{
+  auto node = mData->mStack.top();
+  count = node->MemberCount();
+  return true;
+}
+
 bool JsonLoader::BeginMember(const std::string& name)
 {
   auto node = mData->mStack.top();
@@ -246,6 +268,19 @@ bool JsonLoader::BeginMember(const std::string& name)
   return true;
 }
 
+bool JsonLoader::BeginMember(size_t index, std::string& name)
+{
+  auto node = mData->mStack.top();
+  if(index >= node->MemberCount())
+    return false;
+  auto it = node->MemberBegin();
+  it += index;
+
+  name = it->name.GetString();
+
+  mData->mStack.push(&it->value);
+  return true;
+}
 bool JsonLoader::BeginArray(size_t& count)
 {
   auto arrayNode = mData->mStack.top();
@@ -267,6 +302,11 @@ bool JsonLoader::BeginArrayItem(size_t index)
 }
 
 bool JsonLoader::EndObject()
+{
+  return End();
+}
+
+bool JsonLoader::EndMembers()
 {
   return End();
 }
