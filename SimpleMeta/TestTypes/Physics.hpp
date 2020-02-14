@@ -13,7 +13,7 @@ struct Collider
   {
     return StaticTypeId<Collider>::GetBoundType();
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Collider, mId);
   }
@@ -32,7 +32,7 @@ struct BoxCollider : public Collider
   {
     return StaticTypeId<BoxCollider>::GetBoundType();
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
     BindField(library, boundType, BoxCollider, mSize);
@@ -51,7 +51,7 @@ struct SphereCollider : public Collider
   {
     return StaticTypeId<SphereCollider>::GetBoundType();
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
     BindField(library, boundType, SphereCollider, mRadius);
@@ -73,7 +73,7 @@ struct PhysicsSpace
     }
     return isEqual;
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     Field* field = BindField(library, boundType, PhysicsSpace, mColliders);
   }

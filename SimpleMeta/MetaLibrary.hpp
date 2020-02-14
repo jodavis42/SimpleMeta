@@ -6,29 +6,29 @@
 
 struct BoundType;
 
-struct MetaLibrary
+struct ReflectionLibrary
 {
-  static void AddBoundType(BoundType* boundType)
-  {
-    mBoundTypes.push_back(boundType);
-    mBoundTypeMap[boundType->mName] = boundType;
-    mBoundTypeIdMap[boundType->mId.mId] = boundType;
-  }
-  static BoundType* FindBoundType(const std::string& name)
-  {
-    auto it = mBoundTypeMap.find(name);
-    if(it != mBoundTypeMap.end())
-      return it->second;
-    return nullptr;
-  }
-  static BoundType* FindBoundType(const TypeId& id)
-  {
-    auto it = mBoundTypeIdMap.find(id.mId);
-    if(it != mBoundTypeIdMap.end())
-      return it->second;
-    return nullptr;
-  }
-  static std::vector<BoundType*> mBoundTypes;
-  static std::unordered_map<std::string, BoundType*> mBoundTypeMap;
-  static std::unordered_map<size_t, BoundType*> mBoundTypeIdMap;
+  void AddDependency(ReflectionLibrary* dependency);
+  void AddBoundType(BoundType* boundType);
+
+  BoundType* FindBoundType(const std::string& name, bool recursive = true);
+  BoundType* FindBoundType(const TypeId& id, bool recursive = true);
+
+  std::string mName;
+  std::vector<ReflectionLibrary*> mDependencies;
+  std::vector<BoundType*> mBoundTypes;
+  std::unordered_map<std::string, BoundType*> mBoundTypeMap;
+  std::unordered_map<size_t, BoundType*> mBoundTypeIdMap;
+};
+
+struct ReflectionProject
+{
+  static ReflectionLibrary& CreateLibrary(const std::string& name);
+  static ReflectionLibrary* FindLibrary(const std::string& name);
+  static void DestroyLibrary(ReflectionLibrary& library);
+
+  static BoundType* FindBoundType(const std::string& name, bool recursive = true);
+  static BoundType* FindBoundType(const TypeId& id, bool recursive = true);
+
+  static std::vector<ReflectionLibrary*> mLibraries;
 };

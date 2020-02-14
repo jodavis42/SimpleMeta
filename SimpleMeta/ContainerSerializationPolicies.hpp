@@ -78,9 +78,9 @@ struct PolymorphicReflection
     PolymorphicInfo info;
     serializer.BeginObject(info);
     if(!info.mName.empty())
-      return MetaLibrary::FindBoundType(info.mName);
+      return ReflectionProject::FindBoundType(info.mName);
     else
-      return MetaLibrary::FindBoundType(info.mId);
+      return ReflectionProject::FindBoundType(info.mId);
   }
 
   static bool Save(SerializerType& serializer, BoundType& boundType, char* objData)

@@ -2,8 +2,6 @@
 
 #include "Bindings.hpp"
 
-
-
 struct NameId
 {
   NameId()
@@ -17,7 +15,7 @@ struct NameId
   {
     return mId == rhs.mId && mName == rhs.mName;
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, NameId, mId);
     BindField(library, boundType, NameId, mName);
@@ -33,7 +31,7 @@ struct NameIdList
   {
     return mIds == rhs.mIds;
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, NameIdList, mIds);
   }
@@ -47,7 +45,7 @@ struct NumberList
   {
     return mData == rhs.mData;
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, NumberList, mData);
   }
@@ -61,7 +59,7 @@ struct Dictionary
   {
     return mData == rhs.mData;
   }
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Dictionary, mData);
   }
@@ -96,7 +94,7 @@ struct MyStruct
   }
 };
 
-inline void BindMyStruct(MetaLibrary& library, BoundType& boundType)
+inline void BindMyStruct(ReflectionLibrary& library, BoundType& boundType)
 {
   BindField(library, boundType, MyStruct, mData);
   BindField(library, boundType, MyStruct, mFloat);

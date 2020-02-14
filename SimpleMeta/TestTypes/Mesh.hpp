@@ -16,7 +16,7 @@ struct Vertex
     return mUv == rhs.mUv && mPosition == rhs.mPosition;
   }
 
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Vertex, mUv);
     BindField(library, boundType, Vertex, mPosition);
@@ -33,7 +33,7 @@ struct Mesh
     return mVertices == rhs.mVertices && mName == rhs.mName;
   }
 
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Mesh, mVertices);
     BindField(library, boundType, Mesh, mName);

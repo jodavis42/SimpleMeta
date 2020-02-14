@@ -19,7 +19,7 @@ struct Vec2
     return x == rhs.x && y == rhs.y;
   }
 
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Vec2, x);
     BindField(library, boundType, Vec2, y);
@@ -46,7 +46,7 @@ struct Vec3
     return x == rhs.x && y == rhs.y && z == rhs.z;
   }
 
-  static void Bind(MetaLibrary& library, BoundType& boundType)
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindField(library, boundType, Vec3, x);
     BindField(library, boundType, Vec3, y);

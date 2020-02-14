@@ -11,25 +11,28 @@
 
 int main()
 {
-  MetaLibrary library;
-  BindPrimitiveType(library, char);
-  BindPrimitiveType(library, int);
-  BindPrimitiveType(library, float);
-  BindPrimitiveType(library, double);
-  BindType(library, Vec2, 'vec2');
-  BindType(library, Vec3, 'vec3');
-  BindPrimitiveTypeAs(library, std::string, "string");
-  BindTypeExternal(library, MyStruct, 'myst', BindMyStruct);
-  BindType(library, Vertex, 'vtx');
-  BindType(library, Mesh, 'mesh');
-  BindType(library, NameId, 'nid');
-  BindType(library, NameIdList, 'idlt');
-  BindType(library, Collider, 'col');
-  BindType(library, BoxCollider, 'bcol');
-  BindType(library, SphereCollider, 'scol');
-  BindType(library, PhysicsSpace, 'phys');
-  BindType(library, NumberList, 'nmls');
-  BindType(library, Dictionary, 'dict');
+  ReflectionLibrary& coreLibrary = ReflectionProject::CreateLibrary("Core");
+  BindPrimitiveType(coreLibrary, char);
+  BindPrimitiveType(coreLibrary, int);
+  BindPrimitiveType(coreLibrary, float);
+  BindPrimitiveType(coreLibrary, double);
+  BindType(coreLibrary, Vec2, 'vec2');
+  BindType(coreLibrary, Vec3, 'vec3');
+  BindPrimitiveTypeAs(coreLibrary, std::string, "string");
+
+  ReflectionLibrary& miscLibrary = ReflectionProject::CreateLibrary("Misc");
+  miscLibrary.AddDependency(&coreLibrary);
+  BindTypeExternal(miscLibrary, MyStruct, 'myst', BindMyStruct);
+  BindType(miscLibrary, Vertex, 'vtx');
+  BindType(miscLibrary, Mesh, 'mesh');
+  BindType(miscLibrary, NameId, 'nid');
+  BindType(miscLibrary, NameIdList, 'idlt');
+  BindType(miscLibrary, Collider, 'col');
+  BindType(miscLibrary, BoxCollider, 'bcol');
+  BindType(miscLibrary, SphereCollider, 'scol');
+  BindType(miscLibrary, PhysicsSpace, 'phys');
+  BindType(miscLibrary, NumberList, 'nmls');
+  BindType(miscLibrary, Dictionary, 'dict');
 
   RunUnitTests();
 

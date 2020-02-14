@@ -6,7 +6,7 @@
 #include "StaticTypeId.hpp"
 
 template <typename FieldPointer, FieldPointer field, typename Class, typename FieldType>
-static Field* FromField(MetaLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
+static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
 {
   Field f = Field();
   f.mName = name;
@@ -21,8 +21,8 @@ static Field* FromField(MetaLibrary& library, BoundType& owner, const std::strin
   return &owner.mFields.back();
 }
 
-template <typename ClassType, void (*BindingFn)(MetaLibrary& library, BoundType&)>
-void BindClassType(MetaLibrary& library, const std::string& className, int id)
+template <typename ClassType, void (*BindingFn)(ReflectionLibrary& library, BoundType&)>
+void BindClassType(ReflectionLibrary& library, const std::string& className, int id)
 {
   BoundType* boundType = StaticTypeId<ClassType>::GetBoundType();
   boundType->mName = className;
@@ -35,7 +35,7 @@ void BindClassType(MetaLibrary& library, const std::string& className, int id)
 }
 
 template <typename Type>
-void BindPrimitiveTypeToLibrary(MetaLibrary& library, const std::string& className)
+void BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className)
 {
   BoundType* boundType = StaticTypeId<Type>::GetBoundType();
   boundType->mName = className;
@@ -45,7 +45,7 @@ void BindPrimitiveTypeToLibrary(MetaLibrary& library, const std::string& classNa
 }
 
 template <typename BaseType>
-void BindBaseType(MetaLibrary& library, BoundType& derrivedType)
+void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 {
   BoundType* baseType = StaticTypeId<BaseType>::GetBoundType();
   derrivedType.mBaseType = baseType;
