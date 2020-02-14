@@ -7,6 +7,10 @@ class JsonInternalData;
 class JsonSaver : public Serializer
 {
 public:
+  // Force all overloads to be included
+  using Serializer::SerializePrimitive;
+  using Serializer::BeginObject;
+
   JsonSaver();
   ~JsonSaver();
   std::string ToString();
@@ -52,6 +56,10 @@ public:
 class JsonLoader : public Serializer
 {
 public:
+  // Force all overloads to be included
+  using Serializer::SerializePrimitive;
+  using Serializer::BeginObject;
+
   JsonLoader();
   ~JsonLoader();
 

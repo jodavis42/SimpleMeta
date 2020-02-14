@@ -1,8 +1,6 @@
 #include "BinaryStream.hpp"
 
-#include "StaticTypeId.hpp"
 #include "MetaSerialization.hpp"
-
 
 BinarySaver::BinarySaver(std::ostream& stream) : mStream(stream.rdbuf())
 {

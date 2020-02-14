@@ -2,12 +2,16 @@
 
 #include "StaticTypeId.hpp"
 #include "Serializer.hpp"
-#include <sstream>
+
+#include <istream>
+#include <ostream>
 
 struct BinarySaver : public Serializer
 {
 public:
+  // Force all overloads to be included
   using Serializer::SerializePrimitive;
+  using Serializer::BeginObject;
 
   BinarySaver(std::ostream& stream);
 
@@ -18,11 +22,9 @@ public:
     SerializeProperties(*this, *boundType, (char*)(&data));
   }
 
-  
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
-  using Serializer::BeginObject;
   virtual bool BeginObject(PolymorphicInfo& info) override;
   virtual bool BeginArray(size_t& count) override;
 
@@ -35,6 +37,10 @@ public:
 
 struct BinaryLoader : public Serializer
 {
+  // Force all overloads to be included
+  using Serializer::SerializePrimitive;
+  using Serializer::BeginObject;
+
   BinaryLoader(std::istream& stream);
 
   template <typename T>
@@ -44,7 +50,6 @@ struct BinaryLoader : public Serializer
     SerializeProperties(*this, *boundType, (char*)(&data));
   }
 
-  using Serializer::SerializePrimitive;
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
 
