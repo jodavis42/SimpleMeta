@@ -351,51 +351,103 @@ bool JsonLoader::EndArray()
 bool JsonLoader::ReadPrimitive(bool& data)
 {
   rapidjson::Value* node = mData->mStack.top();
-  if(!node->IsBool())
-    return false;
+  
+  if(node->IsBool())
+  {
+    data = node->GetBool();
+    return true;
+  }
 
-  data = node->GetBool();
-  return true;
+  if(node->IsInt())
+  {
+    data = node->GetInt() != 0;
+    return true;
+  }
+
+  return false;
 }
 
 bool JsonLoader::ReadPrimitive(char& data)
 {
   rapidjson::Value* node = mData->mStack.top();
-  if(!node->IsInt())
-    return false;
+  if(node->IsBool())
+  {
+    data = node->GetBool() ? 1 : 0;
+    return true;
+  }
 
-  data = node->GetInt();
-  return true;
+  if(node->IsInt())
+  {
+    data = node->GetInt();
+    return true;
+  }
+
+  return false;
 }
 
 bool JsonLoader::ReadPrimitive(int& data)
 {
   rapidjson::Value* node = mData->mStack.top();
-  if(!node->IsInt())
-    return false;
+  if(node->IsBool())
+  {
+    data = node->GetBool() ? 1 : 0;
+    return true;
+  }
 
-  data = node->GetInt();
-  return true;
+  if(node->IsInt())
+  {
+    data = node->GetInt();
+    return true;
+  }
+  return false;
 }
 
 bool JsonLoader::ReadPrimitive(float& data)
 {
   rapidjson::Value* node = mData->mStack.top();
-  if(!node->IsFloat())
-    return false;
+  if(node->IsBool())
+  {
+    data = node->GetBool() ? 1.0f : 0.0f;
+    return true;
+  }
 
-  data = node->GetFloat();
-  return true;
+  if(node->IsInt())
+  {
+    data = static_cast<float>(node->GetInt());
+    return true;
+  }
+  
+  if(node->IsDouble())
+  {
+    data = static_cast<float>(node->GetDouble());
+    return true;
+  }
+
+  return false;
 }
 
 bool JsonLoader::ReadPrimitive(double& data)
 {
   rapidjson::Value* node = mData->mStack.top();
-  if(!node->IsDouble())
-    return false;
+  if(node->IsBool())
+  {
+    data = node->GetBool() ? 1.0 : 0.0;
+    return true;
+  }
 
-  data = node->GetDouble();
-  return true;
+  if(node->IsInt())
+  {
+    data = static_cast<double>(node->GetInt());
+    return true;
+  }
+
+  if(node->IsDouble())
+  {
+    data = node->GetDouble();
+    return true;
+  }
+
+  return false;
 }
 
 bool JsonLoader::ReadPrimitive(std::string& data)

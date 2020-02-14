@@ -1,0 +1,22 @@
+{
+  "Types": [
+    {
+      "Name": "MyFloat",
+      "Fields": [
+        {
+          "Name": "Value",
+          "Type": "float"
+        }
+      ]
+    },
+    {
+      "Name": "FloatList",
+      "Fields": [
+        {
+          "Name": "List",
+          "Type": "Array<MyFloat>"
+        }
+      ]
+    }
+  ]
+}

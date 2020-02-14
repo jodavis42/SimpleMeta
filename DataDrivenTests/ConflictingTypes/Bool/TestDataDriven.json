@@ -1,0 +1,19 @@
+{
+    "RootType": "BoolList",
+    "BoolList": {
+        "List": [
+            {
+                "Value": false
+            },
+            {
+                "Value": true
+            },
+            {
+                "Value": 0
+            },
+            {
+                "Value": 1
+            }
+        ]
+    }
+}

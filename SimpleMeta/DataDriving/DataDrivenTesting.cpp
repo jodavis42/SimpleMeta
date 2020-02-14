@@ -25,6 +25,11 @@ BoundType* TryCreateArrayType(ReflectionLibrary& library, DataDrivenTypeNameMap&
   {
     BuildType(library, *typeMap[templateParam], typeMap);
   }
+  if(templateParamType == nullptr)
+  {
+    // Failed to create template param. Typo?
+    __debugbreak();
+  }
   
   BoundType* boundType = new BoundType();
   boundType->mName = typeName;
@@ -244,12 +249,16 @@ void RunDataDrivenFolder(const std::filesystem::path& folderPath, ReflectionLibr
 
 void RunDataDrivenTests(const std::filesystem::path& testsPath, ReflectionLibrary& dataDrivenLibrary)
 {
+  if(!std::filesystem::is_directory(testsPath))
+    return;
+
   for(const std::filesystem::directory_entry& dir : std::filesystem::directory_iterator(testsPath))
   {
     std::filesystem::path path = dir;
     if(std::filesystem::is_directory(path))
+    {
       RunDataDrivenFolder(path, dataDrivenLibrary);
-    else
       RunDataDrivenTests(path, dataDrivenLibrary);
+    }
   }
 }

@@ -1,0 +1,22 @@
+{
+  "Types": [
+    {
+      "Name": "MyDouble",
+      "Fields": [
+        {
+          "Name": "Value",
+          "Type": "double"
+        }
+      ]
+    },
+    {
+      "Name": "DoubleList",
+      "Fields": [
+        {
+          "Name": "List",
+          "Type": "Array<MyDouble>"
+        }
+      ]
+    }
+  ]
+}

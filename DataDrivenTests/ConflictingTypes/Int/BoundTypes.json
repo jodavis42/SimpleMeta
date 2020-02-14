@@ -1,0 +1,22 @@
+{
+  "Types": [
+    {
+      "Name": "MyInt",
+      "Fields": [
+        {
+          "Name": "Value",
+          "Type": "int"
+        }
+      ]
+    },
+    {
+      "Name": "IntList",
+      "Fields": [
+        {
+          "Name": "List",
+          "Type": "Array<MyInt>"
+        }
+      ]
+    }
+  ]
+}

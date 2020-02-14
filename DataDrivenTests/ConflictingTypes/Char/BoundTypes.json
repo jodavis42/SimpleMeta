@@ -1,0 +1,22 @@
+{
+  "Types": [
+    {
+      "Name": "MyChar",
+      "Fields": [
+        {
+          "Name": "Value",
+          "Type": "char"
+        }
+      ]
+    },
+    {
+      "Name": "CharList",
+      "Fields": [
+        {
+          "Name": "List",
+          "Type": "Array<MyChar>"
+        }
+      ]
+    }
+  ]
+}

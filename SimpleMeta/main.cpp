@@ -13,6 +13,7 @@
 int main()
 {
   ReflectionLibrary& coreLibrary = ReflectionProject::CreateLibrary("Core");
+  BindPrimitiveType(coreLibrary, bool);
   BindPrimitiveType(coreLibrary, char);
   BindPrimitiveType(coreLibrary, int);
   BindPrimitiveType(coreLibrary, float);

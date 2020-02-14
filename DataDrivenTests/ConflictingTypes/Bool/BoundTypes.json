@@ -1,0 +1,22 @@
+{
+  "Types": [
+    {
+      "Name": "MyBool",
+      "Fields": [
+        {
+          "Name": "Value",
+          "Type": "bool"
+        }
+      ]
+    },
+    {
+      "Name": "BoolList",
+      "Fields": [
+        {
+          "Name": "List",
+          "Type": "Array<MyBool>"
+        }
+      ]
+    }
+  ]
+}
