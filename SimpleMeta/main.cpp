@@ -55,6 +55,7 @@ void TestJsonRoundTrip(T& input)
     __debugbreak();
   }
 }
+#include "ContainerSerializationPolicies.hpp"
 
 int main()
 {

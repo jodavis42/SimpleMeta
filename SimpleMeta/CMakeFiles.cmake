@@ -13,6 +13,7 @@ target_sources(SimpleMeta
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.cpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
     ${CMAKE_CURRENT_LIST_DIR}/SerializationPolicy.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ContainerSerializationPolicies.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
