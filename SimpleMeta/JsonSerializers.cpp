@@ -9,6 +9,8 @@
 #include "writer.h"
 #include "stringbuffer.h"
 #include <stack>
+#include <fstream>
+#include <sstream>
 
 class JsonInternalData
 {
@@ -194,10 +196,21 @@ JsonLoader::~JsonLoader()
   delete mData;
 }
 
-void JsonLoader::SetJson(const std::string& jsonData)
+void JsonLoader::Load(const std::string& jsonData)
 {
   mData->mDocument.Parse(jsonData.c_str());
   mData->mStack.push(&mData->mDocument);
+}
+
+void JsonLoader::LoadFromFile(const std::string& filePath)
+{
+  std::ifstream stream;
+  stream.open(filePath, std::ifstream::in);
+
+  std::stringstream strStream;
+  strStream << stream.rdbuf();
+
+  Load(strStream.str());
 }
 
 bool JsonLoader::SerializePrimitive(const BoundType& boundType, char* data)

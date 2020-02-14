@@ -68,15 +68,16 @@ public:
   JsonLoader();
   ~JsonLoader();
 
+  void Load(const std::string& jsonData);
+  void LoadFromFile(const std::string& filePath);
+
   template <typename T>
   void Serialize(const std::string& jsonData, T& data)
   {
-    SetJson(jsonData);
+    Load(jsonData);
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
     SerializeProperties(*this, *boundType, (char*)(&data));
   }
-
-  void SetJson(const std::string& jsonData);
 
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, bool& data) override;
