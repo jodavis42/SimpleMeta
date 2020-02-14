@@ -13,13 +13,6 @@ struct TypeId
   size_t mId;
 };
 
-enum class BoundTypePrimitiveType
-{
-Primitive,
-Class,
-Array
-};
-
 struct Field
 {
   std::string mName;
