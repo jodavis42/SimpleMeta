@@ -243,34 +243,41 @@ bool JsonLoader::BeginObject()
 
 bool JsonLoader::BeginObject(PolymorphicInfo& info)
 {
-  auto node = mData->mStack.top();
-  info.mName = node->FindMember("Typename")->value.GetString();
+  rapidjson::Value* node = mData->mStack.top();
 
-  mData->mStack.push(&node->FindMember("Value")->value);
+  auto typenameIt = node->FindMember("Typename");
+  rapidjson::Value& typenameNode = typenameIt->value;
+  info.mName = typenameNode.GetString();
+
+  auto valueIt = node->FindMember("Value");
+  rapidjson::Value& valueNode = valueIt->value;
+  mData->mStack.push(&valueNode);
+
   return true;
 }
 
 bool JsonLoader::BeginMembers(size_t& count)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   count = node->MemberCount();
   return true;
 }
 
 bool JsonLoader::BeginMember(const std::string& name)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   auto it = node->FindMember(name.c_str());
   if(it == node->MemberEnd())
     return false;
 
-  mData->mStack.push(&it->value);
+  rapidjson::Value& valueNode = it->value;
+  mData->mStack.push(&valueNode);
   return true;
 }
 
 bool JsonLoader::BeginMember(size_t index, std::string& name)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(index >= node->MemberCount())
     return false;
   auto it = node->MemberBegin();
@@ -278,12 +285,14 @@ bool JsonLoader::BeginMember(size_t index, std::string& name)
 
   name = it->name.GetString();
 
-  mData->mStack.push(&it->value);
+  rapidjson::Value& valueNode = it->value;
+  mData->mStack.push(&valueNode);
   return true;
 }
+
 bool JsonLoader::BeginArray(size_t& count)
 {
-  auto arrayNode = mData->mStack.top();
+  rapidjson::Value* arrayNode = mData->mStack.top();
   auto array = arrayNode->GetArray();
   count = array.Size();
   return false;
@@ -291,12 +300,12 @@ bool JsonLoader::BeginArray(size_t& count)
 
 bool JsonLoader::BeginArrayItem(size_t index)
 {
-  auto arrayNode = mData->mStack.top();
+  rapidjson::Value* arrayNode = mData->mStack.top();
   auto array = arrayNode->GetArray();
   if(index >= array.Size())
     return false;
 
-  auto&& arrayItemNode = array[(int)index];
+  rapidjson::Value& arrayItemNode = array[(int)index];
   mData->mStack.push(&arrayItemNode);
   return true;
 }
@@ -328,7 +337,7 @@ bool JsonLoader::EndArray()
 
 bool JsonLoader::ReadPrimitive(bool& data)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(!node->IsBool())
     return false;
 
@@ -338,7 +347,7 @@ bool JsonLoader::ReadPrimitive(bool& data)
 
 bool JsonLoader::ReadPrimitive(char& data)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(!node->IsInt())
     return false;
 
@@ -348,7 +357,7 @@ bool JsonLoader::ReadPrimitive(char& data)
 
 bool JsonLoader::ReadPrimitive(int& data)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(!node->IsInt())
     return false;
 
@@ -358,7 +367,7 @@ bool JsonLoader::ReadPrimitive(int& data)
 
 bool JsonLoader::ReadPrimitive(float& data)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(!node->IsFloat())
     return false;
 
@@ -368,7 +377,7 @@ bool JsonLoader::ReadPrimitive(float& data)
 
 bool JsonLoader::ReadPrimitive(double& data)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(!node->IsDouble())
     return false;
 
@@ -378,7 +387,7 @@ bool JsonLoader::ReadPrimitive(double& data)
 
 bool JsonLoader::ReadPrimitive(std::string& data)
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
   if(!node->IsString())
     return false;
 
@@ -388,13 +397,14 @@ bool JsonLoader::ReadPrimitive(std::string& data)
 
 bool JsonLoader::BeginMember()
 {
-  auto node = mData->mStack.top();
+  rapidjson::Value* node = mData->mStack.top();
 
-  auto& it = node->MemberBegin();
+  auto it = node->MemberBegin();
   if(it == node->MemberEnd())
     return false;
 
-  mData->mStack.push(&it->value);
+  rapidjson::Value& valueNode = it->value;
+  mData->mStack.push(&valueNode);
   return true;
 }
 
