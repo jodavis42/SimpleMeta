@@ -1,0 +1,11 @@
+{
+    "RootType": "RigidBody",
+    "RigidBody": {
+        "Velocity": {
+            "x": 1.0,
+            "y": -5.0,
+            "z": 11.0
+        },
+        "Density": -431602080.0
+    }
+}

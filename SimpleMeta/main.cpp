@@ -8,6 +8,7 @@
 #include "TestTypes/Misc.hpp"
 #include "ContainerSerializationPolicies.hpp"
 #include "UnitTesting.hpp"
+#include "DataDriving/DataDrivenTesting.hpp"
 
 int main()
 {
@@ -35,6 +36,17 @@ int main()
   BindType(miscLibrary, Dictionary, 'dict');
 
   RunUnitTests();
+
+  {
+    ReflectionLibrary& dataDrivenLibrary = ReflectionProject::CreateLibrary("DataDriven");
+    dataDrivenLibrary.AddDependency(&miscLibrary);
+    BindType(dataDrivenLibrary, DataDrivenField, 'ddf');
+    BindType(dataDrivenLibrary, DataDrivenType, 'ddt');
+    BindType(dataDrivenLibrary, DataDrivenTypes, 'ddts');
+
+    std::string testDir = "E:\\Code\\Repos\\SimpleMeta\\DataDrivenTests";
+    RunDataDrivenTests(testDir, dataDrivenLibrary);
+  }
 
   return 0;
 }

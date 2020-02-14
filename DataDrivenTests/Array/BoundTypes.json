@@ -1,0 +1,13 @@
+{
+  "Types": [
+    {
+      "Name": "PhysicsMesh",
+      "Fields": [
+        {
+          "Name": "Vertices",
+          "Type": "Array<Vec3>"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "Types": [
+    {
+      "Name": "V2",
+      "Fields": [
+        {
+          "Name": "x",
+          "Type": "float"
+        },
+        {
+          "Name": "y",
+          "Type": "float"
+        }
+      ]
+    },
+    {
+      "Name": "RigidBody",
+      "Fields": [
+        {
+          "Name": "Velocity",
+          "Type": "V3"
+        },
+        {
+          "Name": "Density",
+          "Type": "float"
+        }
+      ]
+    },
+    {
+      "Name": "V3",
+      "Fields": [
+        {
+          "Name": "x",
+          "Type": "float"
+        },
+        {
+          "Name": "y",
+          "Type": "float"
+        },
+        {
+          "Name": "z",
+          "Type": "float"
+        }
+      ]
+    },
+    {
+      "Name": "Collider2",
+      "Fields": [
+        {
+          "Name": "Offset",
+          "Type": "V3"
+        }
+      ]
+    },
+    {
+      "Name": "BoxCollider2",
+      "BaseType":  "Collider2",
+      "Fields": [
+        {
+          "Name": "Size",
+          "Type": "V3"
+        }
+      ]
+    }
+  ]
+}
