@@ -21,6 +21,7 @@ add_definitions(-DPLATFORM_WINDOWS=1 -DPLATFORM_HARDWARE=1 -DPLATFORM_NAME="Win"
 
 #paths
 set(CurrentDirectory ${CMAKE_CURRENT_LIST_DIR})
+set(DataDrivenTestDir ${CurrentDirectory}/DataDrivenTests)
 set(SupportedConfigs $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 
 set(RapidJsonLocation ${CurrentDirectory}/RapidJson)

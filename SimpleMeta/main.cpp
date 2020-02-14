@@ -45,7 +45,7 @@ int main()
     BindType(dataDrivenLibrary, DataDrivenType, 'ddt');
     BindType(dataDrivenLibrary, DataDrivenTypes, 'ddts');
 
-    std::string testDir = "E:\\Code\\Repos\\SimpleMeta\\DataDrivenTests";
+    std::string testDir = "DataDrivenTests";
     RunDataDrivenTests(testDir, dataDrivenLibrary);
   }
 
