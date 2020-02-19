@@ -33,9 +33,17 @@ void TestBinaryRoundTrip(T& input)
 template <typename T>
 void TestJsonRoundTrip(T& input)
 {
+  BoundType* boundType = StaticTypeId<T>::GetBoundType();
+
   JsonSaver saver;
   saver.Serialize(input);
   std::string jsonData = saver.ToString();
+
+  std::ofstream outStream;
+  std::string fileName = boundType->mName;
+  fileName += ".json";
+  outStream.open(fileName.c_str(), std::ofstream::out);
+  outStream << jsonData;
 
   T output;
   JsonLoader loader;
