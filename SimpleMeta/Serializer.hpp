@@ -57,7 +57,7 @@ bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char*
       continue;
     
     BoundType* fieldType = field->mType;
-    char* fieldSrc = data + field->mOffset;
+    char* fieldSrc = field->GetFieldData(data);
 
     MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
     if(fieldSerialization != nullptr && serializer.BeginMember(field->mName))

@@ -11,7 +11,7 @@ struct MetaSerialization;
 
 struct Field : public ReflectionComposition
 {
-  char* GetFieldData(char* instanceData)
+  char* GetFieldData(char* instanceData) const
   {
     return instanceData + mOffset;
   }
