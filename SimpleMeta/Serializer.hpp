@@ -59,14 +59,27 @@ bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char*
     BoundType* fieldType = field->mType;
     char* fieldSrc = field->GetFieldData(data);
 
-    MetaSerialization* fieldSerialization = fieldType->QueryComponentType<MetaSerialization>();
-    if(fieldSerialization != nullptr && serializer.BeginMember(field->mName))
+    MetaSerialization* metaSerialization = fieldType->QueryComponentType<MetaSerialization>();
+    if(metaSerialization != nullptr && serializer.BeginMember(field->mName))
     {
-      fieldSerialization->Serialize(serializer, *fieldType, fieldSrc);
+      metaSerialization->Serialize(serializer, *fieldType, fieldSrc);
       serializer.EndMember();
     }
   }
+  for(size_t i = 0; i < boundType.mGetterSetters.size(); ++i)
+  {
+    GetterSetter* getSet = boundType.mGetterSetters[i];
+    // Only serialize fields with the correct attribute
+    if(!getSet->QueryComponentType<SerializedAttribute>())
+      continue;
 
+    MetaSerialization* metaSerialization = getSet->mType->QueryComponentType<MetaSerialization>();
+    if(metaSerialization != nullptr && serializer.BeginMember(getSet->mName))
+    {
+      metaSerialization->SerializeProperty(serializer, *getSet, data);
+      serializer.EndMember();
+    }
+  }
   return true;
 }
 

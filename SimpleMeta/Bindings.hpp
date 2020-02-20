@@ -43,6 +43,19 @@ BoundType* BindClassType(ReflectionLibrary& library, const std::string& classNam
   return boundType;
 }
 
+template <typename GetterType, GetterType getter, typename SetterType, SetterType setter, typename ClassType, typename GetType, typename SetType>
+static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& owner, const std::string& name, GetType(ClassType::*dummyGetter)()const, void (ClassType::*dummySetter)(SetType))
+{
+  auto getSet = new GetterSetterTyped<ClassType, GetterType, GetType, SetterType, SetType>();
+  getSet->mType = StaticTypeId<GetType>::GetBoundType();
+  getSet->mName = name;
+  getSet->mGetter = getter;
+  getSet->mSetter = setter;
+  getSet->mType->AddComponentType<TypedMetaSerialization<GetType>>();
+  owner.mGetterSetters.push_back(getSet);
+  return getSet;
+}
+
 template <typename Type>
 BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className)
 {
@@ -60,6 +73,7 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
   BoundType* baseType = StaticTypeId<BaseType>::GetBoundType();
   derrivedType.mBaseType = baseType;
   derrivedType.mFields = baseType->mFields;
+  derrivedType.mGetterSetters = baseType->mGetterSetters;
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
@@ -68,6 +82,10 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define BindPropertyAs(Library, boundType, Owner, FieldMember, FieldName) BindFieldAs(Library, boundType, Owner, FieldMember, FieldName)->AddComponentTypeChainable<SerializedAttribute>()
 #define BindProperty(Library, boundType, Owner, FieldMember) BindPropertyAs(Library, boundType, Owner, FieldMember, #FieldMember)
+
+#define BindGetterSetterAs(Library, boundType, Owner, FieldName, Getter, Setter) \
+  FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)->AddComponentTypeChainable<SerializedAttribute>()
+#define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, #FieldName, Get##FieldName, Set##FieldName)
 
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName)
 #define BindPrimitiveType(Library, PrimitiveType) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType)

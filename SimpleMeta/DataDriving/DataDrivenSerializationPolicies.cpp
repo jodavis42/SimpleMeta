@@ -11,6 +11,11 @@ bool GenericBoundTypeMetaSerialization::SerializeBase(Serializer& serializer, Bo
   return serializer.SerializeObject(boundType, instanceData);
 }
 
+bool GenericBoundTypeMetaSerialization::SerializePropertyBase(Serializer& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return false;
+}
+
 char* GenericBoundTypeMetaSerialization::Allocate() const
 {
   return (char*)malloc(mBoundType->mSizeInBytes);
@@ -55,6 +60,11 @@ bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serialize
     serializer.EndArray();
   }
   return true;
+}
+
+bool GenericArrayBoundTypeMetaSerialization::SerializePropertyBase(Serializer& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return false;
 }
 
 char* GenericArrayBoundTypeMetaSerialization::Allocate() const

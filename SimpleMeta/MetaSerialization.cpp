@@ -32,4 +32,28 @@ bool MetaSerialization::Serialize(BinaryLoader& serializer, BoundType& boundType
 {
   return SerializeBase(serializer, boundType, instanceData);
 }
+
+bool MetaSerialization::SerializeProperty(Serializer& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return SerializePropertyBase(serializer, getSet, instanceData);
+}
+
+bool MetaSerialization::SerializeProperty(JsonSaver& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return SerializePropertyBase(serializer, getSet, instanceData);
+}
+
+bool MetaSerialization::SerializeProperty(JsonLoader& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return SerializePropertyBase(serializer, getSet, instanceData);
+}
+
+bool MetaSerialization::SerializeProperty(BinarySaver& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return SerializePropertyBase(serializer, getSet, instanceData);
+}
+
+bool MetaSerialization::SerializeProperty(BinaryLoader& serializer, GetterSetter& getSet, char* instanceData)
+{
+  return SerializePropertyBase(serializer, getSet, instanceData);
 }

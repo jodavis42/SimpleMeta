@@ -72,10 +72,16 @@ void RunUnitTests()
     BoxCollider* box1 = new BoxCollider();
     box1->mId = 3;
     box1->mSize = Vec3(1, 2, 3);
+    SphereCollider* sphere2 = new SphereCollider();
+    sphere2->mId = 4;
+    sphere2->mRadius = 1.2f;
+    sphere2->SetGhost(true);
+    sphere2->SetSendsEvents(true);
 
     PhysicsSpace input;
     input.mColliders.push_back(sphere1);
     input.mColliders.push_back(box1);
+    input.mColliders.push_back(sphere2);
 
     TestJsonRoundTrip(input);
     TestBinaryRoundTrip(input);

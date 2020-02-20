@@ -4,9 +4,15 @@
 
 struct Collider
 {
+  enum
+  {
+    GhostBit = 1 << 0,
+    SendsEventsBit = 1 << 1
+  };
+
   bool operator==(const Collider& rhs) const
   {
-    return mId == rhs.mId;
+    return mId == rhs.mId && mFlags == rhs.mFlags;
   }
 
   virtual BoundType* VirtualGetBoundType() const
@@ -16,9 +22,29 @@ struct Collider
   static void Bind(ReflectionLibrary& library, BoundType& boundType)
   {
     BindProperty(library, boundType, Collider, mId);
+    BindGetterSetter(library, boundType, Collider, Ghost);
+    BindGetterSetterAs(library, boundType, Collider, "SendsEvents", GetSendsEvents, SetSendsEvents);
   }
 
-  int mId;
+  bool GetGhost() const { return mFlags & GhostBit; }
+  void SetGhost(bool state)
+  {
+    if(state)
+      mFlags |= GhostBit;
+    else
+      mFlags &= ~GhostBit;
+  }
+  bool GetSendsEvents() const { return mFlags & SendsEventsBit; }
+  void SetSendsEvents(bool state)
+  {
+    if(state)
+      mFlags |= SendsEventsBit;
+    else
+      mFlags &= ~SendsEventsBit;
+  }
+
+  int mFlags = 0;
+  int mId = 0;
 };
 
 struct BoxCollider : public Collider

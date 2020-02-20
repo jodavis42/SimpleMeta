@@ -4,7 +4,7 @@
 struct BoundType;
 struct Any
 {
-  static constexpr size_t mBufferSize = 10;
+  static constexpr size_t mBufferSize = 100;
 
   Any();
   Any(const Any& any);
