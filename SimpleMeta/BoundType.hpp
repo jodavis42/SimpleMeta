@@ -26,7 +26,6 @@ struct BoundType : public ReflectionComposition
   std::string mName;
   size_t mSizeInBytes = 0;
   std::vector<Field*> mFields;
-  MetaSerialization* mMetaSerialization = nullptr;
   BoundType* mBaseType = nullptr;
   TypeId mId;
 };

@@ -25,6 +25,8 @@ GenericArrayBoundTypeMetaSerialization::GenericArrayBoundTypeMetaSerialization(B
 
 bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serializer, BoundType& boundType, char* data)
 {
+  MetaSerialization* metaSerialization = mArrayTemplateBoundType->QueryComponentType<MetaSerialization>();
+
   std::vector<char>& array = *(std::vector<char>*)data;
   if(serializer.mDirection == SerializerDirection::Saving)
   {
@@ -33,7 +35,7 @@ bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serialize
     for(size_t i = 0; i < count; ++i)
     {
       serializer.BeginArrayItem(i);
-      mArrayTemplateBoundType->mMetaSerialization->Serialize(serializer, *mArrayTemplateBoundType, &array[i * mArrayTemplateBoundType->mSizeInBytes]);
+      metaSerialization->Serialize(serializer, *mArrayTemplateBoundType, &array[i * mArrayTemplateBoundType->mSizeInBytes]);
       serializer.EndArrayItem();
     }
     serializer.EndArray();
@@ -47,7 +49,7 @@ bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serialize
     for(size_t i = 0; i < count; ++i)
     {
       serializer.BeginArrayItem(i);
-      mArrayTemplateBoundType->mMetaSerialization->Serialize(serializer, *mArrayTemplateBoundType, &array[i * mArrayTemplateBoundType->mSizeInBytes]);
+      metaSerialization->Serialize(serializer, *mArrayTemplateBoundType, &array[i * mArrayTemplateBoundType->mSizeInBytes]);
       serializer.EndArrayItem();
     }
     serializer.EndArray();

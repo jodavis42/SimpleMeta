@@ -33,7 +33,7 @@ BoundType* TryCreateArrayType(ReflectionLibrary& library, DataDrivenTypeNameMap&
   
   BoundType* boundType = new BoundType();
   boundType->mName = typeName;
-  boundType->mMetaSerialization = new GenericArrayBoundTypeMetaSerialization(templateParamType);
+  boundType->AddComponentType<GenericArrayBoundTypeMetaSerialization>(templateParamType);
   boundType->mSizeInBytes = sizeof(std::vector<char>);
   return boundType;
 }
@@ -74,7 +74,7 @@ void BuildType(ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeN
   ++dynamicId;
 
   size_t fieldOffset = 0;
-  boundType->mMetaSerialization = new GenericBoundTypeMetaSerialization(boundType);
+  boundType->AddComponentType<GenericBoundTypeMetaSerialization>(boundType);
   // If there's a base type, append the base type fields
   if (!type.mBaseType.empty())
   {
@@ -149,7 +149,8 @@ char* LoadJson(const std::filesystem::path& filePath, BoundType*& rootType)
   loader.EndMember();
 
   rootType = ReflectionProject::FindBoundType(rootTypeName);
-  char* data = rootType->mMetaSerialization->Allocate();
+  MetaSerialization* metaSerialization = rootType->QueryComponentType<MetaSerialization>();
+  char* data = metaSerialization->Allocate();
 
   loader.BeginMember(rootType->mName);
   loader.SerializeObject(*rootType, data);
@@ -189,7 +190,8 @@ char* LoadBinary(const std::filesystem::path& filePath, BoundType*& rootType)
   memoryStream << inStream.rdbuf();
   BinaryLoader loader(memoryStream);
 
-  char* data = rootType->mMetaSerialization->Allocate();
+  MetaSerialization* metaSerialization = rootType->QueryComponentType<MetaSerialization>();
+  char* data = metaSerialization->Allocate();
   loader.SerializeObject(*rootType, data);
   return data;
 }

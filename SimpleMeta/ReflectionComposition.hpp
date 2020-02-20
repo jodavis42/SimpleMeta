@@ -12,7 +12,7 @@ struct ReflectionComposition
 {
   virtual ~ReflectionComposition();
 
-  bool AddComponent(std::shared_ptr<ReflectionComponent> component, const TypeId& typeId);
+  bool AddComponent(std::shared_ptr<ReflectionComponent> component);
   ReflectionComponent* FindComponent(const TypeId& typeId);
   const ReflectionComponent* FindComponent(const TypeId& typeId) const;
   bool RemoveComponent(const TypeId& typeId);
@@ -22,7 +22,7 @@ struct ReflectionComposition
   bool AddComponentType(ArgTypes ... args)
   {
     BoundType* boundType = StaticTypeId<ComponentType>::GetBoundType();
-    return AddComponent(std::make_shared<ComponentType>(args...), boundType->mId);
+    return AddComponent(std::make_shared<ComponentType>(args...));
   }
   template <typename ComponentType, typename ... ArgTypes>
   ReflectionComposition* AddComponentTypeChainable(ArgTypes ... args)

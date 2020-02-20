@@ -85,9 +85,10 @@ struct PolymorphicReflection
 
   static bool Save(SerializerType& serializer, BoundType& boundType, char* objData)
   {
+    MetaSerialization* metaSerialization = boundType.QueryComponentType<MetaSerialization>();
     PolymorphicInfo info{boundType.mName, boundType.mId};
     serializer.BeginObject(info);
-    boundType.mMetaSerialization->Serialize(serializer, boundType, objData);
+    metaSerialization->Serialize(serializer, boundType, objData);
     serializer.EndObject();
     return true;
   }
@@ -95,8 +96,9 @@ struct PolymorphicReflection
   static bool Load(SerializerType& serializer, char*& objData)
   {
     BoundType& boundType = *BeginPolymorphicObject(serializer);
-    objData = boundType.mMetaSerialization->Allocate();
-    boundType.mMetaSerialization->Serialize(serializer, boundType, objData);
+    MetaSerialization* metaSerialization = boundType.QueryComponentType<MetaSerialization>();
+    objData = metaSerialization->Allocate();
+    metaSerialization->Serialize(serializer, boundType, objData);
     serializer.EndObject();
     return true;
   }

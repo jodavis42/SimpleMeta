@@ -7,8 +7,10 @@ ReflectionComposition::~ReflectionComposition()
   ClearComponents();
 }
 
-bool ReflectionComposition::AddComponent(std::shared_ptr<ReflectionComponent> component, const TypeId& typeId)
+bool ReflectionComposition::AddComponent(std::shared_ptr<ReflectionComponent> component)
 {
+  BoundType* boundType = component->GetBoundType();
+  TypeId typeId = boundType->mId;
   if(mComponents.find(typeId.mId) != mComponents.end())
     return false;
 

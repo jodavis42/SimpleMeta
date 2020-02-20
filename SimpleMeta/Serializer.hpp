@@ -59,7 +59,7 @@ bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char*
     BoundType* fieldType = field->mType;
     char* fieldSrc = field->GetFieldData(data);
 
-    MetaSerialization* fieldSerialization = fieldType->mMetaSerialization;
+    MetaSerialization* fieldSerialization = fieldType->QueryComponentType<MetaSerialization>();
     if(fieldSerialization != nullptr && serializer.BeginMember(field->mName))
     {
       fieldSerialization->Serialize(serializer, *fieldType, fieldSrc);

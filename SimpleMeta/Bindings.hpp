@@ -6,6 +6,18 @@
 #include "StaticTypeId.hpp"
 #include "Attributes.hpp"
 
+template <typename ClassType>
+BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& className, int id)
+{
+  BoundType* boundType = StaticTypeId<ClassType>::GetBoundType();
+  boundType->mName = className;
+  boundType->mSizeInBytes = sizeof(ClassType);
+  boundType->mId = id;
+
+  library.AddBoundType(boundType);
+  return boundType;
+}
+
 template <typename FieldPointer, FieldPointer field, typename Class, typename FieldType>
 static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
 {
@@ -13,9 +25,9 @@ static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std:
   f->mName = name;
   f->mOffset = offset;
   f->mType = StaticTypeId<FieldType>::GetBoundType();
-  if(f->mType->mMetaSerialization == nullptr)
+  if(f->mType->QueryComponentType<MetaSerialization>() == nullptr)
   {
-    f->mType->mMetaSerialization = new TypedMetaSerialization<FieldType>();
+    f->mType->AddComponentType<TypedMetaSerialization<FieldType>>();
   }
 
   owner.mFields.push_back(f);
@@ -25,14 +37,9 @@ static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std:
 template <typename ClassType, void (*BindingFn)(ReflectionLibrary& library, BoundType&)>
 BoundType* BindClassType(ReflectionLibrary& library, const std::string& className, int id)
 {
-  BoundType* boundType = StaticTypeId<ClassType>::GetBoundType();
-  boundType->mName = className;
-  boundType->mSizeInBytes = sizeof(ClassType);
-  boundType->mId = id;
-
-  boundType->mMetaSerialization = new TypedMetaSerialization<ClassType>();
+  BoundType* boundType = CreateBoundType<ClassType>(library, className, id);
+  boundType->AddComponentType<TypedMetaSerialization<ClassType>>();
   BindingFn(library, *boundType);
-  library.AddBoundType(boundType);
   return boundType;
 }
 
@@ -42,7 +49,7 @@ BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::str
   BoundType* boundType = StaticTypeId<Type>::GetBoundType();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeof(Type);
-  boundType->mMetaSerialization = new TypedMetaSerialization<Type>();
+  boundType->AddComponentType<TypedMetaSerialization<Type>>();
   library.AddBoundType(boundType);
   return boundType;
 }

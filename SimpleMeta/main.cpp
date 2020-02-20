@@ -19,9 +19,10 @@ int main()
   BindPrimitiveType(coreLibrary, int);
   BindPrimitiveType(coreLibrary, float);
   BindPrimitiveType(coreLibrary, double);
-  BindType(coreLibrary, ReflectionComponent, 'rcmp');
-  BindType(coreLibrary, Attribute, 'att');
-  BindType(coreLibrary, SerializedAttribute, 'attS');
+  CreateBoundType<ReflectionComponent>(coreLibrary, "ReflectionComponent", 'rcmp');
+  CreateBoundType<Attribute>(coreLibrary, "Attribute", 'att');
+  CreateBoundType<SerializedAttribute>(coreLibrary, "SerializedAttribute", 'attS');
+  CreateBoundType<MetaSerialization>(coreLibrary, "MetaSerialization", 'mser');
   BindType(coreLibrary, Vec2, 'vec2');
   BindType(coreLibrary, Vec3, 'vec3');
   BindPrimitiveTypeAs(coreLibrary, std::string, "string");

@@ -3,6 +3,11 @@
 #include "JsonSerializers.hpp"
 #include "BinaryStream.hpp"
 
+BoundType* MetaSerialization::GetBoundType()
+{
+  return StaticTypeId<MetaSerialization>::GetBoundType();
+}
+
 bool MetaSerialization::Serialize(Serializer& serializer, BoundType& boundType, char* data)
 {
   return SerializeBase(serializer, boundType, data);

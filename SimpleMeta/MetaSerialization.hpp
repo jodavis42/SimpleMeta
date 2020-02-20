@@ -6,7 +6,7 @@
 
 #include "SerializationPolicy.hpp"
 
-struct MetaSerialization
+struct MetaSerialization : public ReflectionComponent
 {
 public:
   virtual bool SerializeBase(Serializer& serializer, BoundType& boundType, char* data) = 0;
@@ -15,6 +15,7 @@ public:
   virtual bool Serialize(JsonLoader& serializer, BoundType& boundType, char* data);
   virtual bool Serialize(BinarySaver& serializer, BoundType& boundType, char* data);
   virtual bool Serialize(BinaryLoader& serializer, BoundType& boundType, char* data);
+  virtual BoundType* GetBoundType() override;
   virtual char* Allocate() const = 0;
 };
 
