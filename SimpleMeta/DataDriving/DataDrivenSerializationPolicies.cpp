@@ -6,9 +6,9 @@ GenericBoundTypeMetaSerialization::GenericBoundTypeMetaSerialization(BoundType* 
 
 }
 
-bool GenericBoundTypeMetaSerialization::SerializeBase(Serializer& serializer, BoundType& boundType, char* data)
+bool GenericBoundTypeMetaSerialization::SerializeBase(Serializer& serializer, BoundType& boundType, char* instanceData)
 {
-  return serializer.SerializeObject(boundType, data);
+  return serializer.SerializeObject(boundType, instanceData);
 }
 
 char* GenericBoundTypeMetaSerialization::Allocate() const
@@ -23,11 +23,11 @@ GenericArrayBoundTypeMetaSerialization::GenericArrayBoundTypeMetaSerialization(B
 
 }
 
-bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serializer, BoundType& boundType, char* data)
+bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serializer, BoundType& boundType, char* instanceData)
 {
   MetaSerialization* metaSerialization = mArrayTemplateBoundType->QueryComponentType<MetaSerialization>();
 
-  std::vector<char>& array = *(std::vector<char>*)data;
+  std::vector<char>& array = *(std::vector<char>*)instanceData;
   if(serializer.mDirection == SerializerDirection::Saving)
   {
     size_t count = array.size() / mArrayTemplateBoundType->mSizeInBytes;
@@ -42,7 +42,7 @@ bool GenericArrayBoundTypeMetaSerialization::SerializeBase(Serializer& serialize
   }
   else
   {
-    new (data)(std::vector<char*>);
+    new (instanceData)(std::vector<char*>);
     size_t count;
     serializer.BeginArray(count);
     array.resize(count * mArrayTemplateBoundType->mSizeInBytes);
