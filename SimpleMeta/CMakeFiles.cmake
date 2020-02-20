@@ -1,5 +1,7 @@
 target_sources(SimpleMeta
   PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/Any.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Any.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Asserts.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Attributes.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Attributes.hpp
