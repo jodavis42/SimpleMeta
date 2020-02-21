@@ -3,6 +3,11 @@
 #include "Function.hpp"
 #include "Call.hpp"
 
+char* Field::GetFieldData(char* instanceData) const
+{
+  return instanceData + mOffset;
+}
+
 Any GetterSetter::Get(char* instanceData) const
 {
   if(mGetter == nullptr)
