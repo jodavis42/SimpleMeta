@@ -13,21 +13,24 @@
 
 int main()
 {
+  ReflectionLibrary& reflectionLibrary = ReflectionProject::CreateLibrary("Reflection");
+  CreateBoundType<ReflectionComponent>(reflectionLibrary, "ReflectionComponent", 'rcmp');
+  CreateBoundType<Attribute>(reflectionLibrary, "Attribute", 'att');
+  CreateBoundType<SerializedAttribute>(reflectionLibrary, "SerializedAttribute", 'attS');
+  CreateBoundType<MetaSerialization>(reflectionLibrary, "MetaSerialization", 'mser');
+
   ReflectionLibrary& coreLibrary = ReflectionProject::CreateLibrary("Core");
-  BindPrimitiveTypeToLibrary<void>(coreLibrary, "void", 0);
-  BindPrimitiveType(coreLibrary, bool);
-  BindPrimitiveType(coreLibrary, char);
-  BindPrimitiveType(coreLibrary, int);
-  BindPrimitiveType(coreLibrary, float);
-  BindPrimitiveType(coreLibrary, double);
-  CreateBoundType<ReflectionComponent>(coreLibrary, "ReflectionComponent", 'rcmp');
-  CreateBoundType<Attribute>(coreLibrary, "Attribute", 'att');
-  CreateBoundType<SerializedAttribute>(coreLibrary, "SerializedAttribute", 'attS');
-  CreateBoundType<MetaSerialization>(coreLibrary, "MetaSerialization", 'mser');
+  coreLibrary.AddDependency(&reflectionLibrary);
+  CreateBoundType<void>(coreLibrary, "void", 1, 0);
+  BindPrimitiveType(coreLibrary, bool, 2);
+  BindPrimitiveType(coreLibrary, char, 3);
+  BindPrimitiveType(coreLibrary, int, 4);
+  BindPrimitiveType(coreLibrary, float, 5);
+  BindPrimitiveType(coreLibrary, double, 6);
+  BindPrimitiveTypeAs(coreLibrary, std::string, "string", 7);
   BindType(coreLibrary, Vec2, 'vec2');
   BindType(coreLibrary, Vec3, 'vec3');
-  BindPrimitiveTypeAs(coreLibrary, std::string, "string");
-
+  
   ReflectionLibrary& miscLibrary = ReflectionProject::CreateLibrary("Misc");
   miscLibrary.AddDependency(&coreLibrary);
   BindTypeExternal(miscLibrary, MyStruct, 'myst', BindMyStruct);

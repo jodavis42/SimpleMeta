@@ -84,7 +84,6 @@ bool BinaryLoader::SerializePrimitive(const BoundType& boundType, char* data)
 
 bool BinaryLoader::SerializePrimitive(const BoundType& boundType, std::string& data)
 {
-  new(&data) std::string();
   size_t sizeInBytes = 0;
   Read(sizeInBytes);
   data.resize(sizeInBytes);

@@ -21,7 +21,6 @@ struct ReflectionComposition
   template <typename ComponentType, typename ... ArgTypes>
   bool AddComponentType(ArgTypes ... args)
   {
-    BoundType* boundType = StaticTypeId<ComponentType>::GetBoundType();
     return AddComponent(std::make_shared<ComponentType>(args...));
   }
   template <typename ComponentType, typename ... ArgTypes>

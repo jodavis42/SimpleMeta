@@ -24,7 +24,6 @@ void TestBinaryRoundTrip(T& input)
 
   if(!(input == output))
   {
-    BoundType* boundType = StaticTypeId<T>::GetBoundType();
     printf("Type '%s' failed to serialize correctly\n", boundType->mName.c_str());
     __debugbreak();
   }

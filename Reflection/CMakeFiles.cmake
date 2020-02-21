@@ -16,6 +16,7 @@ target_sources(Reflection
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComponent.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.cpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
     ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp
 )

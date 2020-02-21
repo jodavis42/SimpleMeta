@@ -1,18 +1,28 @@
 #include "MetaLibrary.hpp"
 
-std::vector<ReflectionLibrary*> ReflectionProject::mLibraries;
+ReflectionLibrary::~ReflectionLibrary()
+{
+  for(BoundType* boundType : mBoundTypes)
+  {
+    delete boundType;
+  }
+}
 
 void ReflectionLibrary::AddBoundType(BoundType* boundType)
 {
+  // Don't double register
+  if(FindBoundType(boundType->mId) != nullptr)
+    return;
+
   mBoundTypes.push_back(boundType);
-  mBoundTypeMap[boundType->mName] = boundType;
+  mBoundTypeNameMap[boundType->mName] = boundType;
   mBoundTypeIdMap[boundType->mId.mId] = boundType;
 }
 
 BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recursive)
 {
-  auto it = mBoundTypeMap.find(name);
-  if(it != mBoundTypeMap.end())
+  auto it = mBoundTypeNameMap.find(name);
+  if(it != mBoundTypeNameMap.end())
     return it->second;
 
   for(ReflectionLibrary* dependency : mDependencies)
@@ -46,17 +56,37 @@ void ReflectionLibrary::AddDependency(ReflectionLibrary* dependency)
   mDependencies.push_back(dependency);
 }
 
+ReflectionProject::~ReflectionProject()
+{
+  // Make sure to destruct in reverse order
+  for(size_t i = 0; i < mLibraries.size(); ++i)
+  {
+    ReflectionLibrary* library = mLibraries[mLibraries.size() - i - 1];
+    delete library;
+  }
+  mLibraries.clear();
+}
+
+ReflectionProject* ReflectionProject::GetInstance()
+{
+  static ReflectionProject sInstance;
+  return &sInstance;
+}
+
 ReflectionLibrary& ReflectionProject::CreateLibrary(const std::string& name)
 {
+  ReflectionProject* instance = GetInstance();
   ReflectionLibrary* library = new ReflectionLibrary();
+  instance->mCurrentLibrary = library;
   library->mName = name;
-  mLibraries.push_back(library);
+  instance->mLibraries.push_back(library);
   return *library;
 }
 
 ReflectionLibrary* ReflectionProject::FindLibrary(const std::string& name)
 {
-  for(ReflectionLibrary* library : mLibraries)
+  ReflectionProject* instance = GetInstance();
+  for(ReflectionLibrary* library : instance->mLibraries)
   {
     if(library->mName == name)
       return library;
@@ -66,30 +96,37 @@ ReflectionLibrary* ReflectionProject::FindLibrary(const std::string& name)
 
 void ReflectionProject::DestroyLibrary(ReflectionLibrary& library)
 {
-  for(auto it = mLibraries.begin(); it != mLibraries.end(); ++it)
+  ReflectionProject* instance = GetInstance();
+  for(auto it = instance->mLibraries.begin(); it != instance->mLibraries.end(); ++it)
   {
     if(*it == &library)
     {
-      mLibraries.erase(it);
+      instance->mLibraries.erase(it);
       return;
     }
   }
+
+  instance->mCurrentLibrary = nullptr;
+  if(!instance->mLibraries.empty())
+    instance->mCurrentLibrary = instance->mLibraries.back();
 }
 
 BoundType* ReflectionProject::FindBoundType(const std::string& name, bool recursive)
 {
-  if(mLibraries.empty())
+  ReflectionProject* instance = GetInstance();
+  if(instance->mLibraries.empty())
     return nullptr;
 
-  ReflectionLibrary* topLibrary = mLibraries.back();
+  ReflectionLibrary* topLibrary = instance->mCurrentLibrary;
   return topLibrary->FindBoundType(name);
 }
 
 BoundType* ReflectionProject::FindBoundType(const TypeId& id, bool recursive)
 {
-  if(mLibraries.empty())
+  ReflectionProject* instance = GetInstance();
+  if(instance->mLibraries.empty())
     return nullptr;
 
-  ReflectionLibrary* topLibrary = mLibraries.back();
+  ReflectionLibrary* topLibrary = instance->mCurrentLibrary;
   return topLibrary->FindBoundType(id);
 }

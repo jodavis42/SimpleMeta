@@ -2,12 +2,23 @@
 
 #include "BoundType.hpp"
 
+BoundType* RegisterBoundType(BoundType* boundType);
+
 template <typename T>
 struct StaticTypeId
 {
-  static BoundType*& GetBoundType()
+  // This returns the raw bound type and should only be used when building types the first time.
+  static BoundType*& GetBoundTypeRaw()
   {
     static BoundType* sInstance = new BoundType();
+    return sInstance;
+  }
+
+  // This assumes that all important types have already been built and will auto-register
+  // a type otherwise (to deal with dynamic types like arrays).
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = RegisterBoundType(GetBoundTypeRaw());
     return sInstance;
   }
 };

@@ -24,6 +24,8 @@ struct Field : public ReflectionComposition
 
 struct GetterSetter : public ReflectionComposition
 {
+  ~GetterSetter();
+
   Any Get(char* instanceData) const;
   void Set(char* instanceData, Any any);
 
@@ -35,6 +37,8 @@ struct GetterSetter : public ReflectionComposition
 
 struct BoundType : public ReflectionComposition
 {
+  ~BoundType();
+
   std::string mName;
   size_t mSizeInBytes = 0;
   std::vector<Field*> mFields;

@@ -93,6 +93,13 @@ struct SphereCollider : public Collider
 
 struct PhysicsSpace
 {
+  ~PhysicsSpace()
+  {
+    for(Collider* collider : mColliders)
+    {
+      delete collider;
+    }
+  }
   bool operator==(const PhysicsSpace& rhs) const
   {
     if(mColliders.size() != rhs.mColliders.size())

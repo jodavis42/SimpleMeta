@@ -8,6 +8,12 @@ char* Field::GetFieldData(char* instanceData) const
   return instanceData + mOffset;
 }
 
+GetterSetter::~GetterSetter()
+{
+  delete mGetter;
+  delete mSetter;
+}
+
 Any GetterSetter::Get(char* instanceData) const
 {
   if(mGetter == nullptr)
@@ -29,4 +35,17 @@ void GetterSetter::Set(char* instanceData, Any any)
   call.SetPointerUnchecked(Call::This, instanceData);
   call.SetValueUnchecked(0, any.GetRawData(), any.GetStoredType()->mSizeInBytes);
   call.Invoke();
+}
+
+BoundType::~BoundType()
+{
+  delete mDefaultConstructor;
+  delete mCopyConstructor;
+  delete mDestructor;
+  for(Field* field : mFields)
+    delete field;
+  mFields.clear();
+  for(GetterSetter* getSet : mGetterSetters)
+    delete getSet;
+  mGetterSetters.clear();
 }

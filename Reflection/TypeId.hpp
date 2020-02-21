@@ -3,6 +3,6 @@
 struct TypeId
 {
   TypeId() : mId(0) {}
-  TypeId(int id) : mId(id) {}
+  TypeId(size_t id) : mId(id) {}
   size_t mId;
 };
