@@ -1,10 +1,16 @@
 #include "BinaryStream.hpp"
 
 #include "MetaSerialization.hpp"
+#include "SerializationHelpers.hpp"
 
 BinarySaver::BinarySaver(std::ostream& stream) : mStream(stream.rdbuf())
 {
   mDirection = SerializerDirection::Saving;
+}
+
+bool BinarySaver::SerializeProperties(BoundType& boundType, char* data)
+{
+  return ::SerializeProperties<BinarySaver>(*this, boundType, data);
 }
 
 bool BinarySaver::SerializePrimitive(const BoundType& boundType, char* data)
@@ -65,6 +71,11 @@ BinaryLoader::BinaryLoader(std::istream& stream) : mStream(stream.rdbuf())
   mDirection = SerializerDirection::Loading;
 }
 
+bool BinaryLoader::SerializeProperties(BoundType& boundType, char* data)
+{
+  return ::SerializeProperties<BinaryLoader>(*this, boundType, data);
+}
+
 bool BinaryLoader::SerializePrimitive(const BoundType& boundType, char* data)
 {
   mStream.read(data, boundType.mSizeInBytes);
@@ -119,7 +130,7 @@ bool BinaryLoader::EndObject()
 
 bool BinaryLoader::SerializeObject(BoundType& boundType, char* data)
 {
-  return SerializeProperties(*this, boundType, data);
+  return SerializeProperties(boundType, data);
 }
 
 bool BinaryLoader::Read(char* data, size_t sizeInBytes)

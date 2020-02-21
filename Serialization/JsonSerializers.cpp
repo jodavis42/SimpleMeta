@@ -1,8 +1,8 @@
 #include "JsonSerializers.hpp"
 #include "StaticTypeId.hpp"
+#include "SerializationHelpers.hpp"
 
 #include "rapidjson.h"
-#include "TestTypes/Math.hpp"
 
 #include "document.h"
 #include "prettywriter.h"
@@ -211,6 +211,11 @@ void JsonLoader::LoadFromFile(const std::string& filePath)
   strStream << stream.rdbuf();
 
   Load(strStream.str());
+}
+
+bool JsonLoader::SerializeProperties(BoundType& boundType, char* data)
+{
+  return ::SerializeProperties<JsonLoader>(*this, boundType, data);
 }
 
 bool JsonLoader::SerializePrimitive(const BoundType& boundType, char* data)

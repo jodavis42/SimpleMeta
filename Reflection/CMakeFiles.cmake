@@ -1,0 +1,21 @@
+target_sources(Reflection
+  PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/Any.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Any.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Asserts.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundType.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Call.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Call.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Function.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Function.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/FunctionBinding.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComponent.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp
+)

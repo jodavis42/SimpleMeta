@@ -1,0 +1,15 @@
+target_sources(UnitTests
+  PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTesting.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTesting.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTypes.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTypes.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenSerializationPolicies.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenSerializationPolicies.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Physics.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Math.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Mesh.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Misc.hpp
+)

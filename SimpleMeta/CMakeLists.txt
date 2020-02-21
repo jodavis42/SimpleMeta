@@ -11,7 +11,9 @@ target_include_directories(SimpleMeta
 )
 Set_Common_TargetCompileOptions(SimpleMeta)
 target_link_libraries(SimpleMeta
-                      
+                      Reflection
+                      Serialization
+                      UnitTests
 )
 
 add_custom_command(TARGET SimpleMeta POST_BUILD

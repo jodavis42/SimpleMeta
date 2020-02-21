@@ -20,8 +20,10 @@ public:
   void Serialize(const T& data)
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeProperties(*this, *boundType, (char*)(&data));
+    SerializeProperties(*boundType, (char*)(&data));
   }
+
+  bool SerializeProperties(BoundType& boundType, char* data);
 
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;
@@ -51,8 +53,10 @@ struct BinaryLoader : public Serializer
   void Serialize(T& data)
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    SerializeProperties(*this, *boundType, (char*)(&data));
+    SerializeProperties(*boundType, (char*)(&data));
   }
+
+  bool SerializeProperties(BoundType& boundType, char* data);
 
   virtual bool SerializePrimitive(const BoundType& boundType, char* data) override;
   virtual bool SerializePrimitive(const BoundType& boundType, std::string& data) override;

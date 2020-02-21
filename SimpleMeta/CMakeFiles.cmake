@@ -1,46 +1,4 @@
 target_sources(SimpleMeta
   PRIVATE
-    ${CMAKE_CURRENT_LIST_DIR}/Any.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Any.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Asserts.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Attributes.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Attributes.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/BinaryStream.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/BoundType.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Call.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Call.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Function.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Function.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/FunctionBinding.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/JsonSerializers.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/JsonSerializers.hpp
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/MetaSerialization.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComponent.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/SerializationPolicy.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/ContainerSerializationPolicies.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serializer.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/Serializer.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTesting.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTesting.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTypes.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTypes.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenSerializationPolicies.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenSerializationPolicies.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Physics.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Math.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Mesh.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/TestTypes/Misc.hpp
 )
