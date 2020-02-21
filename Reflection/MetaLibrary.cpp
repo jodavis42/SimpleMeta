@@ -101,8 +101,9 @@ void ReflectionProject::DestroyLibrary(ReflectionLibrary& library)
   {
     if(*it == &library)
     {
+      delete *it;
       instance->mLibraries.erase(it);
-      return;
+      break;
     }
   }
 

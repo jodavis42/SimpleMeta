@@ -2,6 +2,8 @@
 
 #include "Asserts.hpp"
 
+#include "StaticTypeId.hpp"
+
 struct BoundType;
 
 /// A type that can store any type. Used to more easily pass around arbitrary data without relying on templates.
