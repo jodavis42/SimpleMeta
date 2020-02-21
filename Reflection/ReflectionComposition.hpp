@@ -1,23 +1,27 @@
 #pragma once
 
 #include <unordered_map>
-#include "ReflectionComponent.hpp"
 #include <memory>
-//#include "StaticTypeId.hpp"
+
+#include "ReflectionComponent.hpp"
 
 struct BoundType;
 struct TypeId;
 
+/// A composition for reflection objects. The composition is expected to own the lifetime of the added components (albeit via shared pointers).
 struct ReflectionComposition
 {
+  using ReflectionComponentPtr = std::shared_ptr<ReflectionComponent>;
+
   virtual ~ReflectionComposition();
 
-  bool AddComponent(std::shared_ptr<ReflectionComponent> component);
+  bool AddComponent(ReflectionComponentPtr component);
   ReflectionComponent* FindComponent(const TypeId& typeId);
   const ReflectionComponent* FindComponent(const TypeId& typeId) const;
   bool RemoveComponent(const TypeId& typeId);
   void ClearComponents();
 
+  // Template helpers to auto cast to the correct types
   template <typename ComponentType, typename ... ArgTypes>
   bool AddComponentType(ArgTypes ... args)
   {
@@ -43,5 +47,6 @@ struct ReflectionComposition
   }
 
 private:
-  std::unordered_map<size_t, std::shared_ptr<ReflectionComponent>> mComponents;
+  using ComponentMap = std::unordered_map<size_t, ReflectionComponentPtr>;
+  ComponentMap mComponents;
 };

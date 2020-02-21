@@ -4,6 +4,7 @@
 
 size_t Function::ComputeSizeRequired() const
 {
+  // This information could be baked into the fields/params. Worry about this if it matters
   size_t size = 0;
   if(mReturnType != nullptr)
     size += mReturnType->mSizeInBytes;

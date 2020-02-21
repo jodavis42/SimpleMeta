@@ -8,8 +8,6 @@ struct BoundType;
 struct Call;
 struct Function;
 
-typedef void(*BoundFunction)(Call& call);
-
 struct GetterSetter : public ReflectionComposition
 {
   ~GetterSetter();

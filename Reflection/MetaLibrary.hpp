@@ -6,6 +6,7 @@
 
 struct BoundType;
 
+/// A library of types that depends on other libraries. Facilitates search for types by id or name and owning the memory for bound types.
 struct ReflectionLibrary
 {
   ~ReflectionLibrary();
@@ -23,6 +24,7 @@ struct ReflectionLibrary
   std::unordered_map<size_t, BoundType*> mBoundTypeIdMap;
 };
 
+/// A project that owns all of the reflection libraries and contains a singleton interface to allow easy querying of a type.
 struct ReflectionProject
 {
   ~ReflectionProject();

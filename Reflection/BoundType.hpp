@@ -15,11 +15,13 @@ struct BoundType : public ReflectionComposition
   ~BoundType();
 
   std::string mName;
-  size_t mSizeInBytes = 0;
+  TypeId mId;
+
+  BoundType* mBaseType = nullptr;
   std::vector<Field*> mFields;
   std::vector<GetterSetter*> mGetterSetters;
-  BoundType* mBaseType = nullptr;
-  TypeId mId;
+  size_t mSizeInBytes = 0;
+  
   Function* mDefaultConstructor = nullptr;
   Function* mCopyConstructor = nullptr;
   Function* mDestructor = nullptr;

@@ -7,7 +7,7 @@ ReflectionComposition::~ReflectionComposition()
   ClearComponents();
 }
 
-bool ReflectionComposition::AddComponent(std::shared_ptr<ReflectionComponent> component)
+bool ReflectionComposition::AddComponent(ReflectionComponentPtr component)
 {
   BoundType* boundType = component->GetBoundType();
   TypeId typeId = boundType->mId;

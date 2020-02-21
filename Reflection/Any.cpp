@@ -42,6 +42,11 @@ bool Any::IsStoredType(const BoundType* boundType) const
   return mStoredType == boundType;
 }
 
+BoundType* Any::GetStoredType() const
+{
+  return mStoredType;
+}
+
 void Any::AssignFrom(const void* data, BoundType* boundType)
 {
   ErrorIf(boundType == nullptr, "Cannot store a null bound type");

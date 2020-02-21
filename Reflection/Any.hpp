@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Asserts.hpp"
+
 struct BoundType;
+
+/// A type that can store any type. Used to more easily pass around arbitrary data without relying on templates.
 struct Any
 {
   static constexpr size_t mBufferSize = 100;
@@ -11,9 +14,14 @@ struct Any
   Any(const void* data, BoundType* boundType);
   ~Any();
 
+  /// Returns the pointer to the raw data stored for the object
+  /// (may be an allocation if the object is bigger than mBufferSize)
   char* GetRawData();
   const char* GetRawData() const;
+
+  /// Checks if the given bound type is the same as what's stored
   bool IsStoredType(const BoundType* boundType) const;
+  BoundType* GetStoredType() const;
 
   void AssignFrom(const void* data, BoundType* boundType);
   void operator=(const Any& any);
@@ -42,11 +50,6 @@ struct Any
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
     AssignFrom(&data, boundType);
-  }
-
-  BoundType* GetStoredType() const
-  {
-    return mStoredType;
   }
 
 private:

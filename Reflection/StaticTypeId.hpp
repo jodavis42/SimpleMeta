@@ -52,6 +52,8 @@ struct RuntimeTypeId
   }
 };
 
+/// Helper to string types down to their base type (e.g. turn const float& -> float). This is necessary
+/// during function binding so that input/output types can be declared correctly.
 template<typename T>
 struct UnqualifiedType
 {
