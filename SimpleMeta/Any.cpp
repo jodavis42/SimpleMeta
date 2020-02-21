@@ -1,6 +1,7 @@
 #include "Any.hpp"
 
 #include "BoundType.hpp"
+#include "Call.hpp"
 
 Any::Any()
 {
@@ -61,7 +62,17 @@ void Any::AssignFrom(const void* data, BoundType* boundType)
     mIsAllocated = true;
   }
 
-  memcpy(rawDataStart, data, boundType->mSizeInBytes);
+  if(boundType->mCopyConstructor)
+  {
+    Call call(boundType->mCopyConstructor);
+    call.SetValueUnchecked(Call::This, &rawDataStart, sizeof(void*));
+    call.SetValueUnchecked(0, data, boundType->mSizeInBytes);
+    call.Invoke();
+  }
+  else
+  {
+    memcpy(rawDataStart, data, boundType->mSizeInBytes);
+  }
 }
 
 void Any::operator=(const Any& any)
@@ -83,7 +94,14 @@ bool Any::operator==(const Any& any) const
 void Any::Clear()
 {
   char* bufferData = GetRawData();
-  // Needs to invoke the destructor on bufferData
+
+  // Needs to invoke the destructor on bufferData if it exists
+  if(mStoredType != nullptr && mStoredType->mDestructor != nullptr)
+  {
+    Call call(mStoredType->mDestructor);
+    call.SetValueUnchecked(Call::This, &bufferData, sizeof(void*));
+    call.Invoke();
+  }
 
   // If the data was actually allocated, then free the extra memory
   if(mIsAllocated)

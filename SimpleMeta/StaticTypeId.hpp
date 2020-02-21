@@ -40,3 +40,9 @@ struct RuntimeTypeId
     new(data) T();
   }
 };
+
+template<typename T>
+struct UnqualifiedType
+{
+  using type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+};

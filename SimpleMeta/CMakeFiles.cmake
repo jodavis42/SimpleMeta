@@ -10,6 +10,11 @@ target_sources(SimpleMeta
     ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BoundType.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Call.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Call.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Function.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Function.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/FunctionBinding.hpp
     ${CMAKE_CURRENT_LIST_DIR}/JsonSerializers.cpp
     ${CMAKE_CURRENT_LIST_DIR}/JsonSerializers.hpp
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp

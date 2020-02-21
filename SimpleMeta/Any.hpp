@@ -44,6 +44,11 @@ struct Any
     AssignFrom(&data, boundType);
   }
 
+  BoundType* GetStoredType() const
+  {
+    return mStoredType;
+  }
+
 private:
   char mBuffer[mBufferSize];
   BoundType* mStoredType = nullptr;

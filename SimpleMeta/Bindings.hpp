@@ -5,6 +5,7 @@
 #include "MetaSerialization.hpp"
 #include "StaticTypeId.hpp"
 #include "Attributes.hpp"
+#include "FunctionBinding.hpp"
 
 template <typename ClassType>
 BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& className, int id)
@@ -40,30 +41,40 @@ BoundType* BindClassType(ReflectionLibrary& library, const std::string& classNam
   BoundType* boundType = CreateBoundType<ClassType>(library, className, id);
   boundType->AddComponentType<TypedMetaSerialization<ClassType>>();
   BindingFn(library, *boundType);
+  boundType->mDefaultConstructor = FromConstructor<ClassType>();
+  boundType->mCopyConstructor = FromCopyConstructor<ClassType>();
+  boundType->mDestructor = FromDestructor<ClassType>();
   return boundType;
 }
 
 template <typename GetterType, GetterType getter, typename SetterType, SetterType setter, typename ClassType, typename GetType, typename SetType>
 static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& owner, const std::string& name, GetType(ClassType::*dummyGetter)()const, void (ClassType::*dummySetter)(SetType))
 {
-  auto getSet = new GetterSetterTyped<ClassType, GetterType, GetType, SetterType, SetType>();
+  auto getSet = new GetterSetter();
   getSet->mType = StaticTypeId<GetType>::GetBoundType();
   getSet->mName = name;
-  getSet->mGetter = getter;
-  getSet->mSetter = setter;
+  getSet->mGetter = FromMethod<GetterType, getter>(getter);
+  getSet->mSetter = FromMethod<SetterType, setter>(setter);
   getSet->mType->AddComponentType<TypedMetaSerialization<GetType>>();
   owner.mGetterSetters.push_back(getSet);
   return getSet;
 }
 
 template <typename Type>
-BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className)
+BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className, size_t sizeInBytes)
 {
   BoundType* boundType = StaticTypeId<Type>::GetBoundType();
   boundType->mName = className;
-  boundType->mSizeInBytes = sizeof(Type);
-  boundType->AddComponentType<TypedMetaSerialization<Type>>();
+  boundType->mSizeInBytes = sizeInBytes;
   library.AddBoundType(boundType);
+  return boundType;
+}
+
+template <typename Type>
+BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className)
+{
+  BoundType* boundType = BindPrimitiveTypeToLibrary<Type>(library, className, sizeof(Type));
+  boundType->AddComponentType<TypedMetaSerialization<Type>>();
   return boundType;
 }
 

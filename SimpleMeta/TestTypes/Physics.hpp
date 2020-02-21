@@ -26,7 +26,10 @@ struct Collider
     BindGetterSetterAs(library, boundType, Collider, "SendsEvents", GetSendsEvents, SetSendsEvents);
   }
 
-  bool GetGhost() const { return mFlags & GhostBit; }
+  bool GetGhost() const
+  {
+    return mFlags & GhostBit;
+  }
   void SetGhost(bool state)
   {
     if(state)
@@ -34,7 +37,10 @@ struct Collider
     else
       mFlags &= ~GhostBit;
   }
-  bool GetSendsEvents() const { return mFlags & SendsEventsBit; }
+  bool GetSendsEvents() const
+  {
+    return mFlags & SendsEventsBit;
+  }
   void SetSendsEvents(bool state)
   {
     if(state)

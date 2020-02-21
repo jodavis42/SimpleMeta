@@ -14,6 +14,7 @@
 int main()
 {
   ReflectionLibrary& coreLibrary = ReflectionProject::CreateLibrary("Core");
+  BindPrimitiveTypeToLibrary<void>(coreLibrary, "void", 0);
   BindPrimitiveType(coreLibrary, bool);
   BindPrimitiveType(coreLibrary, char);
   BindPrimitiveType(coreLibrary, int);
