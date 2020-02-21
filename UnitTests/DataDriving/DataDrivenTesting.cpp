@@ -4,6 +4,9 @@
 #include "JsonSerializers.hpp"
 #include "BinaryStream.hpp"
 
+#include "Field.hpp"
+#include "GetterSetter.hpp"
+
 #include <filesystem>
 #include <fstream>
 #include <sstream>

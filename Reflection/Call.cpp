@@ -1,5 +1,6 @@
 #include "Call.hpp"
 
+#include "Asserts.hpp"
 #include "BoundType.hpp"
 #include "Function.hpp"
 

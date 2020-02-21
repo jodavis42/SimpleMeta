@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BoundType.hpp"
+#include "Field.hpp"
+#include "GetterSetter.hpp"
 #include "Attributes.hpp"
 #include "Serializer.hpp"
 #include "MetaSerialization.hpp"

@@ -5,35 +5,10 @@
 
 #include "TypeId.hpp"
 #include "ReflectionComposition.hpp"
-#include "Any.hpp"
 
-struct BoundType;
-struct Call;
+struct Field;
 struct Function;
-
-typedef void(*BoundFunction)(Call& call);
-
-struct Field : public ReflectionComposition
-{
-  char* GetFieldData(char* instanceData) const;
-
-  std::string mName;
-  size_t mOffset = 0;
-  BoundType* mType = nullptr;
-};
-
-struct GetterSetter : public ReflectionComposition
-{
-  ~GetterSetter();
-
-  Any Get(char* instanceData) const;
-  void Set(char* instanceData, Any any);
-
-  std::string mName;
-  BoundType* mType = nullptr;
-  Function* mGetter = nullptr;
-  Function* mSetter = nullptr;
-};
+struct GetterSetter;
 
 struct BoundType : public ReflectionComposition
 {

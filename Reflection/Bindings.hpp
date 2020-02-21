@@ -1,6 +1,8 @@
 #pragma once
 
 #include "BoundType.hpp"
+#include "Field.hpp"
+#include "GetterSetter.hpp"
 #include "MetaLibrary.hpp"
 #include "MetaSerialization.hpp"
 #include "StaticTypeId.hpp"
