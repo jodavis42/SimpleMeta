@@ -2,7 +2,10 @@
 
 #include "BoundType.hpp"
 
+BoundType* ValidateRawBoundType(BoundType* boundType);
 BoundType* RegisterBoundType(BoundType* boundType);
+BoundType* RegisterPointerBoundType(BoundType* unqualifiedBase, BoundType* boundType);
+BoundType* RegisterReferenceBoundType(BoundType* unqualifiedBase, BoundType* boundType);
 
 template <typename T>
 struct StaticTypeId
@@ -10,7 +13,7 @@ struct StaticTypeId
   // This returns the raw bound type and should only be used when building types the first time.
   static BoundType*& GetBoundTypeRaw()
   {
-    static BoundType* sInstance = new BoundType();
+    static BoundType* sInstance = ValidateRawBoundType(new BoundType());
     return sInstance;
   }
 
@@ -23,12 +26,43 @@ struct StaticTypeId
   }
 };
 
+// Speciailize pointer types so we can properly track pointers to base types and so on
 template <typename T>
 struct StaticTypeId<T*> : public StaticTypeId<T>
 {
   static BoundType*& GetBoundType()
   {
-    return StaticTypeId<T>::GetBoundType();
+    static BoundType* sInstance = RegisterPointerBoundType(StaticTypeId<T>::GetBoundType(), new BoundType());
+    return sInstance;
+  }
+};
+
+// Do the same for reference types
+template <typename T>
+struct StaticTypeId<T&> : public StaticTypeId<T>
+{
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = RegisterReferenceBoundType(StaticTypeId<T>::GetBoundType(), new BoundType());
+    return sInstance;
+  }
+};
+
+// Deal with const types...
+template <typename T>
+struct StaticTypeId<const T*> : public StaticTypeId<T>
+{
+  static BoundType*& GetBoundType()
+  {
+    return StaticTypeId<T*>::GetBoundType();
+  }
+};
+template <typename T>
+struct StaticTypeId<const T&> : public StaticTypeId<T>
+{
+  static BoundType*& GetBoundType()
+  {
+    return StaticTypeId<T&>::GetBoundType();
   }
 };
 

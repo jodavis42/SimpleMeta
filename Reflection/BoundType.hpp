@@ -25,4 +25,6 @@ struct BoundType : public ReflectionComposition
   Function* mDefaultConstructor = nullptr;
   Function* mCopyConstructor = nullptr;
   Function* mDestructor = nullptr;
+  bool mIsPointerType = false;
+  bool mIsReferenceType = false;
 };

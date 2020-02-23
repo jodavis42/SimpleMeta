@@ -19,6 +19,11 @@ void ReflectionLibrary::AddBoundType(BoundType* boundType)
   mBoundTypeIdMap[boundType->mId.mId] = boundType;
 }
 
+void ReflectionLibrary::Finalize()
+{
+  mIsFinalized = true;
+}
+
 BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recursive)
 {
   auto it = mBoundTypeNameMap.find(name);
@@ -76,6 +81,13 @@ ReflectionProject* ReflectionProject::GetInstance()
 ReflectionLibrary& ReflectionProject::CreateLibrary(const std::string& name)
 {
   ReflectionProject* instance = GetInstance();
+  // If we were already building a library then finalize it so it's locked.
+  // This helps prevent errors of creating new types later which are missing important info (names, etc...)
+  if(instance->mCurrentLibrary != nullptr)
+  {
+    instance->mCurrentLibrary->Finalize();
+  }
+
   ReflectionLibrary* library = new ReflectionLibrary();
   instance->mCurrentLibrary = library;
   library->mName = name;

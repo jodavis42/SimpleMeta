@@ -13,6 +13,7 @@ struct ReflectionLibrary
 
   void AddDependency(ReflectionLibrary* dependency);
   void AddBoundType(BoundType* boundType);
+  void Finalize();
 
   BoundType* FindBoundType(const std::string& name, bool recursive = true);
   BoundType* FindBoundType(const TypeId& id, bool recursive = true);
@@ -22,6 +23,9 @@ struct ReflectionLibrary
   std::vector<BoundType*> mBoundTypes;
   std::unordered_map<std::string, BoundType*> mBoundTypeNameMap;
   std::unordered_map<size_t, BoundType*> mBoundTypeIdMap;
+
+  // For a library to be finalized, it's only able to accept new ref/pointer types, but no new actual direct bound types.
+  bool mIsFinalized = false;
 };
 
 /// A project that owns all of the reflection libraries and contains a singleton interface to allow easy querying of a type.
