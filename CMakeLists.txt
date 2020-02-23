@@ -28,6 +28,7 @@ set(RapidJsonLocation ${CurrentDirectory}/RapidJson)
 add_subdirectory(Reflection)
 add_subdirectory(Serialization)
 add_subdirectory(UnitTests)
+add_subdirectory(CodeGeneration)
 add_subdirectory(SimpleMeta)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT SimpleMeta)
