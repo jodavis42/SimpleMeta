@@ -4,6 +4,10 @@
 #include <fstream>
 #include <sstream>
 
+struct ReflectionLibrary;
+struct BoundType;
+struct Function;
+
 template <typename T>
 void TestBinaryRoundTrip(T& input)
 {
@@ -56,4 +60,15 @@ void TestJsonRoundTrip(T& input)
   }
 }
 
+struct ScopedFunction
+{
+  ScopedFunction(Function* function);
+  ~ScopedFunction();
+
+  operator Function*();
+  
+  Function* mFunction;
+};
+
+void DummyBind(ReflectionLibrary& library, BoundType& boundType);
 void RunUnitTests();

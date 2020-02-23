@@ -1,5 +1,7 @@
 #include "UnitTesting.hpp"
 
+#include "AnyTests.hpp"
+#include "CallTests.hpp"
 #include "BinaryStream.hpp"
 #include "JsonSerializers.hpp"
 #include "TestTypes/Physics.hpp"
@@ -7,8 +9,31 @@
 #include "TestTypes/Mesh.hpp"
 #include "TestTypes/Misc.hpp"
 
+ScopedFunction::ScopedFunction(Function* function) : mFunction(function)
+{
+
+}
+
+ScopedFunction::~ScopedFunction()
+{
+  delete mFunction;
+}
+
+ScopedFunction::operator Function*()
+{
+  return mFunction;
+}
+
+void DummyBind(ReflectionLibrary& library, BoundType& boundType)
+{
+
+}
+
 void RunUnitTests()
 {
+  RunAnyTests();
+  RunCallTests();
+
   {
     Mesh outMesh;
     outMesh.mVertices.push_back(Vertex(Vec3(0, 0, 0), Vec2(0, 0)));
