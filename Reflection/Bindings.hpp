@@ -10,13 +10,21 @@
 #include "FunctionBinding.hpp"
 
 template <typename ClassType>
+void DefaultTypeSetup(ReflectionLibrary& library, BoundType& ownerType);
+
+template <typename ClassType, typename FieldType>
+void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& fieldType);
+
+template <typename ClassType, typename GetterSetterType>
+void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& getterSetterType);
+
+template <typename ClassType>
 BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& className, size_t id, size_t sizeInBytes)
 {
   BoundType* boundType = StaticTypeId<ClassType>::GetBoundTypeRaw();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeInBytes;
   boundType->mId = id;
-
   library.AddBoundType(boundType);
   return boundType;
 }
@@ -34,11 +42,7 @@ static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std:
   f->mName = name;
   f->mOffset = offset;
   f->mType = StaticTypeId<FieldType>::GetBoundType();
-  if(f->mType->QueryComponentType<MetaSerialization>() == nullptr)
-  {
-    f->mType->AddComponentType<TypedMetaSerialization<FieldType>>();
-  }
-
+  DefaultFieldSetup<ClassType, FieldType>(library, owner, *f->mType);
   owner.mFields.push_back(f);
   return f;
 }
@@ -47,11 +51,11 @@ template <typename ClassType, void (*BindingFn)(ReflectionLibrary& library, Boun
 BoundType* BindClassType(ReflectionLibrary& library, const std::string& className, int id)
 {
   BoundType* boundType = CreateBoundType<ClassType>(library, className, id);
-  boundType->AddComponentType<TypedMetaSerialization<ClassType>>();
   BindingFn(library, *boundType);
   boundType->mDefaultConstructor = FromConstructor<ClassType>();
   boundType->mCopyConstructor = FromCopyConstructor<ClassType>();
   boundType->mDestructor = FromDestructor<ClassType>();
+  DefaultTypeSetup<ClassType>(library, *boundType);
   return boundType;
 }
 
@@ -63,7 +67,7 @@ static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& own
   getSet->mName = name;
   getSet->mGetter = FromMethod<GetterType, getter>(getter);
   getSet->mSetter = FromMethod<SetterType, setter>(setter);
-  getSet->mType->AddComponentType<TypedMetaSerialization<GetType>>();
+  DefaultGetterSetterSetup<ClassType, GetType>(library, owner, *getSet->mType);
   owner.mGetterSetters.push_back(getSet);
   return getSet;
 }

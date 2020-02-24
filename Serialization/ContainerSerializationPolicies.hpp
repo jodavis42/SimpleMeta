@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SerializationPolicy.hpp"
+#include "BinaryStream.hpp"
+#include "JsonSerializers.hpp"
 
 #include <unordered_map>
 

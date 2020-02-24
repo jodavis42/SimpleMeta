@@ -80,3 +80,30 @@ struct TypedMetaSerialization : public MetaSerialization
     return (char*)result;
   }
 };
+
+template <typename ClassType>
+void DefaultTypeSetup(ReflectionLibrary& library, BoundType& ownerType)
+{
+  if(ownerType.QueryComponentType<MetaSerialization>() == nullptr)
+  {
+    ownerType.AddComponentType<TypedMetaSerialization<ClassType>>();
+  }
+}
+
+template <typename ClassType, typename FieldType>
+void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& fieldType)
+{
+  if(fieldType.QueryComponentType<MetaSerialization>() == nullptr)
+  {
+    fieldType.AddComponentType<TypedMetaSerialization<FieldType>>();
+  }
+}
+
+template <typename ClassType, typename FieldType>
+void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& getterSetterType)
+{
+  if(getterSetterType.QueryComponentType<MetaSerialization>() == nullptr)
+  {
+    getterSetterType.AddComponentType<TypedMetaSerialization<FieldType>>();
+  }
+}
