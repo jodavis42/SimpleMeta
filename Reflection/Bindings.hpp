@@ -27,8 +27,8 @@ BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& classN
   return CreateBoundType<ClassType>(library, className, id, sizeof(ClassType));
 }
 
-template <typename FieldPointer, FieldPointer field, typename Class, typename FieldType>
-static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType Class::*dummy, size_t offset)
+template <typename FieldPointer, FieldPointer field, typename ClassType, typename FieldType>
+static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType ClassType::*dummy, size_t offset)
 {
   Field* f = new Field();
   f->mName = name;
