@@ -200,7 +200,7 @@ void TestNumber()
   }
   
   {
-    Function* fn = CreateMethod(&Number::Inv);
+    ScopedFunction fn = CreateMethod(&Number::Inv);
     Call call(fn);
     call.SetPointerUnchecked(Call::This, &two);
     call.Invoke();
@@ -210,7 +210,7 @@ void TestNumber()
 
   {
     Number self(0);
-    Function* fn = CreateMethod(&Number::operator+=);
+    ScopedFunction fn = CreateMethod(&Number::operator+=);
     Call call(fn);
     call.SetPointerUnchecked(Call::This, &self);
     call.SetReference(0, one);

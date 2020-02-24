@@ -1,3 +1,7 @@
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "BoundType.hpp"
 #include "MetaLibrary.hpp"
 #include "StaticTypeId.hpp"
@@ -13,6 +17,7 @@
 
 int main()
 {
+  _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
   ReflectionLibrary& reflectionLibrary = ReflectionProject::CreateLibrary("Reflection");
   CreateBoundType<ReflectionComponent>(reflectionLibrary, "ReflectionComponent", 'rcmp');
   CreateBoundType<Attribute>(reflectionLibrary, "Attribute", 'att');
