@@ -108,7 +108,7 @@ struct PhysicsSpace
     bool isEqual = true;
     for(size_t i = 0; i < mColliders.size(); ++i)
     {
-      isEqual |= (*mColliders[i] == *rhs.mColliders[i]);
+      isEqual &= (*mColliders[i] == *rhs.mColliders[i]);
     }
     return isEqual;
   }
