@@ -11,6 +11,9 @@ BoundType* AllocateBoundType()
   return boundType;
 }
 
+template <typename... Args>
+struct RecursiveStaticTypeId;
+
 BoundType* ValidateRawBoundType(BoundType* boundType);
 BoundType* RegisterBoundType(BoundType* boundType);
 BoundType* RegisterPointerBoundType(BoundType* unqualifiedBase, BoundType* boundType);
@@ -94,95 +97,37 @@ struct StaticTypeId<const T&> : public StaticTypeId<T>
 };
 
 // Deal with templated types (have to visit the sub-types)
-template <template <typename> typename ContainerType, typename ParamType0>
-struct StaticTypeId< ContainerType<ParamType0> >
-{
-  static BoundType* Create()
-  {
-    StaticTypeId<ParamType0>::GetBoundType();
-    return AllocateBoundType<ContainerType<ParamType0>>();
-  }
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = Create();
-    return sInstance;
-  }
-};
-template <template <typename, typename> typename ContainerType, typename ParamType0, typename ParamType1>
-struct StaticTypeId< ContainerType<ParamType0, ParamType1> >
-{
-  static BoundType* Create()
-  {
-    StaticTypeId<ParamType0>::GetBoundType();
-    StaticTypeId<ParamType1>::GetBoundType();
-    return AllocateBoundType<ContainerType<ParamType0, ParamType1>>();
-  }
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = Create();
-    return sInstance;
-  }
-};
-template <template <typename, typename, typename> typename ContainerType, typename ParamType0, typename ParamType1, typename ParamType2>
-struct StaticTypeId< ContainerType<ParamType0, ParamType1, ParamType2> >
-{
-  static BoundType* Create()
-  {
-    StaticTypeId<ParamType0>::GetBoundType();
-    StaticTypeId<ParamType1>::GetBoundType();
-    StaticTypeId<ParamType2>::GetBoundType();
-    return AllocateBoundType<ContainerType<ParamType0, ParamType1, ParamType2>>();
-  }
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = Create();
-    return sInstance;
-  }
-};
-template <template <typename, typename, typename, typename> typename ContainerType, typename ParamType0, typename ParamType1, typename ParamType2, typename ParamType3>
-struct StaticTypeId< ContainerType<ParamType0, ParamType1, ParamType2, ParamType3> >
-{
-  static BoundType* Create()
-  {
-    StaticTypeId<ParamType0>::GetBoundType();
-    StaticTypeId<ParamType1>::GetBoundType();
-    StaticTypeId<ParamType2>::GetBoundType();
-    StaticTypeId<ParamType3>::GetBoundType();
-    return AllocateBoundType<ContainerType<ParamType0, ParamType1, ParamType2, ParamType3>>();
-  }
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = Create();
-    return sInstance;
-  }
-};
-template <template <typename, typename, typename, typename, typename> typename ContainerType, typename ParamType0, typename ParamType1, typename ParamType2, typename ParamType3, typename ParamType4>
-struct StaticTypeId< ContainerType<ParamType0, ParamType1, ParamType2, ParamType3, ParamType4> >
-{
-  static BoundType* Create()
-  {
-    StaticTypeId<ParamType0>::GetBoundType();
-    StaticTypeId<ParamType1>::GetBoundType();
-    StaticTypeId<ParamType2>::GetBoundType();
-    StaticTypeId<ParamType3>::GetBoundType();
-    StaticTypeId<ParamType4>::GetBoundType();
-    return AllocateBoundType<ContainerType<ParamType0, ParamType1, ParamType2, ParamType3, ParamType4>>();
-  }
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = Create();
-    return sInstance;
-  }
-};
-// Deal with templated types (have to visit the sub-types)
 template <template <typename...> typename ContainerType, typename ... ParamTypes>
 struct StaticTypeId< ContainerType<ParamTypes...> >
 {
+  static BoundType* Create()
+  {
+    RecursiveStaticTypeId<ParamTypes...>::Recurse();
+    return AllocateBoundType<ContainerType<ParamTypes...>>();
+  }
   static BoundType*& GetBoundType()
   {
-    static_assert(false, "Cannot support unknown parameter count");
-    static BoundType* sInstance = nullptr;
+    static BoundType* sInstance = Create();
     return sInstance;
+  }
+};
+
+/// Recursive template to call StaticTypeId::GetBoundType() on all args in a variadic
+template <typename First, typename... Args>
+struct RecursiveStaticTypeId<First, Args...>
+{
+  static void Recurse()
+  {
+    StaticTypeId<First>::GetBoundType();
+    RecursiveStaticTypeId<Args...>::Recurse();
+  }
+};
+/// Base case to terminate recursion on no params
+template <>
+struct RecursiveStaticTypeId<>
+{
+  static void Recurse()
+  {
   }
 };
 
