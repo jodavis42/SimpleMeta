@@ -2,6 +2,7 @@
 
 int main()
 {
-  GenerateFunctions("Generated");
+  std::string outputFolder = GENERATION_FOLDER;
+  GenerateFunctions(outputFolder);
   return 0;
 }

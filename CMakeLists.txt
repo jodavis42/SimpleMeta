@@ -25,6 +25,7 @@ set(DataDrivenTestDir ${CurrentDirectory}/DataDrivenTests)
 set(SupportedConfigs $<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>)
 
 set(RapidJsonLocation ${CurrentDirectory}/RapidJson)
+set(ReflectionLocation ${CurrentDirectory}/Reflection)
 add_subdirectory(Reflection)
 add_subdirectory(Serialization)
 add_subdirectory(UnitTests)

@@ -13,3 +13,5 @@ target_link_libraries(CodeGeneration
                       Reflection
                       Serialization
 )
+
+add_definitions(-DGENERATION_FOLDER="${ReflectionLocation}")
