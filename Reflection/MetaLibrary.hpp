@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include "BoundType.hpp"
 
 struct BoundType;
@@ -14,6 +15,7 @@ struct ReflectionLibrary
   void AddDependency(ReflectionLibrary* dependency);
   void AddBoundType(BoundType* boundType);
   void Finalize();
+  bool Validate();
 
   BoundType* FindBoundType(const std::string& name, bool recursive = true);
   BoundType* FindBoundType(const TypeId& id, bool recursive = true);
@@ -23,6 +25,7 @@ struct ReflectionLibrary
   std::vector<BoundType*> mBoundTypes;
   std::unordered_map<std::string, BoundType*> mBoundTypeNameMap;
   std::unordered_map<size_t, BoundType*> mBoundTypeIdMap;
+  std::unordered_set<BoundType*> mBoundTypesToRegister;
 
   // For a library to be finalized, it's only able to accept new ref/pointer types, but no new actual direct bound types.
   bool mIsFinalized = false;

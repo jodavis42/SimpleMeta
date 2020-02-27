@@ -117,8 +117,10 @@ void TestDeepCopyType()
 void RunAnyTests()
 {
   ReflectionLibrary& anyLibrary = ReflectionProject::CreateLibrary("Any");
+  anyLibrary.AddDependency(ReflectionProject::FindLibrary("Core"));
   BindTypeExternal(anyLibrary, LargeType, 'lrgt', DummyBind);
   BindTypeExternal(anyLibrary, DeepCopyType, 'dpcp', DummyBind);
+  anyLibrary.Finalize();
 
   TestPrimitive();
   TestMathType();

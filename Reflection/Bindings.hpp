@@ -21,7 +21,7 @@ void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, 
 template <typename ClassType>
 BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& className, size_t id, size_t sizeInBytes)
 {
-  BoundType* boundType = StaticTypeId<ClassType>::GetBoundTypeRaw();
+  BoundType* boundType = StaticTypeId<ClassType>::GetBoundType();
   boundType->mName = className;
   boundType->mSizeInBytes = sizeInBytes;
   boundType->mId = id;

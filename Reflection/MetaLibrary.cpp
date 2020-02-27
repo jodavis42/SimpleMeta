@@ -1,4 +1,6 @@
 #include "MetaLibrary.hpp"
+#include "Asserts.hpp"
+#include "StaticTypeId.hpp"
 
 ReflectionLibrary::~ReflectionLibrary()
 {
@@ -10,25 +12,64 @@ ReflectionLibrary::~ReflectionLibrary()
 
 void ReflectionLibrary::AddBoundType(BoundType* boundType)
 {
-  // Don't double register
-  if(FindBoundType(boundType->mId) != nullptr)
+  ErrorIf(mIsFinalized, "Can't add to a finalized library");
+
+  // Already queued to register, skip
+  if(mBoundTypesToRegister.find(boundType) != mBoundTypesToRegister.end())
     return;
 
-  mBoundTypes.push_back(boundType);
-  mBoundTypeNameMap[boundType->mName] = boundType;
-  mBoundTypeIdMap[boundType->mId.mId] = boundType;
+  // Check if a type was already registered in a dependancy, if so don't register it again
+  if(boundType->mId.mId != TypeId::sInvalidId && FindBoundType(boundType->mId) != nullptr)
+    return;
+
+  mBoundTypesToRegister.insert(boundType);
 }
 
 void ReflectionLibrary::Finalize()
 {
+  // Don't double finalize
+  if(mIsFinalized)
+    return;
+
   mIsFinalized = true;
+
+  // This id isn't guaranteed to be safe, come up with a better solution...
+  static size_t sId = 9999;
+
+  for(BoundType* boundType : mBoundTypesToRegister)
+  {
+    // Type was dynamic (like a vector) and didn't have an explicit id. Auto-generate it.
+    if(boundType->mId.mId == TypeId::sInvalidId)
+      boundType->mId.mId = ++sId;
+
+    mBoundTypes.push_back(boundType);
+    mBoundTypeNameMap[boundType->mName] = boundType;
+    mBoundTypeIdMap[boundType->mId.mId] = boundType;
+  }
+
+  Validate();
+  mBoundTypesToRegister.clear();
+}
+
+bool ReflectionLibrary::Validate()
+{
+  for(BoundType* boundType : mBoundTypes)
+  {
+    ErrorIf(boundType->mId.mId == TypeId::sInvalidId, "Invalid id");
+    // All types need a size (except void)
+    ErrorIf(boundType->mSizeInBytes == 0 && boundType->mName != "void", "Invalid size");
+  }
+  return true;
 }
 
 BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recursive)
 {
   auto it = mBoundTypeNameMap.find(name);
   if(it != mBoundTypeNameMap.end())
+  {
+    ErrorIf(it->second->mId.mId == TypeId::sInvalidId, "Fetching an uninitialized bound type");
     return it->second;
+  }
 
   for(ReflectionLibrary* dependency : mDependencies)
   {
@@ -44,7 +85,10 @@ BoundType* ReflectionLibrary::FindBoundType(const TypeId& id, bool recursive)
 {
   auto it = mBoundTypeIdMap.find(id.mId);
   if(it != mBoundTypeIdMap.end())
+  {
+    ErrorIf(it->second->mId.mId == TypeId::sInvalidId, "Fetching an uninitialized bound type");
     return it->second;
+  }
 
   for(ReflectionLibrary* dependency : mDependencies)
   {
@@ -89,6 +133,7 @@ ReflectionLibrary& ReflectionProject::CreateLibrary(const std::string& name)
   }
 
   ReflectionLibrary* library = new ReflectionLibrary();
+  ErrorIf(instance->mCurrentLibrary != nullptr && !instance->mCurrentLibrary->mIsFinalized, "Cannot create a new library before the previous one was finalized");
   instance->mCurrentLibrary = library;
   library->mName = name;
   instance->mLibraries.push_back(library);

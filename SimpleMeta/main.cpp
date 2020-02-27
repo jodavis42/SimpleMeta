@@ -39,8 +39,8 @@ int main()
   ReflectionLibrary& miscLibrary = ReflectionProject::CreateLibrary("Misc");
   miscLibrary.AddDependency(&coreLibrary);
   BindTypeExternal(miscLibrary, MyStruct, 'myst', BindMyStruct);
-  BindType(miscLibrary, Vertex, 'vtx');
   BindType(miscLibrary, Mesh, 'mesh');
+  BindType(miscLibrary, Vertex, 'vtx');
   BindType(miscLibrary, NameId, 'nid');
   BindType(miscLibrary, NameIdList, 'idlt');
   BindType(miscLibrary, Collider, 'col');
@@ -49,6 +49,7 @@ int main()
   BindType(miscLibrary, PhysicsSpace, 'phys');
   BindType(miscLibrary, NumberList, 'nmls');
   BindType(miscLibrary, Dictionary, 'dict');
+  miscLibrary.Finalize();
 
   RunUnitTests();
 
@@ -58,7 +59,8 @@ int main()
     BindType(dataDrivenLibrary, DataDrivenField, 'ddf');
     BindType(dataDrivenLibrary, DataDrivenType, 'ddt');
     BindType(dataDrivenLibrary, DataDrivenTypes, 'ddts');
-
+    dataDrivenLibrary.Finalize();
+ 
     std::string testDir = "DataDrivenTests";
     RunDataDrivenTests(testDir, dataDrivenLibrary);
   }

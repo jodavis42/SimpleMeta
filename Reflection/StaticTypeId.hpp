@@ -10,18 +10,28 @@ BoundType* RegisterReferenceBoundType(BoundType* unqualifiedBase, BoundType* bou
 template <typename T>
 struct StaticTypeId
 {
-  // This returns the raw bound type and should only be used when building types the first time.
-  static BoundType*& GetBoundTypeRaw()
+  static BoundType* AutoRegisterType(BoundType* boundType)
   {
-    static BoundType* sInstance = ValidateRawBoundType(new BoundType());
-    return sInstance;
+    boundType = RegisterBoundType(boundType);
+    boundType->mSizeInBytes = sizeof(T);
+    return boundType;
   }
 
   // This assumes that all important types have already been built and will auto-register
   // a type otherwise (to deal with dynamic types like arrays).
   static BoundType*& GetBoundType()
   {
-    static BoundType* sInstance = RegisterBoundType(GetBoundTypeRaw());
+    static BoundType* sInstance = AutoRegisterType(new BoundType());
+    return sInstance;
+  }
+};
+
+template <>
+struct StaticTypeId<void>
+{
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = ValidateRawBoundType(new BoundType());
     return sInstance;
   }
 };
@@ -49,6 +59,15 @@ struct StaticTypeId<T&> : public StaticTypeId<T>
 };
 
 // Deal with const types...
+template <typename T>
+struct StaticTypeId<const T> : public StaticTypeId<T>
+{
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = StaticTypeId<T>::GetBoundType();
+    return sInstance;
+  }
+};
 template <typename T>
 struct StaticTypeId<const T*> : public StaticTypeId<T>
 {

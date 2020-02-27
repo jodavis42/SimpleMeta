@@ -2,7 +2,9 @@
 
 struct TypeId
 {
-  TypeId() : mId(0) {}
+  TypeId() : mId(sInvalidId) {}
   TypeId(size_t id) : mId(id) {}
   size_t mId;
+
+  static constexpr size_t sInvalidId = static_cast<size_t>(-1);
 };

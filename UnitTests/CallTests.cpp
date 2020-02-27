@@ -222,14 +222,19 @@ void TestNumber()
 void RunCallTests()
 {
   ReflectionLibrary& callLibrary = ReflectionProject::CreateLibrary("Call");
+  callLibrary.AddDependency(ReflectionProject::FindLibrary("Core"));
   BindTypeExternal(callLibrary, Number, 'numb', DummyBind);
   BindTypeExternal(callLibrary, SimpleGetterTest, 'sgt', DummyBind);
   BindTypeExternal(callLibrary, SimpleSetterTest, 'sst', DummyBind);
-  callLibrary.Finalize();
+  
 
   TestSimpleGetters();
   TestSimpleSetters();
   TestNumber();
+
+  // Finalize after the tests since this adds new types from the function generation.
+  // This is a hack and really isn't good, but it's a quick and dirty test.
+  callLibrary.Finalize();
 
   ReflectionProject::DestroyLibrary(callLibrary);
 }
