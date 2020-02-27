@@ -16,7 +16,7 @@ std::ofstream& AppendArgs(std::ofstream& stream, size_t argCount)
 {
   for(size_t i = 0; i < argCount; ++i)
   {
-    stream << "Arg" << i;
+    stream << "Arg" << i << "Type";
     if(i != argCount - 1)
       stream << ", ";
   }
@@ -31,7 +31,7 @@ std::ofstream& AppendTypes(std::ofstream& stream, bool isStatic, bool hasReturn,
   if(hasReturn)
     stream << ", ReturnType";
   for(size_t i = 0; i < argCount; ++i)
-    stream << ", Arg" << i;
+    stream << ", Arg" << i << "Type";
 
   return stream;
 }
@@ -44,7 +44,7 @@ void GenerateTemplateArgs(std::ofstream& stream, bool isStatic, bool hasReturn, 
   if(hasReturn)
     stream << ", typename ReturnType";
   for(size_t i = 0; i < argCount; ++i)
-    stream << ", typename Arg" << i;
+    stream << ", typename Arg" << i << "Type";
   stream << ">" << std::endl;
 }
 
@@ -69,12 +69,10 @@ void GenerateBoundFunction(std::ofstream& stream, bool isStatic, bool isConst, b
   Print(stream, "void %s(Call& call)\n", fnName.c_str());
   stream << "{" << std::endl;
   for(size_t i = 0; i < argCount; ++i)
-    Print(stream, "  typedef UnqualifiedType<Arg%d>::type Arg%dType;\n", i, i);
-  for(size_t i = 0; i < argCount; ++i)
     Print(stream, "  Arg%dType arg%d = call.Get<Arg%dType>(%d);\n", i, i, i, i);
   if(!isStatic)
   {
-    Print(stream, "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());\n");
+    Print(stream, "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());\n");
     Print(stream, "  ClassType* self = *reinterpret_cast<ClassType**>(location);\n");
   }
 
@@ -104,16 +102,14 @@ void GenerateBoundConstructor(std::ofstream& stream, size_t argCount)
 {
   stream << "template <typename ClassType";
   for(size_t i = 0; i < argCount; ++i)
-    stream << ", typename Arg" << i;
+    stream << ", typename Arg" << i << "Type";
   stream << ">" << std::endl;
 
   Print(stream, "void BoundConstructor(Call& call)\n");
   stream << "{" << std::endl;
   for(size_t i = 0; i < argCount; ++i)
-    Print(stream, "  typedef UnqualifiedType<Arg%d>::type Arg%dType;\n", i, i);
-  for(size_t i = 0; i < argCount; ++i)
     Print(stream, "  Arg%dType arg%d = call.Get<Arg%dType>(%d);\n", i, i, i, i);
-  Print(stream, "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());\n");
+  Print(stream, "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());\n");
   Print(stream, "  ClassType* self = *reinterpret_cast<ClassType**>(location);\n");
 
   Print(stream, "  new(self) ClassType(");
@@ -133,7 +129,7 @@ void GenerateBoundCopyConstructor(std::ofstream& stream)
   stream << "void BoundCopyConstructor(Call& call)" << std::endl;
   stream << "{" << std::endl;
   stream << "  ClassType& arg0 = call.Get<ClassType>(0);" << std::endl;
-  stream << "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());" << std::endl;
+  stream << "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
   stream << "  char* self = *(char**)location;" << std::endl;
   stream << "  new (self) ClassType(arg0);" << std::endl;
   stream << "}" << std::endl << std::endl;
@@ -144,7 +140,7 @@ void GenerateBoundDestructor(std::ofstream& stream)
   stream << "template <typename ClassType>" << std::endl;
   stream << "void BoundDestructor(Call& call)" << std::endl;
   stream << "{" << std::endl;
-  stream << "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());" << std::endl;
+  stream << "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
   stream << "  ClassType* self = *reinterpret_cast<ClassType**>(location);" << std::endl;
   stream << "  self->~ClassType();" << std::endl;
   stream << "}" << std::endl << std::endl;
@@ -169,15 +165,13 @@ void GenerateFromMethod(std::ofstream& stream, bool isStatic, bool isConst, bool
   AppendArgs(stream, argCount);
   Print(stream, ")%s)\n", isConst ? "const" : "");
   stream << "{" << std::endl;
-  for(size_t i = 0; i < argCount; ++i)
-    Print(stream, "  typedef UnqualifiedType<Arg%d>::type Arg%dType;\n", i, i);
   stream << "  Function* fn = new Function();" << std::endl;
   Print(stream, "  fn->mBoundFunction = &%s<FunctionType, FunctionToBind", fnName.c_str());
   AppendTypes(stream, isStatic, hasReturn, argCount);
   Print(stream, ">;\n");
   Print(stream, "  fn->SetReturnType(StaticTypeId<%s>::GetBoundType());\n", returnType.c_str());
   if(!isStatic)
-    stream << "  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());" << std::endl;
+    stream << "  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
   for(size_t i = 0; i < argCount; ++i)
     Print(stream, "  fn->SetParamType(%d, StaticTypeId<Arg%dType>::GetBoundType());\n", i, i);
   stream << "  return fn;" << std::endl;
@@ -193,8 +187,6 @@ void GenerateFromConstructor(std::ofstream& stream, size_t argCount)
 
   stream << "Function* FromConstructor()" << std::endl;
   stream << "{" << std::endl;
-  for(size_t i = 0; i < argCount; ++i)
-    Print(stream, "  typedef UnqualifiedType<Arg%d>::type Arg%dType;\n", i, i);
   stream << "  Function* fn = new Function();" << std::endl;
   stream << "  fn->mBoundFunction = &BoundConstructor<ClassType";
   for(size_t i = 0; i < argCount; ++i)
@@ -214,8 +206,8 @@ void GenerateFromCopyConstructor(std::ofstream& stream)
   stream << "{" << std::endl;
   stream << "  Function* fn = new Function();" << std::endl;
   stream << "  fn->mBoundFunction = &BoundCopyConstructor<ClassType>;" << std::endl;
-  stream << "  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());" << std::endl;
-  stream << "  fn->SetParamType(0, StaticTypeId<ClassType>::GetBoundType());" << std::endl;
+  stream << "  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
+  stream << "  fn->SetParamType(0, StaticTypeId<const ClassType>::GetBoundType());" << std::endl;
   stream << "  return fn;" << std::endl;
   stream << "}" << std::endl << std::endl;
 }
@@ -227,7 +219,7 @@ void GenerateFromDestructor(std::ofstream& stream)
   stream << "{" << std::endl;
   stream << "  Function* fn = new Function();" << std::endl;
   stream << "  fn->mBoundFunction = &BoundDestructor<ClassType>;" << std::endl;
-  stream << "  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());" << std::endl;
+  stream << "  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
   stream << "  return fn;" << std::endl;
   stream << "}" << std::endl << std::endl;
 }

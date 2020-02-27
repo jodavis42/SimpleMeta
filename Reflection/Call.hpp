@@ -21,11 +21,11 @@ struct CallHelper
   {
     using ArgType = UnqualifiedType<T>::type;
     char* location = call.GetLocationChecked(index, StaticTypeId<ArgType>::GetBoundType());
-    *reinterpret_cast<ArgType*>(location) = data;
+    call.SetInternal(index, data, sizeof(data));
   }
 };
 
-/// Speciailization of the call helper to deal with reference types. This is achieved by converting
+/// Specialization of the call helper to deal with reference types. This is achieved by converting
 /// the stored data to/from a pointer, this way references point at the same address.
 template <typename T>
 struct CallHelper<T&> : public CallHelper<T>
@@ -41,8 +41,7 @@ struct CallHelper<T&> : public CallHelper<T>
   {
     using ArgType = UnqualifiedType<T>::type;
     char* location = call.GetLocationUnChecked(index);
-    const ArgType* pointer = &data;
-    *reinterpret_cast<const ArgType**>(location) = pointer;
+    call.SetInternal(index, &data, sizeof(&data));
   }
 };
 
@@ -69,32 +68,45 @@ struct Call
   {
     return CallHelper<T>::Get(*this, index);
   }
+
   template <typename T>
-  T& GetReference(int index)
+  void Set(int index, T& data)
   {
-    return CallHelper<T&>::Get(*this, index);
+    // Choose to set this as a reference or a value type based upon the parameter type.
+    // This is done because types passed in by reference will not actually be reference
+    // template params (e.g. passing in a float& will always just be float)
+    BoundType* expectedType = GetLocationType(index);
+    if(expectedType->mIsReferenceType)
+      CallHelper<T&>::Set(*this, index, data);
+    else
+      CallHelper<T>::Set(*this, index, data);
   }
 
   template <typename T>
-  void Set(int index, const T& data)
+  void SetInternal(int index, const T& data, size_t sizeInBytes)
   {
-    CallHelper<T>::Set(*this, index, data);
-  }
-  // If the parameter is a reference type and you explicitly want to pass through the same address
-  // then this overload must be used. This is to get around certain limitations of template function speciailization (at least for now).
-  template <typename T>
-  void SetReference(int index, const T& data)
-  {
-    CallHelper<T&>::Set(*this, index, data);
+    using ArgType = UnqualifiedType<T>::type;
+    size_t offset = GetLocationOffset(index);
+    ErrorIf(offset + sizeInBytes > mBufferSizeInBytes, "Access out of bounds");
+    char* location = mBuffer + offset;
+    *reinterpret_cast<ArgType*>(location) = data;
   }
 
   /// Invoke the function call (assumes all args have been set).
   bool Invoke();
 
+  
   char* GetLocationChecked(int index, BoundType* boundType);
   char* GetLocationUnChecked(int index);
+  size_t GetLocationOffset(int index) const;
+  BoundType* GetLocationType(int index) const;
+  
 
 private:
+  Call(const Call&) {}
+  void operator=(const Call&) {}
+
   Function*  mFunction = nullptr;
   char* mBuffer = nullptr;
+  size_t mBufferSizeInBytes = 0;
 };

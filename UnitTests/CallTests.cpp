@@ -143,7 +143,7 @@ void TestSimpleSetters()
     ScopedFunction boundFn = CreateMethod(&SimpleSetterTest::SetRef);
     Call call(boundFn);
     call.SetPointerUnchecked(Call::This, &instance);
-    call.SetReference(0, refData);
+    call.Set(0, refData);
     call.Invoke();
     ErrorIf(instance.mPointerData != &refData, "Set(float&) failed");
   }
@@ -154,7 +154,7 @@ void TestSimpleSetters()
     ScopedFunction boundFn = CreateMethod(&SimpleSetterTest::SetConstRef);
     Call call(boundFn);
     call.SetPointerUnchecked(Call::This, &instance);
-    call.SetReference(0, refData);
+    call.Set(0, refData);
     call.Invoke();
     ErrorIf(instance.mConstPointerData != &refData, "Set(const float&) failed");
   }
@@ -213,7 +213,7 @@ void TestNumber()
     ScopedFunction fn = CreateMethod(&Number::operator+=);
     Call call(fn);
     call.SetPointerUnchecked(Call::This, &self);
-    call.SetReference(0, one);
+    call.Set(0, one);
     call.Invoke();
     ErrorIf(self != one, "Call Failed");
   }

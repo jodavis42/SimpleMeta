@@ -7,7 +7,8 @@
 Call::Call(Function* function)
 {
   mFunction = function;
-  mBuffer = new char[function->ComputeSizeRequired()];
+  mBufferSizeInBytes = function->ComputeSizeRequired();
+  mBuffer = new char[mBufferSizeInBytes];
 }
 
 Call::~Call()
@@ -40,18 +41,18 @@ void Call::SetPointerUnchecked(int index, const void* dataPtr)
 
 char* Call::GetLocationChecked(int index, BoundType* boundType)
 {
-  BoundType* expectedType = nullptr;
-  if(index == Return)
-    expectedType = mFunction->GetReturnType();
-  else if(index == This)
-    expectedType = mFunction->GetThisType();
-  else
-    expectedType = mFunction->GetParamType(index);
+  BoundType* expectedType = GetLocationType(index);
   ErrorIf(boundType != expectedType, "Invalid expected type");
   return GetLocationUnChecked(index);
 }
 
 char* Call::GetLocationUnChecked(int index)
+{
+  size_t offset = GetLocationOffset(index);
+  return mBuffer + offset;
+}
+
+size_t Call::GetLocationOffset(int index) const
 {
   size_t offset = 0;
   if(mFunction->GetReturnType() != nullptr && index > Return)
@@ -60,7 +61,19 @@ char* Call::GetLocationUnChecked(int index)
     offset += mFunction->GetThisType()->mSizeInBytes;
   for(int i = 0; i < index; ++i)
     offset += mFunction->GetParamType(i)->mSizeInBytes;
-  return mBuffer + offset;
+  return offset;
+}
+
+BoundType* Call::GetLocationType(int index) const
+{
+  BoundType* expectedType = nullptr;
+  if(index == Return)
+    expectedType = mFunction->GetReturnType();
+  else if(index == This)
+    expectedType = mFunction->GetThisType();
+  else
+    expectedType = mFunction->GetParamType(index);
+  return expectedType;
 }
 
 bool Call::Invoke()

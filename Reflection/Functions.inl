@@ -32,7 +32,7 @@ Function* FromMethod(ReturnType(*)())
 template <typename FunctionType, FunctionType FunctionToBind, typename ClassType>
 void BoundInstance(Call& call)
 {
-  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());
+  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   ClassType* self = *reinterpret_cast<ClassType**>(location);
   (self->*FunctionToBind)();
 }
@@ -43,7 +43,7 @@ Function* FromMethod(void(ClassType::*)())
   Function* fn = new Function();
   fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   return fn;
 }
 
@@ -53,14 +53,14 @@ Function* FromMethod(void(ClassType::*)()const)
   Function* fn = new Function();
   fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   return fn;
 }
 
 template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType>
 void BoundInstanceReturn(Call& call)
 {
-  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());
+  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   ClassType* self = *reinterpret_cast<ClassType**>(location);
   ReturnType ret = (self->*FunctionToBind)();
   call.Set<ReturnType>(Call::Return, ret);
@@ -72,7 +72,7 @@ Function* FromMethod(ReturnType(ClassType::*)())
   Function* fn = new Function();
   fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   return fn;
 }
 
@@ -82,241 +82,211 @@ Function* FromMethod(ReturnType(ClassType::*)()const)
   Function* fn = new Function();
   fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename Arg0>
+template <typename FunctionType, FunctionType FunctionToBind, typename Arg0Type>
 void BoundStatic(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
   (*FunctionToBind)(arg0);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename Arg0>
-Function* FromMethod(void(*)(Arg0))
+template <typename FunctionType, FunctionType FunctionToBind, typename Arg0Type>
+Function* FromMethod(void(*)(Arg0Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundStatic<FunctionType, FunctionToBind, Arg0>;
+  fn->mBoundFunction = &BoundStatic<FunctionType, FunctionToBind, Arg0Type>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0>
+template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0Type>
 void BoundStaticReturn(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
   ReturnType ret = (*FunctionToBind)(arg0);
   call.Set<ReturnType>(Call::Return, ret);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0>
-Function* FromMethod(ReturnType(*)(Arg0))
+template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0Type>
+Function* FromMethod(ReturnType(*)(Arg0Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundStaticReturn<FunctionType, FunctionToBind, ReturnType, Arg0>;
+  fn->mBoundFunction = &BoundStaticReturn<FunctionType, FunctionToBind, ReturnType, Arg0Type>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0>
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0Type>
 void BoundInstance(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  Arg0 arg0 = call.Get<Arg0>(0);
-  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());
+  Arg0Type arg0 = call.Get<Arg0Type>(0);
+  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   ClassType* self = *reinterpret_cast<ClassType**>(location);
   (self->*FunctionToBind)(arg0);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0>
-Function* FromMethod(void(ClassType::*)(Arg0))
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0Type>
+Function* FromMethod(void(ClassType::*)(Arg0Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0>;
+  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0Type>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0>
-Function* FromMethod(void(ClassType::*)(Arg0)const)
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0Type>
+Function* FromMethod(void(ClassType::*)(Arg0Type)const)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0>;
+  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0Type>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0>
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0Type>
 void BoundInstanceReturn(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
-  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());
+  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   ClassType* self = *reinterpret_cast<ClassType**>(location);
   ReturnType ret = (self->*FunctionToBind)(arg0);
   call.Set<ReturnType>(Call::Return, ret);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0>
-Function* FromMethod(ReturnType(ClassType::*)(Arg0))
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0Type>
+Function* FromMethod(ReturnType(ClassType::*)(Arg0Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0>;
+  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0Type>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0>
-Function* FromMethod(ReturnType(ClassType::*)(Arg0)const)
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0Type>
+Function* FromMethod(ReturnType(ClassType::*)(Arg0Type)const)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0>;
+  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0Type>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename Arg0, typename Arg1>
+template <typename FunctionType, FunctionType FunctionToBind, typename Arg0Type, typename Arg1Type>
 void BoundStatic(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
   Arg1Type arg1 = call.Get<Arg1Type>(1);
   (*FunctionToBind)(arg0, arg1);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename Arg0, typename Arg1>
-Function* FromMethod(void(*)(Arg0, Arg1))
+template <typename FunctionType, FunctionType FunctionToBind, typename Arg0Type, typename Arg1Type>
+Function* FromMethod(void(*)(Arg0Type, Arg1Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundStatic<FunctionType, FunctionToBind, Arg0, Arg1>;
+  fn->mBoundFunction = &BoundStatic<FunctionType, FunctionToBind, Arg0Type, Arg1Type>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0, typename Arg1>
+template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0Type, typename Arg1Type>
 void BoundStaticReturn(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
   Arg1Type arg1 = call.Get<Arg1Type>(1);
   ReturnType ret = (*FunctionToBind)(arg0, arg1);
   call.Set<ReturnType>(Call::Return, ret);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0, typename Arg1>
-Function* FromMethod(ReturnType(*)(Arg0, Arg1))
+template <typename FunctionType, FunctionType FunctionToBind, typename ReturnType, typename Arg0Type, typename Arg1Type>
+Function* FromMethod(ReturnType(*)(Arg0Type, Arg1Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundStaticReturn<FunctionType, FunctionToBind, ReturnType, Arg0, Arg1>;
+  fn->mBoundFunction = &BoundStaticReturn<FunctionType, FunctionToBind, ReturnType, Arg0Type, Arg1Type>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0, typename Arg1>
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0Type, typename Arg1Type>
 void BoundInstance(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
   Arg1Type arg1 = call.Get<Arg1Type>(1);
-  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());
+  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   ClassType* self = *reinterpret_cast<ClassType**>(location);
   (self->*FunctionToBind)(arg0, arg1);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0, typename Arg1>
-Function* FromMethod(void(ClassType::*)(Arg0, Arg1))
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0Type, typename Arg1Type>
+Function* FromMethod(void(ClassType::*)(Arg0Type, Arg1Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0, Arg1>;
+  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0Type, Arg1Type>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0, typename Arg1>
-Function* FromMethod(void(ClassType::*)(Arg0, Arg1)const)
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename Arg0Type, typename Arg1Type>
+Function* FromMethod(void(ClassType::*)(Arg0Type, Arg1Type)const)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0, Arg1>;
+  fn->mBoundFunction = &BoundInstance<FunctionType, FunctionToBind, ClassType, Arg0Type, Arg1Type>;
   fn->SetReturnType(StaticTypeId<void>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0, typename Arg1>
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0Type, typename Arg1Type>
 void BoundInstanceReturn(Call& call)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Arg0Type arg0 = call.Get<Arg0Type>(0);
   Arg1Type arg1 = call.Get<Arg1Type>(1);
-  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType>::GetBoundType());
+  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   ClassType* self = *reinterpret_cast<ClassType**>(location);
   ReturnType ret = (self->*FunctionToBind)(arg0, arg1);
   call.Set<ReturnType>(Call::Return, ret);
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0, typename Arg1>
-Function* FromMethod(ReturnType(ClassType::*)(Arg0, Arg1))
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0Type, typename Arg1Type>
+Function* FromMethod(ReturnType(ClassType::*)(Arg0Type, Arg1Type))
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0, Arg1>;
+  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0Type, Arg1Type>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
 }
 
-template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0, typename Arg1>
-Function* FromMethod(ReturnType(ClassType::*)(Arg0, Arg1)const)
+template <typename FunctionType, FunctionType FunctionToBind, typename ClassType, typename ReturnType, typename Arg0Type, typename Arg1Type>
+Function* FromMethod(ReturnType(ClassType::*)(Arg0Type, Arg1Type)const)
 {
-  typedef UnqualifiedType<Arg0>::type Arg0Type;
-  typedef UnqualifiedType<Arg1>::type Arg1Type;
   Function* fn = new Function();
-  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0, Arg1>;
+  fn->mBoundFunction = &BoundInstanceReturn<FunctionType, FunctionToBind, ClassType, ReturnType, Arg0Type, Arg1Type>;
   fn->SetReturnType(StaticTypeId<ReturnType>::GetBoundType());
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
