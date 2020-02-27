@@ -2,6 +2,15 @@
 
 #include "BoundType.hpp"
 
+template <typename T>
+BoundType* AllocateBoundType()
+{
+  BoundType* boundType = RegisterBoundType(new BoundType());
+  boundType->mSizeInBytes = sizeof(T);
+  boundType->mName = typeid(T).name();
+  return boundType;
+}
+
 BoundType* ValidateRawBoundType(BoundType* boundType);
 BoundType* RegisterBoundType(BoundType* boundType);
 BoundType* RegisterPointerBoundType(BoundType* unqualifiedBase, BoundType* boundType);
@@ -21,7 +30,7 @@ struct StaticTypeId
   // a type otherwise (to deal with dynamic types like arrays).
   static BoundType*& GetBoundType()
   {
-    static BoundType* sInstance = AutoRegisterType(new BoundType());
+    static BoundType* sInstance = AllocateBoundType<T>();
     return sInstance;
   }
 };
@@ -42,7 +51,7 @@ struct StaticTypeId<T*> : public StaticTypeId<T>
 {
   static BoundType*& GetBoundType()
   {
-    static BoundType* sInstance = RegisterPointerBoundType(StaticTypeId<T>::GetBoundType(), new BoundType());
+    static BoundType* sInstance = AllocateBoundType<T>();
     return sInstance;
   }
 };
@@ -64,8 +73,7 @@ struct StaticTypeId<const T> : public StaticTypeId<T>
 {
   static BoundType*& GetBoundType()
   {
-    static BoundType* sInstance = StaticTypeId<T>::GetBoundType();
-    return sInstance;
+    return StaticTypeId<T>::GetBoundType();
   }
 };
 template <typename T>
@@ -82,6 +90,99 @@ struct StaticTypeId<const T&> : public StaticTypeId<T>
   static BoundType*& GetBoundType()
   {
     return StaticTypeId<T&>::GetBoundType();
+  }
+};
+
+// Deal with templated types (have to visit the sub-types)
+template <template <typename> typename ContainerType, typename ParamType0>
+struct StaticTypeId< ContainerType<ParamType0> >
+{
+  static BoundType* Create()
+  {
+    StaticTypeId<ParamType0>::GetBoundType();
+    return AllocateBoundType<ContainerType<ParamType0>>();
+  }
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = Create();
+    return sInstance;
+  }
+};
+template <template <typename, typename> typename ContainerType, typename ParamType0, typename ParamType1>
+struct StaticTypeId< ContainerType<ParamType0, ParamType1> >
+{
+  static BoundType* Create()
+  {
+    StaticTypeId<ParamType0>::GetBoundType();
+    StaticTypeId<ParamType1>::GetBoundType();
+    return AllocateBoundType<ContainerType<ParamType0, ParamType1>>();
+  }
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = Create();
+    return sInstance;
+  }
+};
+template <template <typename, typename, typename> typename ContainerType, typename ParamType0, typename ParamType1, typename ParamType2>
+struct StaticTypeId< ContainerType<ParamType0, ParamType1, ParamType2> >
+{
+  static BoundType* Create()
+  {
+    StaticTypeId<ParamType0>::GetBoundType();
+    StaticTypeId<ParamType1>::GetBoundType();
+    StaticTypeId<ParamType2>::GetBoundType();
+    return AllocateBoundType<ContainerType<ParamType0, ParamType1, ParamType2>>();
+  }
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = Create();
+    return sInstance;
+  }
+};
+template <template <typename, typename, typename, typename> typename ContainerType, typename ParamType0, typename ParamType1, typename ParamType2, typename ParamType3>
+struct StaticTypeId< ContainerType<ParamType0, ParamType1, ParamType2, ParamType3> >
+{
+  static BoundType* Create()
+  {
+    StaticTypeId<ParamType0>::GetBoundType();
+    StaticTypeId<ParamType1>::GetBoundType();
+    StaticTypeId<ParamType2>::GetBoundType();
+    StaticTypeId<ParamType3>::GetBoundType();
+    return AllocateBoundType<ContainerType<ParamType0, ParamType1, ParamType2, ParamType3>>();
+  }
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = Create();
+    return sInstance;
+  }
+};
+template <template <typename, typename, typename, typename, typename> typename ContainerType, typename ParamType0, typename ParamType1, typename ParamType2, typename ParamType3, typename ParamType4>
+struct StaticTypeId< ContainerType<ParamType0, ParamType1, ParamType2, ParamType3, ParamType4> >
+{
+  static BoundType* Create()
+  {
+    StaticTypeId<ParamType0>::GetBoundType();
+    StaticTypeId<ParamType1>::GetBoundType();
+    StaticTypeId<ParamType2>::GetBoundType();
+    StaticTypeId<ParamType3>::GetBoundType();
+    StaticTypeId<ParamType4>::GetBoundType();
+    return AllocateBoundType<ContainerType<ParamType0, ParamType1, ParamType2, ParamType3, ParamType4>>();
+  }
+  static BoundType*& GetBoundType()
+  {
+    static BoundType* sInstance = Create();
+    return sInstance;
+  }
+};
+// Deal with templated types (have to visit the sub-types)
+template <template <typename...> typename ContainerType, typename ... ParamTypes>
+struct StaticTypeId< ContainerType<ParamTypes...> >
+{
+  static BoundType*& GetBoundType()
+  {
+    static_assert(false, "Cannot support unknown parameter count");
+    static BoundType* sInstance = nullptr;
+    return sInstance;
   }
 };
 
