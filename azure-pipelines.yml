@@ -1,0 +1,26 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-2019'
+
+steps:
+- task: CMake@1
+  inputs:
+    displayName: CMake Generate
+    workingDirectory: 'CMake'
+    cmakeArgs: '-S ../ -B ./bin -G "Visual Studio 16 2019"'
+- task: CMake@1
+  inputs:
+    displayName: CMake Build
+    workingDirectory: 'CMake'
+    cmakeArgs: '--build ./bin'
+- task: PublishSymbols@2
+  inputs:
+    SearchPattern: '**/bin/**/*.pdb'
+    SymbolServerType: 'TeamServices'
