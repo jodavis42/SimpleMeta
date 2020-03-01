@@ -17,4 +17,13 @@ BoundType::~BoundType()
   for(GetterSetter* getSet : mGetterSetters)
     delete getSet;
   mGetterSetters.clear();
+
+  for(auto&& pair : mFunctionMap)
+  {
+    for(Function* function : pair.second)
+    {
+      delete function;
+    }
+  }
+  mFunctionMap.clear();
 }

@@ -72,6 +72,14 @@ static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& own
   return getSet;
 }
 
+template <typename FunctionType, FunctionType FunctionToBind>
+static Function* FromFunction(ReflectionLibrary& library, BoundType& owner, const std::string& name, FunctionType)
+{
+  Function* function = FromMethod<FunctionType, FunctionToBind>(FunctionToBind);
+  owner.mFunctionMap[name].push_back(function);
+  return function;
+}
+
 template <typename PrimitiveType>
 BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className, size_t id)
 {
@@ -105,6 +113,19 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
     *getSet->mSetter = *baseGetSet->mSetter;
     derrivedType.mGetterSetters.push_back(getSet);
   }
+
+  for(auto&& pair : baseType->mFunctionMap)
+  {
+    auto&& derivedFunctionList = derrivedType.mFunctionMap[pair.first];
+    derivedFunctionList.reserve(pair.second.size());
+    for(size_t i = 0; i < pair.second.size(); ++i)
+    {
+      Function* baseFunction = pair.second[i];
+      Function* derivedFunction = new Function();
+      *derivedFunction = *baseFunction;
+      derivedFunctionList.push_back(derivedFunction);
+    }
+  }
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
@@ -126,5 +147,8 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define BindTypeExternalAs(Library, ClassType, ClassTypeName, Id, BindingFn) BindClassType<ClassType, BindingFn>(Library, ClassTypeName, Id)
 #define BindTypeExternal(Library, ClassType, Id, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, Id, BindingFn)
+
+#define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function) FromFunction<decltype(&ClassType::Function), &ClassType::Function>(Library, BoundType, FunctionName, &ClassType::Function)
+#define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, #Function, Function)
 
 #define BindBase(Library, BoundType, BaseType) BindBaseType<BaseType>(Library, BoundType)
