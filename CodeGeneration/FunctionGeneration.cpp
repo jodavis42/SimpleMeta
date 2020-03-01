@@ -192,7 +192,7 @@ void GenerateFromConstructor(std::ofstream& stream, size_t argCount)
   for(size_t i = 0; i < argCount; ++i)
     stream << ", Arg" << i << "Type";
   stream << ">; " << std::endl;
-  stream << "  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());" << std::endl;
+  stream << "  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
   for(size_t i = 0; i < argCount; ++i)
     Print(stream, "  fn->SetParamType(%d, StaticTypeId<Arg%dType>::GetBoundType());\n", i, i);
   stream << "  return fn;" << std::endl;

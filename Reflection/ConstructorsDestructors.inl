@@ -11,7 +11,7 @@ Function* FromConstructor()
 {
   Function* fn = new Function();
   fn->mBoundFunction = &BoundConstructor<ClassType>; 
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   return fn;
 }
 
@@ -29,7 +29,7 @@ Function* FromConstructor()
 {
   Function* fn = new Function();
   fn->mBoundFunction = &BoundConstructor<ClassType, Arg0Type>; 
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   return fn;
 }
@@ -49,7 +49,7 @@ Function* FromConstructor()
 {
   Function* fn = new Function();
   fn->mBoundFunction = &BoundConstructor<ClassType, Arg0Type, Arg1Type>; 
-  fn->SetThisType(StaticTypeId<ClassType>::GetBoundType());
+  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
   fn->SetParamType(0, StaticTypeId<Arg0Type>::GetBoundType());
   fn->SetParamType(1, StaticTypeId<Arg1Type>::GetBoundType());
   return fn;
