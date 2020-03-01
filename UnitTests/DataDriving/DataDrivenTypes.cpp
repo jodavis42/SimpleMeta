@@ -1,6 +1,7 @@
 #include "DataDrivenTypes.hpp"
 
 #include "Bindings.hpp"
+#include "MetaSerialization.hpp"
 #include "ContainerSerializationPolicies.hpp"
 
 void DataDrivenField::Bind(ReflectionLibrary& library, BoundType& boundType)

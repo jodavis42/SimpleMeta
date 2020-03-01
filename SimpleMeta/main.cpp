@@ -6,6 +6,7 @@
 #include "MetaLibrary.hpp"
 #include "StaticTypeId.hpp"
 #include "Bindings.hpp"
+#include "MetaSerialization.hpp"
 #include "Attributes.hpp"
 #include "TestTypes/Physics.hpp"
 #include "TestTypes/Math.hpp"

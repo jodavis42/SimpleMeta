@@ -4,7 +4,6 @@
 #include "Field.hpp"
 #include "GetterSetter.hpp"
 #include "MetaLibrary.hpp"
-#include "MetaSerialization.hpp"
 #include "StaticTypeId.hpp"
 #include "Attributes.hpp"
 #include "FunctionBinding.hpp"
@@ -132,11 +131,11 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
   FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember))
 #define BindField(Library, boundType, Owner, FieldMember) BindFieldAs(Library, boundType, Owner, FieldMember, #FieldMember)
 
-#define BindPropertyAs(Library, boundType, Owner, FieldMember, FieldName) BindFieldAs(Library, boundType, Owner, FieldMember, FieldName)->AddComponentTypeChainable<SerializedAttribute>()
+#define BindPropertyAs(Library, boundType, Owner, FieldMember, FieldName) BindFieldAs(Library, boundType, Owner, FieldMember, FieldName)
 #define BindProperty(Library, boundType, Owner, FieldMember) BindPropertyAs(Library, boundType, Owner, FieldMember, #FieldMember)
 
 #define BindGetterSetterAs(Library, boundType, Owner, FieldName, Getter, Setter) \
-  FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)->AddComponentTypeChainable<SerializedAttribute>()
+  FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)
 #define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, #FieldName, Get##FieldName, Set##FieldName)
 
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName, Id) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName, Id)

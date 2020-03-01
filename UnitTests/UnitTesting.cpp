@@ -8,6 +8,7 @@
 #include "TestTypes/Math.hpp"
 #include "TestTypes/Mesh.hpp"
 #include "TestTypes/Misc.hpp"
+#include "MetaSerialization.hpp"
 
 ScopedFunction::ScopedFunction(Function* function) : mFunction(function)
 {

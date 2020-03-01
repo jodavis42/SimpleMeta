@@ -1,6 +1,7 @@
 #include "AnyTests.hpp"
 
 #include "Bindings.hpp"
+#include "MetaSerialization.hpp"
 #include "Any.hpp"
 
 #include "UnitTesting.hpp"
