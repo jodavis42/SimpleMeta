@@ -5,7 +5,6 @@
 #include "GetterSetter.hpp"
 #include "MetaLibrary.hpp"
 #include "StaticTypeId.hpp"
-#include "Attributes.hpp"
 #include "FunctionBinding.hpp"
 
 namespace SimpleReflection
