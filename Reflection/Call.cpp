@@ -47,7 +47,7 @@ void Call::SetPointerUnchecked(int index, const void* dataPtr)
 char* Call::GetLocationChecked(int index, BoundType* boundType)
 {
   BoundType* expectedType = GetLocationType(index);
-  ErrorIf(boundType != expectedType, "Invalid expected type");
+  ReflectionErrorIf(boundType != expectedType, "Invalid expected type");
   return GetLocationUnChecked(index);
 }
 

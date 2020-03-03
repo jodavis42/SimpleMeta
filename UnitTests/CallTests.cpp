@@ -76,14 +76,14 @@ struct Number
 template <typename T, typename ClassType>
 void Compare(T result, ClassType& instance)
 {
-  ErrorIf(result != instance.mValue, "Call failed");
+  ReflectionErrorIf(result != instance.mValue, "Call failed");
 }
 
 template <typename T, typename ClassType>
 void Compare(T* result, ClassType& instance)
 {
-  ErrorIf(*result != instance.mValue, "Call failed");
-  ErrorIf(result != &instance.mValue, "Call Failed");
+  ReflectionErrorIf(*result != instance.mValue, "Call failed");
+  ReflectionErrorIf(result != &instance.mValue, "Call Failed");
 }
 
 template <typename FnType, FnType fn, typename ClassType, typename ReturnType, typename ... Args>
@@ -140,7 +140,7 @@ void TestSimpleSetters()
     call.SetPointerUnchecked(Call::This, &instance);
     call.Set(0, data);
     call.Invoke();
-    ErrorIf(instance.mData != data, "Set(float) failed");
+    ReflectionErrorIf(instance.mData != data, "Set(float) failed");
   }
   
   {
@@ -151,7 +151,7 @@ void TestSimpleSetters()
     call.SetPointerUnchecked(Call::This, &instance);
     call.Set(0, refData);
     call.Invoke();
-    ErrorIf(instance.mPointerData != &refData, "Set(float&) failed");
+    ReflectionErrorIf(instance.mPointerData != &refData, "Set(float&) failed");
   }
 
   {
@@ -162,7 +162,7 @@ void TestSimpleSetters()
     call.SetPointerUnchecked(Call::This, &instance);
     call.Set(0, refData);
     call.Invoke();
-    ErrorIf(instance.mConstPointerData != &refData, "Set(const float&) failed");
+    ReflectionErrorIf(instance.mConstPointerData != &refData, "Set(const float&) failed");
   }
 
   {
@@ -173,7 +173,7 @@ void TestSimpleSetters()
     call.SetPointerUnchecked(Call::This, &instance);
     call.Set(0, ptrData);
     call.Invoke();
-    ErrorIf(instance.mPointerData != &data, "Set(float*) failed");
+    ReflectionErrorIf(instance.mPointerData != &data, "Set(float*) failed");
   }
 
   {
@@ -184,7 +184,7 @@ void TestSimpleSetters()
     call.SetPointerUnchecked(Call::This, &instance);
     call.Set(0, ptrData);
     call.Invoke();
-    ErrorIf(instance.mConstPointerData != &data, "Set(const float*) failed");
+    ReflectionErrorIf(instance.mConstPointerData != &data, "Set(const float*) failed");
   }
 }
 
@@ -202,7 +202,7 @@ void TestNumber()
     call.Set(1, two);
     call.Invoke();
     float fResult = call.Get<float>(Call::Return);
-    ErrorIf(fResult != 3, "Call Failed");
+    ReflectionErrorIf(fResult != 3, "Call Failed");
   }
   
   {
@@ -211,7 +211,7 @@ void TestNumber()
     call.SetPointerUnchecked(Call::This, &two);
     call.Invoke();
     float fResult = call.Get<float>(Call::Return);
-    ErrorIf(fResult != 0.5f, "Call Failed");
+    ReflectionErrorIf(fResult != 0.5f, "Call Failed");
   }
 
   {
@@ -221,7 +221,7 @@ void TestNumber()
     call.SetPointerUnchecked(Call::This, &self);
     call.Set(0, one);
     call.Invoke();
-    ErrorIf(self != one, "Call Failed");
+    ReflectionErrorIf(self != one, "Call Failed");
   }
 }
 

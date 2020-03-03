@@ -54,7 +54,7 @@ BoundType* Any::GetStoredType() const
 
 void Any::AssignFrom(const void* data, BoundType* boundType)
 {
-  ErrorIf(boundType == nullptr, "Cannot store a null bound type");
+  ReflectionErrorIf(boundType == nullptr, "Cannot store a null bound type");
 
   // Clear any old values
   Clear();

@@ -11,7 +11,7 @@ namespace SimpleReflection
 BoundType* ValidateRawBoundType(BoundType* boundType)
 {
   ReflectionProject* instance = ReflectionProject::GetInstance();
-  ErrorIf(instance->mCurrentLibrary->mIsFinalized, "Library is finalized, can't create a new raw bound type.");
+  ReflectionErrorIf(instance->mCurrentLibrary->mIsFinalized, "Library is finalized, can't create a new raw bound type.");
   return boundType;
 }
 

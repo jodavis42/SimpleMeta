@@ -38,7 +38,7 @@ struct Any
   T Get()
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    ErrorIf(!IsStoredType(boundType), "Invalid Type in Any::Get");
+    ReflectionErrorIf(!IsStoredType(boundType), "Invalid Type in Any::Get");
     return *reinterpret_cast<T*>(GetRawData());
   }
 
@@ -46,7 +46,7 @@ struct Any
   T Get() const
   {
     BoundType* boundType = StaticTypeId<T>::GetBoundType();
-    ErrorIf(!IsStoredType(boundType), "Invalid Type in Any::Get");
+    ReflectionErrorIf(!IsStoredType(boundType), "Invalid Type in Any::Get");
     return *reinterpret_cast<T*>(GetRawData());
   }
 

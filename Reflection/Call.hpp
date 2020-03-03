@@ -90,7 +90,7 @@ struct Call
   {
     using ArgType = UnqualifiedType<T>::type;
     size_t offset = GetLocationOffset(index);
-    ErrorIf(offset + sizeInBytes > mBufferSizeInBytes, "Access out of bounds");
+    ReflectionErrorIf(offset + sizeInBytes > mBufferSizeInBytes, "Access out of bounds");
     char* location = mBuffer + offset;
     *reinterpret_cast<ArgType*>(location) = data;
   }

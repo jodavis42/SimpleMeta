@@ -82,20 +82,20 @@ void TestSimple(const T& input1, const T& input2)
   // Scope this to make sure deep copies work
   {
     T output1 = any.Get<T>();
-    ErrorIf(!(input1 == output1), "Any Get/Set didn't match.");
+    ReflectionErrorIf(!(input1 == output1), "Any Get/Set didn't match.");
   }
 
   Any any2 = any;
   T output2 = any2.Get<T>();
-  ErrorIf(!(input1 == output2), "Any CopyConstructor failed.");
+  ReflectionErrorIf(!(input1 == output2), "Any CopyConstructor failed.");
 
 //  ErrorIf(!(any == any2), "Operator== failed. Any's should be equal.");
 
   Any any3;
-  ErrorIf(any == any3, "Operator== failed. Any's should have unrelated bound types.");
+  ReflectionErrorIf(any == any3, "Operator== failed. Any's should have unrelated bound types.");
 
   any3.Set(input2);
-  ErrorIf(any == any3, "Operator== failed. Any's should have different data.");
+  ReflectionErrorIf(any == any3, "Operator== failed. Any's should have different data.");
 }
 
 void TestPrimitive()

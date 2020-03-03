@@ -17,7 +17,7 @@ ReflectionLibrary::~ReflectionLibrary()
 
 void ReflectionLibrary::AddBoundType(BoundType* boundType)
 {
-  ErrorIf(mIsFinalized, "Can't add to a finalized library");
+  ReflectionErrorIf(mIsFinalized, "Can't add to a finalized library");
 
   // Already queued to register, skip
   if(mBoundTypesToRegister.find(boundType) != mBoundTypesToRegister.end())
@@ -60,9 +60,9 @@ bool ReflectionLibrary::Validate()
 {
   for(BoundType* boundType : mBoundTypes)
   {
-    ErrorIf(boundType->mId.mId == TypeId::sInvalidId, "Invalid id");
+    ReflectionErrorIf(boundType->mId.mId == TypeId::sInvalidId, "Invalid id");
     // All types need a size (except void)
-    ErrorIf(boundType->mSizeInBytes == 0 && boundType->mName != "void", "Invalid size");
+    ReflectionErrorIf(boundType->mSizeInBytes == 0 && boundType->mName != "void", "Invalid size");
   }
   return true;
 }
@@ -72,7 +72,7 @@ BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recurs
   auto it = mBoundTypeNameMap.find(name);
   if(it != mBoundTypeNameMap.end())
   {
-    ErrorIf(it->second->mId.mId == TypeId::sInvalidId, "Fetching an uninitialized bound type");
+    ReflectionErrorIf(it->second->mId.mId == TypeId::sInvalidId, "Fetching an uninitialized bound type");
     return it->second;
   }
 
@@ -91,7 +91,7 @@ BoundType* ReflectionLibrary::FindBoundType(const TypeId& id, bool recursive)
   auto it = mBoundTypeIdMap.find(id.mId);
   if(it != mBoundTypeIdMap.end())
   {
-    ErrorIf(it->second->mId.mId == TypeId::sInvalidId, "Fetching an uninitialized bound type");
+    ReflectionErrorIf(it->second->mId.mId == TypeId::sInvalidId, "Fetching an uninitialized bound type");
     return it->second;
   }
 
@@ -138,7 +138,7 @@ ReflectionLibrary& ReflectionProject::CreateLibrary(const std::string& name)
   }
 
   ReflectionLibrary* library = new ReflectionLibrary();
-  ErrorIf(instance->mCurrentLibrary != nullptr && !instance->mCurrentLibrary->mIsFinalized, "Cannot create a new library before the previous one was finalized");
+  ReflectionErrorIf(instance->mCurrentLibrary != nullptr && !instance->mCurrentLibrary->mIsFinalized, "Cannot create a new library before the previous one was finalized");
   instance->mCurrentLibrary = library;
   library->mName = name;
   instance->mLibraries.push_back(library);
