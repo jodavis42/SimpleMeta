@@ -1,3 +1,5 @@
+#include "Precompiled.hpp"
+
 #include "Call.hpp"
 
 #include "Asserts.hpp"

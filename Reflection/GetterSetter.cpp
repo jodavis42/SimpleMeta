@@ -1,3 +1,5 @@
+#include "Precompiled.hpp"
+
 #include "GetterSetter.hpp"
 
 #include "Asserts.hpp"

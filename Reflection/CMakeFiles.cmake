@@ -19,6 +19,8 @@ target_sources(Reflection
     ${CMAKE_CURRENT_LIST_DIR}/GetterSetter.hpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.cpp
     ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Precompiled.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/Precompiled.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComponent.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.hpp

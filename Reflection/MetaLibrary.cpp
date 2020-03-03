@@ -1,3 +1,5 @@
+#include "Precompiled.hpp"
+
 #include "MetaLibrary.hpp"
 #include "Asserts.hpp"
 #include "StaticTypeId.hpp"

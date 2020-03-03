@@ -16,6 +16,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 project(SimpleMeta CXX)
 
 include(CMake/CommonCompileOptions.cmake)
+include(CMake/Precompiled.cmake)
 add_definitions(-DCOMPILER_MICROSOFT=1)
 add_definitions(-DPLATFORM_WINDOWS=1 -DPLATFORM_HARDWARE=1 -DPLATFORM_NAME="Win" -D_UNICODE -DUNICODE)
 

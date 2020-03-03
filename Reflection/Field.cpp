@@ -1,3 +1,5 @@
+#include "Precompiled.hpp"
+
 #include "Field.hpp"
 
 namespace SimpleReflection

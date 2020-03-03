@@ -1,3 +1,5 @@
+#include "Precompiled.hpp"
+
 #include "ReflectionComposition.hpp"
 
 #include "BoundType.hpp"

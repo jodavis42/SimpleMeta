@@ -1,3 +1,5 @@
+#include "Precompiled.hpp"
+
 #include "Function.hpp"
 
 #include "BoundType.hpp"

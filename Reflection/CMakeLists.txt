@@ -10,3 +10,5 @@ target_include_directories(Reflection
 )
 Set_Common_TargetCompileOptions(Reflection)
 target_link_libraries(Reflection)
+
+ADD_MSVC_PRECOMPILED_HEADER(Reflection "Precompiled.hpp" "Precompiled.cpp")
