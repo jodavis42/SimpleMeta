@@ -3,7 +3,7 @@
 #include "BoundType.hpp"
 #include "Field.hpp"
 #include "GetterSetter.hpp"
-#include "MetaLibrary.hpp"
+#include "ReflectionLibrary.hpp"
 #include "StaticTypeId.hpp"
 #include "FunctionBinding.hpp"
 

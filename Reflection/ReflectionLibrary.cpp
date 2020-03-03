@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 
-#include "MetaLibrary.hpp"
+#include "ReflectionLibrary.hpp"
 #include "Asserts.hpp"
 #include "StaticTypeId.hpp"
 

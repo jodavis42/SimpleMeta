@@ -17,13 +17,13 @@ target_sources(Reflection
     ${CMAKE_CURRENT_LIST_DIR}/FunctionBinding.hpp
     ${CMAKE_CURRENT_LIST_DIR}/GetterSetter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/GetterSetter.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/MetaLibrary.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Precompiled.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Precompiled.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComponent.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.cpp
     ${CMAKE_CURRENT_LIST_DIR}/ReflectionComposition.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionLibrary.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/ReflectionLibrary.hpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.cpp
     ${CMAKE_CURRENT_LIST_DIR}/StaticTypeId.hpp
     ${CMAKE_CURRENT_LIST_DIR}/TypeId.hpp

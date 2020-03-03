@@ -3,7 +3,7 @@
 #include <crtdbg.h>
 
 #include "BoundType.hpp"
-#include "MetaLibrary.hpp"
+#include "ReflectionLibrary.hpp"
 #include "StaticTypeId.hpp"
 #include "Bindings.hpp"
 #include "MetaSerialization.hpp"

@@ -3,7 +3,7 @@
 #include "StaticTypeId.hpp"
 
 #include "Asserts.hpp"
-#include "MetaLibrary.hpp"
+#include "ReflectionLibrary.hpp"
 
 namespace SimpleReflection
 {
