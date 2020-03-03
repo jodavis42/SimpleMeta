@@ -7,6 +7,11 @@
 #include "UnitTesting.hpp"
 #include "TestTypes/Math.hpp"
 
+using SimpleReflection::ReflectionLibrary;
+using SimpleReflection::ReflectionProject;
+using SimpleReflection::BoundType;
+using SimpleReflection::Any;
+
 struct LargeType
 {
   LargeType()

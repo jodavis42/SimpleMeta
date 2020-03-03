@@ -16,7 +16,7 @@ struct Vertex
     return mUv == rhs.mUv && mPosition == rhs.mPosition;
   }
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, Vertex, mUv);
     BindProperty(library, boundType, Vertex, mPosition);
@@ -33,7 +33,7 @@ struct Mesh
     return mVertices == rhs.mVertices && mName == rhs.mName;
   }
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, Mesh, mVertices);
     BindProperty(library, boundType, Mesh, mName);

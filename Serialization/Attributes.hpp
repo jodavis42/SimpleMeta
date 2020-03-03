@@ -4,12 +4,12 @@
 #include <vector>
 #include "ReflectionComponent.hpp"
 
-struct Attribute : public ReflectionComponent
+struct Attribute : public SimpleReflection::ReflectionComponent
 {
   Attribute() {}
   Attribute(const std::string& name) : mName(name) {}
 
-  virtual BoundType* GetBoundType() override;
+  virtual SimpleReflection::BoundType* GetBoundType() override;
 
   std::string mName;
 };
@@ -18,5 +18,5 @@ struct SerializedAttribute : public Attribute
 {
   SerializedAttribute() : Attribute("Serialized") {}
 
-  virtual BoundType* GetBoundType() override;
+  virtual SimpleReflection::BoundType* GetBoundType() override;
 };

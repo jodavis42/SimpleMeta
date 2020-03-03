@@ -4,6 +4,9 @@
 #include "GetterSetter.hpp"
 #include "Function.hpp"
 
+namespace SimpleReflection
+{
+
 BoundType::~BoundType()
 {
   delete mDefaultConstructor;
@@ -27,3 +30,5 @@ BoundType::~BoundType()
   }
   mFunctionMap.clear();
 }
+
+}//namespace SimpleReflection

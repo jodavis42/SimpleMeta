@@ -2,6 +2,9 @@
 
 #include "StaticTypeId.hpp"
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 struct Function;
 struct Call;
@@ -110,3 +113,5 @@ private:
   char* mBuffer = nullptr;
   size_t mBufferSizeInBytes = 0;
 };
+
+}//namespace SimpleReflection

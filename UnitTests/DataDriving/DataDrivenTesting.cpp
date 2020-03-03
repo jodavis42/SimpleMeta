@@ -12,7 +12,7 @@
 #include <sstream>
 #include <regex>
 
-BoundType* TryCreateArrayType(ReflectionLibrary& library, DataDrivenTypeNameMap& typeMap, const std::string& typeName)
+SimpleReflection::BoundType* TryCreateArrayType(ReflectionLibrary& library, DataDrivenTypeNameMap& typeMap, const std::string& typeName)
 {
   // Check if the name of this type was an array
   std::regex regex("Array<([\\d\\w]+)>");
@@ -41,10 +41,10 @@ BoundType* TryCreateArrayType(ReflectionLibrary& library, DataDrivenTypeNameMap&
   return boundType;
 }
 
-BoundType* FindOrCreateBoundType(ReflectionLibrary& library, DataDrivenTypeNameMap& typeMap, const std::string& typeName)
+SimpleReflection::BoundType* FindOrCreateBoundType(SimpleReflection::ReflectionLibrary& library, DataDrivenTypeNameMap& typeMap, const std::string& typeName)
 {
   // If the type already exists, just return it
-  BoundType* boundType = library.FindBoundType(typeName);
+  SimpleReflection::BoundType* boundType = library.FindBoundType(typeName);
   if(boundType != nullptr)
     return boundType;
   
@@ -60,7 +60,7 @@ BoundType* FindOrCreateBoundType(ReflectionLibrary& library, DataDrivenTypeNameM
   return boundType;
 }
 
-void BuildType(ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeNameMap& typeMap)
+void BuildType(SimpleReflection::ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeNameMap& typeMap)
 {
   // New dynamic ids to use
   static size_t dynamicId = 1000;
@@ -82,9 +82,9 @@ void BuildType(ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeN
   if (!type.mBaseType.empty())
   {
     boundType->mBaseType = FindOrCreateBoundType(library, typeMap, type.mBaseType);
-    for (Field* baseField : boundType->mBaseType->mFields)
+    for (SimpleReflection::Field* baseField : boundType->mBaseType->mFields)
     {
-      Field* newField = new Field();
+      SimpleReflection::Field* newField = new SimpleReflection::Field();
       *newField = *baseField;
       boundType->mFields.push_back(newField);
       fieldOffset += baseField->mOffset;
@@ -94,7 +94,7 @@ void BuildType(ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeN
   // Build all of the fields for this type
   for (DataDrivenField& dataDrivenField : type.mFields)
   {
-    Field* newField = new Field();
+    SimpleReflection::Field* newField = new SimpleReflection::Field();
     newField->mName = dataDrivenField.mName;
     newField->mType = FindOrCreateBoundType(library, typeMap, dataDrivenField.mType);
     newField->mOffset = fieldOffset;
@@ -105,7 +105,7 @@ void BuildType(ReflectionLibrary& library, DataDrivenType& type, DataDrivenTypeN
   library.AddBoundType(boundType);
 }
 
-void BuildTypes(ReflectionLibrary& library, DataDrivenTypes& types)
+void BuildTypes(SimpleReflection::ReflectionLibrary& library, DataDrivenTypes& types)
 {
   DataDrivenTypeNameMap typeMap;
   // Build a map of all typenames in this library so we can deal with them being in a random order
@@ -124,7 +124,7 @@ void BuildTypes(ReflectionLibrary& library, DataDrivenTypes& types)
   }
 }
 
-bool LoadDataDrivenTypes(const std::filesystem::path& boundTypesPath, ReflectionLibrary& library)
+bool LoadDataDrivenTypes(const std::filesystem::path& boundTypesPath, SimpleReflection::ReflectionLibrary& library)
 {
   if(!std::filesystem::exists(boundTypesPath))
     return false;
@@ -141,7 +141,7 @@ bool LoadDataDrivenTypes(const std::filesystem::path& boundTypesPath, Reflection
   return true;
 }
 
-char* LoadJson(const std::filesystem::path& filePath, BoundType*& rootType)
+char* LoadJson(const std::filesystem::path& filePath, SimpleReflection::BoundType*& rootType)
 {
   JsonLoader loader;
   loader.LoadFromFile(filePath.string());
@@ -151,7 +151,7 @@ char* LoadJson(const std::filesystem::path& filePath, BoundType*& rootType)
   loader.SerializePrimitive(*StaticTypeId<std::string>::GetBoundType(), rootTypeName);
   loader.EndMember();
 
-  rootType = ReflectionProject::FindBoundType(rootTypeName);
+  rootType = SimpleReflection::ReflectionProject::FindBoundType(rootTypeName);
   MetaSerialization* metaSerialization = rootType->QueryComponentType<MetaSerialization>();
   char* data = metaSerialization->Allocate();
 
@@ -162,7 +162,7 @@ char* LoadJson(const std::filesystem::path& filePath, BoundType*& rootType)
   return data;
 }
 
-void SaveJson(const std::filesystem::path& filePath, BoundType* rootType, char* data)
+void SaveJson(const std::filesystem::path& filePath, SimpleReflection::BoundType* rootType, char* data)
 {
   JsonSaver saver;
 
@@ -184,7 +184,7 @@ void SaveJson(const std::filesystem::path& filePath, BoundType* rootType, char* 
   outStream.close();
 }
 
-char* LoadBinary(const std::filesystem::path& filePath, BoundType*& rootType)
+char* LoadBinary(const std::filesystem::path& filePath, SimpleReflection::BoundType*& rootType)
 {
   std::ifstream inStream;
   inStream.open(filePath.c_str(), std::ifstream::binary | std::ifstream::in);
@@ -199,7 +199,7 @@ char* LoadBinary(const std::filesystem::path& filePath, BoundType*& rootType)
   return data;
 }
 
-void SaveBinary(const std::filesystem::path& filePath, BoundType* rootType, char* data)
+void SaveBinary(const std::filesystem::path& filePath, SimpleReflection::BoundType* rootType, char* data)
 {
   std::stringstream memoryStream;
   BinarySaver saver(memoryStream);
@@ -228,9 +228,9 @@ void RunDataDrivenFile(const std::filesystem::path& filePath, ReflectionLibrary&
   memcmp(binaryData, loadedJsonData, boundType->mSizeInBytes);
 }
 
-void RunDataDrivenFolder(const std::filesystem::path& folderPath, ReflectionLibrary& dataDrivenLibrary)
+void RunDataDrivenFolder(const std::filesystem::path& folderPath, SimpleReflection::ReflectionLibrary& dataDrivenLibrary)
 {
-  ReflectionLibrary& scriptLibrary = ReflectionProject::CreateLibrary("Script");
+  ReflectionLibrary& scriptLibrary = SimpleReflection::ReflectionProject::CreateLibrary("Script");
   scriptLibrary.AddDependency(&dataDrivenLibrary);
 
   std::filesystem::path boundTypesPath = folderPath;
@@ -251,10 +251,10 @@ void RunDataDrivenFolder(const std::filesystem::path& folderPath, ReflectionLibr
     RunDataDrivenFile(filePath, scriptLibrary);
   }
 
-  ReflectionProject::DestroyLibrary(scriptLibrary);
+  SimpleReflection::ReflectionProject::DestroyLibrary(scriptLibrary);
 }
 
-void RunDataDrivenTests(const std::filesystem::path& testsPath, ReflectionLibrary& dataDrivenLibrary)
+void RunDataDrivenTests(const std::filesystem::path& testsPath, SimpleReflection::ReflectionLibrary& dataDrivenLibrary)
 {
   if(!std::filesystem::is_directory(testsPath))
     return;

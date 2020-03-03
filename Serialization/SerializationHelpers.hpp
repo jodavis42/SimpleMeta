@@ -7,6 +7,9 @@
 #include "Serializer.hpp"
 #include "MetaSerialization.hpp"
 
+using SimpleReflection::Field;
+using SimpleReflection::GetterSetter;
+
 template <typename SerializerType>
 bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char* data)
 {

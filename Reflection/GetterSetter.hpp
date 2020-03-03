@@ -4,6 +4,9 @@
 #include "ReflectionComposition.hpp"
 #include "Any.hpp"
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 struct Call;
 struct Function;
@@ -20,3 +23,5 @@ struct GetterSetter : public ReflectionComposition
   Function* mGetter = nullptr;
   Function* mSetter = nullptr;
 };
+
+}//namespace SimpleReflection

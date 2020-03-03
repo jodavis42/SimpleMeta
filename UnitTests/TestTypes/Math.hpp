@@ -20,7 +20,7 @@ struct Vec2
     return x == rhs.x && y == rhs.y;
   }
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, Vec2, x);
     BindProperty(library, boundType, Vec2, y);
@@ -47,7 +47,7 @@ struct Vec3
     return x == rhs.x && y == rhs.y && z == rhs.z;
   }
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, Vec3, x);
     BindProperty(library, boundType, Vec3, y);

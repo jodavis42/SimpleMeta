@@ -4,6 +4,9 @@
 
 #include <vector>
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 struct Call;
 
@@ -32,3 +35,4 @@ private:
   std::vector<BoundType*> mParams;
 };
 
+}//namespace SimpleReflection

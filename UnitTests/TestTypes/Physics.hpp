@@ -17,9 +17,9 @@ struct Collider
 
   virtual BoundType* VirtualGetBoundType() const
   {
-    return StaticTypeId<Collider>::GetBoundType();
+    return SimpleReflection::StaticTypeId<Collider>::GetBoundType();
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, Collider, mId);
     BindGetterSetter(library, boundType, Collider, Ghost);
@@ -62,9 +62,9 @@ struct BoxCollider : public Collider
 
   virtual BoundType* VirtualGetBoundType() const
   {
-    return StaticTypeId<BoxCollider>::GetBoundType();
+    return SimpleReflection::StaticTypeId<BoxCollider>::GetBoundType();
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
     BindProperty(library, boundType, BoxCollider, mSize);
@@ -81,9 +81,9 @@ struct SphereCollider : public Collider
   }
   virtual BoundType* VirtualGetBoundType() const
   {
-    return StaticTypeId<SphereCollider>::GetBoundType();
+    return SimpleReflection::StaticTypeId<SphereCollider>::GetBoundType();
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
     BindProperty(library, boundType, SphereCollider, mRadius);
@@ -112,7 +112,7 @@ struct PhysicsSpace
     }
     return isEqual;
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, PhysicsSpace, mColliders);
   }

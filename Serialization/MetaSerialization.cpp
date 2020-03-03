@@ -3,6 +3,8 @@
 #include "JsonSerializers.hpp"
 #include "BinaryStream.hpp"
 
+using SimpleReflection::StaticTypeId;
+
 BoundType* MetaSerialization::GetBoundType()
 {
   return StaticTypeId<MetaSerialization>::GetBoundType();

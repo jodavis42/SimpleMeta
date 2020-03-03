@@ -5,6 +5,9 @@
 #include "Function.hpp"
 #include "Call.hpp"
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 
 // Ideally these would be replaced with a bunch of variadics, but the unpack is very complicated for that.
@@ -13,4 +16,6 @@ struct BoundType;
 #include "Functions.inl"
 #include "ConstructorsDestructors.inl"
 
-#define CreateMethod(Fn) FromMethod<decltype(Fn), Fn>(Fn)
+#define CreateMethod(Fn) SimpleReflection::FromMethod<decltype(Fn), Fn>(Fn)
+
+}//namespace SimpleReflection

@@ -2,6 +2,9 @@
 
 #include "BoundType.hpp"
 
+namespace SimpleReflection
+{
+
 template <typename T>
 BoundType* AllocateBoundType()
 {
@@ -158,3 +161,5 @@ struct UnqualifiedType
 {
   using type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 };
+
+}//namespace SimpleReflection

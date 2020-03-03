@@ -4,6 +4,9 @@
 #include "Function.hpp"
 #include "Call.hpp"
 
+namespace SimpleReflection
+{
+
 GetterSetter::~GetterSetter()
 {
   delete mGetter;
@@ -36,3 +39,5 @@ void GetterSetter::Set(char* instanceData, Any any)
   call.SetValueUnchecked(0, any.GetRawData(), any.GetStoredType()->mSizeInBytes);
   call.Invoke();
 }
+
+}//namespace SimpleReflection

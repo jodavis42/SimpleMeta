@@ -3,6 +3,9 @@
 #include "Asserts.hpp"
 #include "MetaLibrary.hpp"
 
+namespace SimpleReflection
+{
+
 BoundType* ValidateRawBoundType(BoundType* boundType)
 {
   ReflectionProject* instance = ReflectionProject::GetInstance();
@@ -36,3 +39,5 @@ BoundType* RegisterReferenceBoundType(BoundType* unqualifiedBase, BoundType* bou
   boundType->mSizeInBytes = sizeof(void*);
   return boundType;
 }
+
+}//namespace SimpleReflection

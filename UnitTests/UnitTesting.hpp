@@ -4,14 +4,17 @@
 #include <fstream>
 #include <sstream>
 
+namespace SimpleReflection
+{
 struct ReflectionLibrary;
 struct BoundType;
 struct Function;
+}//namespace SimpleReflection
 
 template <typename T>
 void TestBinaryRoundTrip(T& input)
 {
-  BoundType* boundType = StaticTypeId<T>::GetBoundType();
+  BoundType* boundType = SimpleReflection::StaticTypeId<T>::GetBoundType();
 
   std::ofstream outStream;
   outStream.open(boundType->mName, std::ofstream::binary | std::ofstream::out);
@@ -36,7 +39,7 @@ void TestBinaryRoundTrip(T& input)
 template <typename T>
 void TestJsonRoundTrip(T& input)
 {
-  BoundType* boundType = StaticTypeId<T>::GetBoundType();
+  SimpleReflection::BoundType* boundType = SimpleReflection::StaticTypeId<T>::GetBoundType();
 
   JsonSaver saver;
   saver.Serialize(input);
@@ -62,13 +65,13 @@ void TestJsonRoundTrip(T& input)
 
 struct ScopedFunction
 {
-  ScopedFunction(Function* function);
+  ScopedFunction(SimpleReflection::Function* function);
   ~ScopedFunction();
 
-  operator Function*();
+  operator SimpleReflection::Function*();
   
-  Function* mFunction;
+  SimpleReflection::Function* mFunction;
 };
 
-void DummyBind(ReflectionLibrary& library, BoundType& boundType);
+void DummyBind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType);
 void RunUnitTests();

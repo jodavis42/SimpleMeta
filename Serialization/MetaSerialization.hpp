@@ -1,12 +1,16 @@
 #pragma once
 
+#include "Any.hpp"
 #include "Serializer.hpp"
 #include "JsonSerializers.hpp"
 #include "BinaryStream.hpp"
 
 #include "SerializationPolicy.hpp"
 
-struct MetaSerialization : public ReflectionComponent
+using SimpleReflection::Any;
+using SimpleReflection::BoundType;
+
+struct MetaSerialization : public SimpleReflection::ReflectionComponent
 {
 public:
   virtual BoundType* GetBoundType() override;
@@ -81,6 +85,9 @@ struct TypedMetaSerialization : public MetaSerialization
   }
 };
 
+namespace SimpleReflection
+{
+
 template <typename ClassType>
 void DefaultTypeSetup(ReflectionLibrary& library, BoundType& ownerType)
 {
@@ -107,3 +114,5 @@ void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, 
     getterSetterType.AddComponentType<TypedMetaSerialization<FieldType>>();
   }
 }
+
+}//namespace SimpleReflection

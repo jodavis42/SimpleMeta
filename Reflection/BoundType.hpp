@@ -7,6 +7,9 @@
 #include "TypeId.hpp"
 #include "ReflectionComposition.hpp"
 
+namespace SimpleReflection
+{
+
 struct Field;
 struct Function;
 struct GetterSetter;
@@ -30,3 +33,5 @@ struct BoundType : public ReflectionComposition
   bool mIsPointerType = false;
   bool mIsReferenceType = false;
 };
+
+}//namespace SimpleReflection

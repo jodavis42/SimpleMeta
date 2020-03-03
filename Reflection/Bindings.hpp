@@ -8,6 +8,9 @@
 #include "Attributes.hpp"
 #include "FunctionBinding.hpp"
 
+namespace SimpleReflection
+{
+
 template <typename ClassType>
 void DefaultTypeSetup(ReflectionLibrary& library, BoundType& ownerType);
 
@@ -128,26 +131,28 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
-  FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember))
+  SimpleReflection::FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember))
 #define BindField(Library, boundType, Owner, FieldMember) BindFieldAs(Library, boundType, Owner, FieldMember, #FieldMember)
 
 #define BindPropertyAs(Library, boundType, Owner, FieldMember, FieldName) BindFieldAs(Library, boundType, Owner, FieldMember, FieldName)
 #define BindProperty(Library, boundType, Owner, FieldMember) BindPropertyAs(Library, boundType, Owner, FieldMember, #FieldMember)
 
 #define BindGetterSetterAs(Library, boundType, Owner, FieldName, Getter, Setter) \
-  FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)
+  SimpleReflection::FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)
 #define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, #FieldName, Get##FieldName, Set##FieldName)
 
-#define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName, Id) BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName, Id)
+#define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName, Id) SimpleReflection::BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName, Id)
 #define BindPrimitiveType(Library, PrimitiveType, Id) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType, Id)
 
 #define BindTypeAs(Library, ClassType, ClassTypeName, Id) BindClassType<ClassType, &ClassType::Bind>(Library, ClassTypeName, Id)
 #define BindType(Library, ClassType, Id) BindTypeAs(Library, ClassType, #ClassType, Id)
 
-#define BindTypeExternalAs(Library, ClassType, ClassTypeName, Id, BindingFn) BindClassType<ClassType, BindingFn>(Library, ClassTypeName, Id)
+#define BindTypeExternalAs(Library, ClassType, ClassTypeName, Id, BindingFn) SimpleReflection::BindClassType<ClassType, BindingFn>(Library, ClassTypeName, Id)
 #define BindTypeExternal(Library, ClassType, Id, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, Id, BindingFn)
 
-#define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function) FromFunction<decltype(&ClassType::Function), &ClassType::Function>(Library, BoundType, FunctionName, &ClassType::Function)
+#define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function) SimpleReflection::FromFunction<decltype(&ClassType::Function), &ClassType::Function>(Library, BoundType, FunctionName, &ClassType::Function)
 #define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, #Function, Function)
 
-#define BindBase(Library, BoundType, BaseType) BindBaseType<BaseType>(Library, BoundType)
+#define BindBase(Library, BoundType, BaseType) SimpleReflection::BindBaseType<BaseType>(Library, BoundType)
+
+}//namespace SimpleReflection

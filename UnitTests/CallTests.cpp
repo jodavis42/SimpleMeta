@@ -7,6 +7,11 @@
 
 #include "UnitTesting.hpp"
 
+using SimpleReflection::ReflectionLibrary;
+using SimpleReflection::ReflectionProject;
+using SimpleReflection::BoundType;
+using SimpleReflection::Call;
+
 struct SimpleGetterTest
 {
   SimpleGetterTest() : mValue(0) {}

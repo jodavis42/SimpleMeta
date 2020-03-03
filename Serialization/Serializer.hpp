@@ -3,6 +3,11 @@
 #include "BoundType.hpp"
 #include "Attributes.hpp"
 
+using SimpleReflection::TypeId;
+using SimpleReflection::BoundType;
+using SimpleReflection::GetterSetter;
+using SimpleReflection::ReflectionLibrary;
+
 enum class SerializerDirection
 {
   Saving,

@@ -2,6 +2,9 @@
 
 #include "BoundType.hpp"
 
+namespace SimpleReflection
+{
+
 size_t Function::ComputeSizeRequired() const
 {
   // This information could be baked into the fields/params. Worry about this if it matters
@@ -53,3 +56,5 @@ bool Function::IsStatic() const
 {
   return mThisType == nullptr;
 }
+
+}//namespace SimpleReflection

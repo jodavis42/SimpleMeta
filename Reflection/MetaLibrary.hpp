@@ -5,6 +5,9 @@
 #include <unordered_set>
 #include "BoundType.hpp"
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 
 /// A library of types that depends on other libraries. Facilitates search for types by id or name and owning the memory for bound types.
@@ -47,3 +50,5 @@ struct ReflectionProject
   ReflectionLibrary* mCurrentLibrary = nullptr;
   std::vector<ReflectionLibrary*> mLibraries;
 };
+
+}//namespace SimpleReflection

@@ -1,12 +1,12 @@
 #include "Attributes.hpp"
 #include "StaticTypeId.hpp"
 
-BoundType* Attribute::GetBoundType()
+SimpleReflection::BoundType* Attribute::GetBoundType()
 {
-  return StaticTypeId<Attribute>::GetBoundType();
+  return SimpleReflection::StaticTypeId<Attribute>::GetBoundType();
 }
 
-BoundType* SerializedAttribute::GetBoundType()
+SimpleReflection::BoundType* SerializedAttribute::GetBoundType()
 {
-  return StaticTypeId<SerializedAttribute>::GetBoundType();
+  return SimpleReflection::StaticTypeId<SerializedAttribute>::GetBoundType();
 }

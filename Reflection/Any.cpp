@@ -3,6 +3,9 @@
 #include "BoundType.hpp"
 #include "Call.hpp"
 
+namespace SimpleReflection
+{
+
 Any::Any()
 {
   Clear();
@@ -115,3 +118,5 @@ void Any::Clear()
   memset(mBuffer, 0, mBufferSize);
   mIsAllocated = false;
 }
+
+}//namespace SimpleReflection

@@ -15,7 +15,7 @@ struct NameId
   {
     return mId == rhs.mId && mName == rhs.mName;
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, NameId, mId);
     BindProperty(library, boundType, NameId, mName);
@@ -31,7 +31,7 @@ struct NameIdList
   {
     return mIds == rhs.mIds;
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, NameIdList, mIds);
   }
@@ -45,7 +45,7 @@ struct NumberList
   {
     return mData == rhs.mData;
   }
-  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, NumberList, mData);
   }
@@ -94,7 +94,7 @@ struct MyStruct
   }
 };
 
-inline void BindMyStruct(ReflectionLibrary& library, BoundType& boundType)
+inline void BindMyStruct(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
 {
   BindProperty(library, boundType, MyStruct, mData);
   BindProperty(library, boundType, MyStruct, mFloat);

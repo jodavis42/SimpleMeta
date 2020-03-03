@@ -9,7 +9,7 @@ struct DataDrivenField
   std::string mName;
   std::string mType;
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType);
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType);
 };
 
 struct DataDrivenType
@@ -18,12 +18,12 @@ struct DataDrivenType
   std::string mBaseType;
   std::vector<DataDrivenField> mFields;
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType);
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType);
 };
 
 struct DataDrivenTypes
 {
   std::vector<DataDrivenType> mTypes;
 
-  static void Bind(ReflectionLibrary& library, BoundType& boundType);
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType);
 };

@@ -4,6 +4,9 @@
 
 #include "StaticTypeId.hpp"
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 
 /// A type that can store any type. Used to more easily pass around arbitrary data without relying on templates.
@@ -59,3 +62,5 @@ private:
   BoundType* mStoredType = nullptr;
   bool mIsAllocated = false;
 };
+
+}//namespace SimpleReflection

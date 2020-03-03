@@ -2,6 +2,9 @@
 
 #include "BoundType.hpp"
 
+namespace SimpleReflection
+{
+
 ReflectionComposition::~ReflectionComposition()
 {
   ClearComponents();
@@ -48,3 +51,5 @@ void ReflectionComposition::ClearComponents()
 {
   mComponents.clear();
 }
+
+}//namespace SimpleReflection

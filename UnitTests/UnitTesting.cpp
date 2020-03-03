@@ -10,7 +10,7 @@
 #include "TestTypes/Misc.hpp"
 #include "MetaSerialization.hpp"
 
-ScopedFunction::ScopedFunction(Function* function) : mFunction(function)
+ScopedFunction::ScopedFunction(SimpleReflection::Function* function) : mFunction(function)
 {
 
 }
@@ -20,12 +20,12 @@ ScopedFunction::~ScopedFunction()
   delete mFunction;
 }
 
-ScopedFunction::operator Function*()
+ScopedFunction::operator SimpleReflection::Function*()
 {
   return mFunction;
 }
 
-void DummyBind(ReflectionLibrary& library, BoundType& boundType)
+void DummyBind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
 {
 
 }

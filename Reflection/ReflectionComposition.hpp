@@ -5,6 +5,9 @@
 
 #include "ReflectionComponent.hpp"
 
+namespace SimpleReflection
+{
+
 struct BoundType;
 struct TypeId;
 
@@ -50,3 +53,5 @@ private:
   using ComponentMap = std::unordered_map<size_t, ReflectionComponentPtr>;
   ComponentMap mComponents;
 };
+
+}//namespace SimpleReflection

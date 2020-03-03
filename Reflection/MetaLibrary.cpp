@@ -2,6 +2,9 @@
 #include "Asserts.hpp"
 #include "StaticTypeId.hpp"
 
+namespace SimpleReflection
+{
+
 ReflectionLibrary::~ReflectionLibrary()
 {
   for(BoundType* boundType : mBoundTypes)
@@ -188,3 +191,5 @@ BoundType* ReflectionProject::FindBoundType(const TypeId& id, bool recursive)
   ReflectionLibrary* topLibrary = instance->mCurrentLibrary;
   return topLibrary->FindBoundType(id);
 }
+
+}//namespace SimpleReflection

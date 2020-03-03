@@ -33,7 +33,7 @@ bool BinarySaver::BeginMembers(size_t& count)
 
 bool BinarySaver::BeginMember(size_t index, std::string& name)
 {
-  return SerializePrimitive(*StaticTypeId<std::string>::GetBoundType(), name);
+  return SerializePrimitive(*SimpleReflection::StaticTypeId<std::string>::GetBoundType(), name);
 }
 
 bool BinarySaver::BeginObject(PolymorphicInfo& info)
@@ -98,7 +98,7 @@ bool BinaryLoader::BeginMembers(size_t& count)
 
 bool BinaryLoader::BeginMember(size_t index, std::string& name)
 {
-  return SerializePrimitive(*StaticTypeId<std::string>::GetBoundType(), name);
+  return SerializePrimitive(*SimpleReflection::StaticTypeId<std::string>::GetBoundType(), name);
 }
 
 bool BinaryLoader::BeginObject()

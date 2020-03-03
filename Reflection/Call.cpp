@@ -4,6 +4,9 @@
 #include "BoundType.hpp"
 #include "Function.hpp"
 
+namespace SimpleReflection
+{
+
 Call::Call(Function* function)
 {
   mFunction = function;
@@ -81,3 +84,5 @@ bool Call::Invoke()
   mFunction->mBoundFunction(*this);
   return true;
 }
+
+}//namespace SimpleReflection

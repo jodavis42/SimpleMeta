@@ -2,6 +2,9 @@
 
 #include "StaticTypeId.hpp"
 
+using SimpleReflection::StaticTypeId;
+using SimpleReflection::BoundType;
+
 template <typename T>
 struct SerializationPolicy
 {

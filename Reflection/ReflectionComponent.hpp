@@ -1,5 +1,8 @@
 #pragma once
 
+namespace SimpleReflection
+{
+
 struct ReflectionLibrary;
 struct BoundType;
 
@@ -12,3 +15,5 @@ struct ReflectionComponent
   /// All reflection components must implement this so that the composition can know what type they are.
   virtual BoundType* GetBoundType() abstract;
 };
+
+}//namespace SimpleReflection
