@@ -57,7 +57,7 @@ struct StaticTypeId<T*> : public StaticTypeId<T>
 {
   static BoundType*& GetBoundType()
   {
-    static BoundType* sInstance = AllocateBoundType<T>();
+    static BoundType* sInstance = RegisterPointerBoundType(StaticTypeId<T>::GetBoundType(), new BoundType());
     return sInstance;
   }
 };
