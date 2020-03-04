@@ -98,8 +98,12 @@ void DefaultTypeSetup(ReflectionLibrary& library, BoundType& ownerType)
 }
 
 template <typename ClassType, typename FieldType>
-void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& fieldType)
+void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& fieldType, Field& field)
 {
+  if(field.QueryComponentType<SerializedAttribute>() == nullptr)
+  {
+    field.AddComponentType<SerializedAttribute>();
+  }
   if(fieldType.QueryComponentType<MetaSerialization>() == nullptr)
   {
     fieldType.AddComponentType<TypedMetaSerialization<FieldType>>();
@@ -107,8 +111,12 @@ void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundTy
 }
 
 template <typename ClassType, typename FieldType>
-void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& getterSetterType)
+void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& getterSetterType, GetterSetter& getterSetter)
 {
+  if(getterSetter.QueryComponentType<SerializedAttribute>() == nullptr)
+  {
+    getterSetter.AddComponentType<SerializedAttribute>();
+  }
   if(getterSetterType.QueryComponentType<MetaSerialization>() == nullptr)
   {
     getterSetterType.AddComponentType<TypedMetaSerialization<FieldType>>();

@@ -14,10 +14,10 @@ template <typename ClassType>
 void DefaultTypeSetup(ReflectionLibrary& library, BoundType& ownerType);
 
 template <typename ClassType, typename FieldType>
-void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& fieldType);
+void DefaultFieldSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& fieldType, Field& field);
 
 template <typename ClassType, typename GetterSetterType>
-void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& getterSetterType);
+void DefaultGetterSetterSetup(ReflectionLibrary& library, BoundType& ownerType, BoundType& getterSetterType, GetterSetter& getterSetter);
 
 template <typename ClassType>
 BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& className, size_t id, size_t sizeInBytes)
@@ -43,7 +43,7 @@ static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std:
   f->mName = name;
   f->mOffset = offset;
   f->mType = StaticTypeId<FieldType>::GetBoundType();
-  DefaultFieldSetup<ClassType, FieldType>(library, owner, *f->mType);
+  DefaultFieldSetup<ClassType, FieldType>(library, owner, *f->mType, *f);
   owner.mFields.push_back(f);
   return f;
 }
@@ -68,7 +68,7 @@ static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& own
   getSet->mName = name;
   getSet->mGetter = FromMethod<GetterType, getter>(getter);
   getSet->mSetter = FromMethod<SetterType, setter>(setter);
-  DefaultGetterSetterSetup<ClassType, GetType>(library, owner, *getSet->mType);
+  DefaultGetterSetterSetup<ClassType, GetType>(library, owner, *getSet->mType, *getSet);
   owner.mGetterSetters.push_back(getSet);
   return getSet;
 }
