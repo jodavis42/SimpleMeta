@@ -6,6 +6,7 @@
 
 #include "TypeId.hpp"
 #include "ReflectionComposition.hpp"
+#include "BoundTypeRanges.hpp"
 
 namespace SimpleReflection
 {
@@ -20,6 +21,10 @@ struct BoundType : public ReflectionComposition
 
   std::string mName;
   TypeId mId;
+
+  FieldRange GetFields();
+  GetterSetterRange GetGetterSetters();
+  bool FindFunctions(const std::string& fnName, std::vector<Function*>& functions, bool recursive);
 
   BoundType* mBaseType = nullptr;
   std::vector<Field*> mFields;

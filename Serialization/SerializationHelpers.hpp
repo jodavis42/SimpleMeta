@@ -13,9 +13,10 @@ using SimpleReflection::GetterSetter;
 template <typename SerializerType>
 bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char* data)
 {
-  for(size_t i = 0; i < boundType.mFields.size(); ++i)
+  for(auto range = boundType.GetFields(); !range.Empty(); range.PopFront())
   {
-    const Field* field = boundType.mFields[i];
+    //const Field* field = boundType.mFields[i];
+    const Field* field = range.Front();
     // Only serialize fields with the correct attribute
     if(!field->QueryComponentType<SerializedAttribute>())
       continue;
@@ -30,9 +31,9 @@ bool SerializeProperties(SerializerType& serializer, BoundType& boundType, char*
       serializer.EndMember();
     }
   }
-  for(size_t i = 0; i < boundType.mGetterSetters.size(); ++i)
+  for(auto range = boundType.GetGetterSetters(); !range.Empty(); range.PopFront())
   {
-    GetterSetter* getSet = boundType.mGetterSetters[i];
+    GetterSetter* getSet = range.Front();
     // Only serialize fields with the correct attribute
     if(!getSet->QueryComponentType<SerializedAttribute>())
       continue;

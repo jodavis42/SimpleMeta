@@ -6,6 +6,8 @@ target_sources(Reflection
     ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp
     ${CMAKE_CURRENT_LIST_DIR}/BoundType.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundTypeRanges.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundTypeRanges.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Call.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Call.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Field.cpp

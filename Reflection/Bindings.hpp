@@ -93,40 +93,6 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 {
   BoundType* baseType = StaticTypeId<BaseType>::GetBoundType();
   derrivedType.mBaseType = baseType;
-
-  derrivedType.mFields.reserve(baseType->mFields.size());
-  for(size_t i = 0; i < baseType->mFields.size(); ++i)
-  {
-    Field* field = new Field();
-    *field = *baseType->mFields[i];
-    derrivedType.mFields.push_back(field);
-  }
-  
-  derrivedType.mGetterSetters.reserve(baseType->mGetterSetters.size());
-  for(size_t i = 0; i < baseType->mGetterSetters.size(); ++i)
-  {
-    GetterSetter* baseGetSet = baseType->mGetterSetters[i];
-    GetterSetter* getSet = new GetterSetter();
-    *getSet = *baseGetSet;
-    getSet->mGetter = new Function();
-    *getSet->mGetter = *baseGetSet->mGetter;
-    getSet->mSetter = new Function();
-    *getSet->mSetter = *baseGetSet->mSetter;
-    derrivedType.mGetterSetters.push_back(getSet);
-  }
-
-  for(auto&& pair : baseType->mFunctionMap)
-  {
-    auto&& derivedFunctionList = derrivedType.mFunctionMap[pair.first];
-    derivedFunctionList.reserve(pair.second.size());
-    for(size_t i = 0; i < pair.second.size(); ++i)
-    {
-      Function* baseFunction = pair.second[i];
-      Function* derivedFunction = new Function();
-      *derivedFunction = *baseFunction;
-      derivedFunctionList.push_back(derivedFunction);
-    }
-  }
 }
 
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \

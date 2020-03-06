@@ -33,4 +33,28 @@ BoundType::~BoundType()
   mFunctionMap.clear();
 }
 
+FieldRange BoundType::GetFields()
+{
+  return FieldRange(this);
+}
+
+GetterSetterRange BoundType::GetGetterSetters()
+{
+  return GetterSetterRange(this);
+}
+
+bool BoundType::FindFunctions(const std::string& fnName, std::vector<Function*>& functions, bool recursive)
+{
+  auto it = mFunctionMap.find(fnName);
+  if(it != mFunctionMap.end())
+  {
+    functions = it->second;
+    return true;
+  }
+    
+  if(recursive && mBaseType != nullptr)
+    return mBaseType->FindFunctions(fnName, functions, recursive);
+  return false;
+}
+
 }//namespace SimpleReflection
