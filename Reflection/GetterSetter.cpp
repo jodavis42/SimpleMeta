@@ -15,7 +15,7 @@ GetterSetter::~GetterSetter()
   delete mSetter;
 }
 
-Any GetterSetter::Get(char* instanceData) const
+Any GetterSetter::Get(void* instanceData) const
 {
   if(mGetter == nullptr)
     return Any();
@@ -30,7 +30,7 @@ Any GetterSetter::Get(char* instanceData) const
   return Any(resultData, mGetter->GetReturnType());
 }
 
-void GetterSetter::Set(char* instanceData, Any any)
+void GetterSetter::Set(void* instanceData, Any any)
 {
   if(mSetter == nullptr)
     return;
@@ -38,7 +38,7 @@ void GetterSetter::Set(char* instanceData, Any any)
   // Set the 'this' and the any arg then invoke
   Call call(mSetter);
   call.SetPointerUnchecked(Call::This, instanceData);
-  call.SetValueUnchecked(0, any.GetRawData(), any.GetStoredType()->mSizeInBytes);
+  call.Set(0, any);
   call.Invoke();
 }
 

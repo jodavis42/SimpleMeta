@@ -2,6 +2,7 @@
 
 #include "AnyTests.hpp"
 #include "CallTests.hpp"
+#include "GetSetTests.hpp"
 #include "BinaryStream.hpp"
 #include "JsonSerializers.hpp"
 #include "TestTypes/Physics.hpp"
@@ -34,6 +35,7 @@ void RunUnitTests()
 {
   RunAnyTests();
   RunCallTests();
+  RunGetSetTests();
 
   {
     Mesh outMesh;

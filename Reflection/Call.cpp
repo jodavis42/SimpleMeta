@@ -5,6 +5,7 @@
 #include "Asserts.hpp"
 #include "BoundType.hpp"
 #include "Function.hpp"
+#include "Any.hpp"
 
 namespace SimpleReflection
 {
@@ -42,6 +43,23 @@ void Call::SetPointer(int index, const void* dataPtr, BoundType* boundType)
 void Call::SetPointerUnchecked(int index, const void* dataPtr)
 {
   SetValueUnchecked(index, &dataPtr, sizeof(&dataPtr));
+}
+
+void Call::Set(int index, Any& any)
+{
+  // Set the value from the any based upon the expected type
+  BoundType* expectedType = GetLocationType(index);
+  char* rawData = any.GetRawData();
+  if(expectedType->mIsReferenceType)
+  {
+    char* location = GetLocationUnChecked(index);
+    SetInternal(index, rawData, expectedType->mSizeInBytes);
+  }
+  else
+  {
+    char* location = GetLocationUnChecked(index);
+    SetInternal(index, *rawData, expectedType->mSizeInBytes);
+  }
 }
 
 char* Call::GetLocationChecked(int index, BoundType* boundType)

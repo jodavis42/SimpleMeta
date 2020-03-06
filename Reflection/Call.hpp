@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Asserts.hpp"
 #include "StaticTypeId.hpp"
 
 namespace SimpleReflection
@@ -8,6 +9,7 @@ namespace SimpleReflection
 struct BoundType;
 struct Function;
 struct Call;
+struct Any;
 
 /// Helper object to deal with template speciailization on call objects
 template <typename T>
@@ -65,6 +67,7 @@ struct Call
   /// Sets the given data as if it's a pointer (aka a this). The pointer is not owned so make sure the scope is valid.
   void SetPointer(int index, const void* dataPtr, BoundType* boundType);
   void SetPointerUnchecked(int index, const void* dataPtr);
+  void Set(int index, Any& any);
 
   template <typename T>
   T Get(int index)

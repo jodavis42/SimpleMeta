@@ -15,8 +15,8 @@ struct GetterSetter : public ReflectionComposition
 {
   ~GetterSetter();
 
-  Any Get(char* instanceData) const;
-  void Set(char* instanceData, Any any);
+  Any Get(void* instanceData) const;
+  void Set(void* instanceData, Any any);
 
   std::string mName;
   BoundType* mType = nullptr;

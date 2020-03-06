@@ -4,6 +4,8 @@ target_sources(UnitTests
     ${CMAKE_CURRENT_LIST_DIR}/AnyTests.hpp
     ${CMAKE_CURRENT_LIST_DIR}/CallTests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/CallTests.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/GetSetTests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/GetSetTests.hpp
     ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.cpp
     ${CMAKE_CURRENT_LIST_DIR}/UnitTesting.hpp
     ${CMAKE_CURRENT_LIST_DIR}/DataDriving/DataDrivenTesting.cpp

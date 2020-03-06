@@ -73,6 +73,31 @@ static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& own
   return getSet;
 }
 
+template <typename GetterType, GetterType getter, typename SetterType, SetterType setter, typename ClassType, typename GetType>
+static GetterSetter* FromGetter(ReflectionLibrary& library, BoundType& owner, const std::string& name, GetType(ClassType::* dummyGetter)()const, std::nullptr_t)
+{
+  auto getSet = new GetterSetter();
+  getSet->mType = StaticTypeId<GetType>::GetBoundType();
+  getSet->mName = name;
+  getSet->mGetter = FromMethod<GetterType, getter>(getter);
+  DefaultGetterSetterSetup<ClassType, GetType>(library, owner, *getSet->mType, *getSet);
+  owner.mGetterSetters.push_back(getSet);
+  return getSet;
+}
+
+template <typename GetterType, GetterType getter, typename SetterType, SetterType setter, typename ClassType, typename SetType>
+static GetterSetter* FromSetter(ReflectionLibrary& library, BoundType& owner, const std::string& name, std::nullptr_t, void (ClassType::* dummySetter)(SetType))
+{
+  using FieldType = UnqualifiedType<SetType>::type;
+  auto getSet = new GetterSetter();
+  getSet->mType = StaticTypeId<FieldType>::GetBoundType();
+  getSet->mName = name;
+  getSet->mSetter = FromMethod<SetterType, setter>(setter);
+  DefaultGetterSetterSetup<ClassType, FieldType>(library, owner, *getSet->mType, *getSet);
+  owner.mGetterSetters.push_back(getSet);
+  return getSet;
+}
+
 template <typename FunctionType, FunctionType FunctionToBind>
 static Function* FromFunction(ReflectionLibrary& library, BoundType& owner, const std::string& name, FunctionType)
 {
@@ -106,10 +131,18 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
   SimpleReflection::FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)
 #define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, #FieldName, Get##FieldName, Set##FieldName)
 
+#define BindGetterAs(Library, boundType, Owner, FieldName, Getter) \
+  SimpleReflection::FromGetter<decltype(&Owner::Getter), &Owner::Getter, decltype(nullptr), nullptr, Owner>(library, boundType, FieldName, &Owner::Getter, nullptr)
+#define BindGetter(Library, boundType, Owner, FieldName) BindGetterAs(Library, boundType, Owner, #FieldName, Get##FieldName)
+
+#define BindSetterAs(Library, boundType, Owner, FieldName, Setter) \
+  SimpleReflection::FromSetter<decltype(nullptr), nullptr, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, nullptr, &Owner::Setter)
+#define BindSetter(Library, boundType, Owner, FieldName) BindSetterAs(Library, boundType, Owner, #FieldName, Set##FieldName)
+
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName, Id) SimpleReflection::BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName, Id)
 #define BindPrimitiveType(Library, PrimitiveType, Id) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType, Id)
 
-#define BindTypeAs(Library, ClassType, ClassTypeName, Id) BindClassType<ClassType, &ClassType::Bind>(Library, ClassTypeName, Id)
+#define BindTypeAs(Library, ClassType, ClassTypeName, Id) SimpleReflection::BindClassType<ClassType, &ClassType::Bind>(Library, ClassTypeName, Id)
 #define BindType(Library, ClassType, Id) BindTypeAs(Library, ClassType, #ClassType, Id)
 
 #define BindTypeExternalAs(Library, ClassType, ClassTypeName, Id, BindingFn) SimpleReflection::BindClassType<ClassType, BindingFn>(Library, ClassTypeName, Id)
