@@ -2,6 +2,13 @@
 
 #include "Math.hpp"
 
+enum class ColliderType
+{
+  None,
+  Sphere,
+  Box
+};
+
 struct Collider
 {
   enum
@@ -12,7 +19,15 @@ struct Collider
 
   bool operator==(const Collider& rhs) const
   {
+    return IsEqual(rhs);
+  }
+  virtual bool IsEqual(const Collider& rhs) const
+  {
     return mId == rhs.mId && mFlags == rhs.mFlags;
+  }
+  virtual ColliderType GetType() const
+  {
+    return ColliderType::None;
   }
 
   virtual BoundType* VirtualGetBoundType() const
@@ -55,9 +70,20 @@ struct Collider
 
 struct BoxCollider : public Collider
 {
-  bool operator==(const BoxCollider& rhs) const
+  virtual bool IsEqual(const Collider& rhs) const override
   {
-    return __super::operator==(rhs) && mSize == rhs.mSize;
+    if(rhs.GetType() != GetType())
+      return false;
+    const BoxCollider& castedRhs = reinterpret_cast<const BoxCollider&>(rhs);
+    return IsEqual(castedRhs);
+  }
+  bool IsEqual(const BoxCollider& rhs) const
+  {
+    return __super::IsEqual(rhs) && mSize == rhs.mSize;
+  }
+  virtual ColliderType GetType() const override
+  {
+    return ColliderType::Box;
   }
 
   virtual BoundType* VirtualGetBoundType() const
@@ -75,10 +101,23 @@ struct BoxCollider : public Collider
 
 struct SphereCollider : public Collider
 {
-  bool operator==(const SphereCollider& rhs) const
+  virtual bool IsEqual(const Collider& rhs) const override
   {
-    return __super::operator==(rhs) && mRadius == rhs.mRadius;
+    if(rhs.GetType() != GetType())
+      return false;
+    const SphereCollider& castedRhs = reinterpret_cast<const SphereCollider&>(rhs);
+    return IsEqual(castedRhs);
   }
+  bool IsEqual(const SphereCollider& rhs) const
+  {
+    return __super::IsEqual(rhs) && mRadius == rhs.mRadius;
+  }
+
+  virtual ColliderType GetType() const override
+  {
+    return ColliderType::Sphere;
+  }
+
   virtual BoundType* VirtualGetBoundType() const
   {
     return SimpleReflection::StaticTypeId<SphereCollider>::GetBoundType();
