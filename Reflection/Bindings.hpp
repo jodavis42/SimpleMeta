@@ -52,11 +52,13 @@ template <typename ClassType, void (*BindingFn)(ReflectionLibrary& library, Boun
 BoundType* BindClassType(ReflectionLibrary& library, const std::string& className, int id)
 {
   BoundType* boundType = CreateBoundType<ClassType>(library, className, id);
+  ReflectionErrorIf(boundType->mIsSetup, "ClassType '%s' was bound twice. You can only bind a type once", className.c_str());
   BindingFn(library, *boundType);
   boundType->mDefaultConstructor = FromConstructor<ClassType>();
   boundType->mCopyConstructor = FromCopyConstructor<ClassType>();
   boundType->mDestructor = FromDestructor<ClassType>();
   DefaultTypeSetup<ClassType>(library, *boundType);
+  boundType->mIsSetup = true;
   return boundType;
 }
 
@@ -110,6 +112,8 @@ template <typename PrimitiveType>
 BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className, size_t id)
 {
   BoundType* boundType = CreateBoundType<PrimitiveType>(library, className, id, sizeof(PrimitiveType));
+  ReflectionErrorIf(boundType->mIsSetup, "Primitive '%s' was bound twice. You can only bind a type once", className.c_str());
+  boundType->mIsSetup = true;
   return boundType;
 }
 

@@ -68,5 +68,7 @@ int main()
     RunDataDrivenTests(testDir, dataDrivenLibrary);
   }
 
+  ReflectionProject::GetInstance()->Shutdown();
+
   return 0;
 }

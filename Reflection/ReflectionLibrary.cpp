@@ -11,7 +11,9 @@ ReflectionLibrary::~ReflectionLibrary()
 {
   for(BoundType* boundType : mBoundTypes)
   {
-    delete boundType;
+    boundType->Destruct();
+    if(!boundType->mNative)
+      delete boundType;
   }
 }
 
@@ -26,6 +28,8 @@ void ReflectionLibrary::AddBoundType(BoundType* boundType)
   // Check if a type was already registered in a dependancy, if so don't register it again
   if(boundType->mId.mId != TypeId::sInvalidId && FindBoundType(boundType->mId) != nullptr)
     return;
+
+  ReflectionErrorIf(boundType->mIsRegistered, "BoundType '%s' is already registered but is not in a dependent library", boundType->mName.c_str());
 
   mBoundTypesToRegister.insert(boundType);
 }
@@ -47,6 +51,7 @@ void ReflectionLibrary::Finalize()
     if(boundType->mId.mId == TypeId::sInvalidId)
       boundType->mId.mId = ++sId;
 
+    boundType->mIsRegistered = true;
     mBoundTypes.push_back(boundType);
     mBoundTypeNameMap[boundType->mName] = boundType;
     mBoundTypeIdMap[boundType->mId.mId] = boundType;
@@ -112,6 +117,11 @@ void ReflectionLibrary::AddDependency(ReflectionLibrary* dependency)
 
 ReflectionProject::~ReflectionProject()
 {
+  ReflectionErrorIf(mShutdown == false, "ReflectionProject must be shutdown before destructing");
+}
+
+void ReflectionProject::Shutdown()
+{
   // Make sure to destruct in reverse order
   for(size_t i = 0; i < mLibraries.size(); ++i)
   {
@@ -119,6 +129,7 @@ ReflectionProject::~ReflectionProject()
     delete library;
   }
   mLibraries.clear();
+  mShutdown = true;
 }
 
 ReflectionProject* ReflectionProject::GetInstance()

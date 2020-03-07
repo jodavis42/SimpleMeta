@@ -5,49 +5,43 @@
 namespace SimpleReflection
 {
 
-template <typename T>
-BoundType* AllocateBoundType()
-{
-  BoundType* boundType = RegisterBoundType(new BoundType());
-  boundType->mSizeInBytes = sizeof(T);
-  boundType->mName = typeid(T).name();
-  return boundType;
-}
-
 template <typename... Args>
 struct RecursiveStaticTypeId;
 
-BoundType* ValidateRawBoundType(BoundType* boundType);
 BoundType* RegisterBoundType(BoundType* boundType);
 BoundType* RegisterPointerBoundType(BoundType* unqualifiedBase, BoundType* boundType);
 BoundType* RegisterReferenceBoundType(BoundType* unqualifiedBase, BoundType* boundType);
 
 template <typename T>
-struct StaticTypeId
+BoundType InitializeNativeBoundType()
 {
-  static BoundType* AutoRegisterType(BoundType* boundType)
-  {
-    boundType = RegisterBoundType(boundType);
-    boundType->mSizeInBytes = sizeof(T);
-    return boundType;
-  }
-
-  // This assumes that all important types have already been built and will auto-register
-  // a type otherwise (to deal with dynamic types like arrays).
-  static BoundType*& GetBoundType()
-  {
-    static BoundType* sInstance = AllocateBoundType<T>();
-    return sInstance;
-  }
-};
+  BoundType boundType;
+  boundType.mSizeInBytes = sizeof(T);
+  boundType.mName = typeid(T).name();
+  boundType.mNative = true;
+  return std::move(boundType);
+}
 
 template <>
-struct StaticTypeId<void>
+inline BoundType InitializeNativeBoundType<void>()
 {
-  static BoundType*& GetBoundType()
+  BoundType boundType;
+  boundType.mSizeInBytes = 0;
+  boundType.mName = "void";
+  boundType.mNative = true;
+  return std::move(boundType);
+}
+
+template <typename T>
+struct StaticTypeId
+{
+  // This assumes that all important types have already been built and will auto-register
+  // a type otherwise (to deal with dynamic types like arrays).
+  static BoundType* GetBoundType()
   {
-    static BoundType* sInstance = ValidateRawBoundType(new BoundType());
-    return sInstance;
+    static BoundType sInstance = InitializeNativeBoundType<T>();
+    RegisterBoundType(&sInstance);
+    return &sInstance;
   }
 };
 
@@ -55,10 +49,11 @@ struct StaticTypeId<void>
 template <typename T>
 struct StaticTypeId<T*> : public StaticTypeId<T>
 {
-  static BoundType*& GetBoundType()
+  static BoundType* GetBoundType()
   {
-    static BoundType* sInstance = RegisterPointerBoundType(StaticTypeId<T>::GetBoundType(), new BoundType());
-    return sInstance;
+    static BoundType sInstance = InitializeNativeBoundType<T*>();
+    RegisterPointerBoundType(StaticTypeId<T>::GetBoundType(), &sInstance);
+    return &sInstance;
   }
 };
 
@@ -66,10 +61,11 @@ struct StaticTypeId<T*> : public StaticTypeId<T>
 template <typename T>
 struct StaticTypeId<T&> : public StaticTypeId<T>
 {
-  static BoundType*& GetBoundType()
+  static BoundType* GetBoundType()
   {
-    static BoundType* sInstance = RegisterReferenceBoundType(StaticTypeId<T>::GetBoundType(), new BoundType());
-    return sInstance;
+    static BoundType sInstance = InitializeNativeBoundType<T&>();
+    RegisterReferenceBoundType(StaticTypeId<T>::GetBoundType(), &sInstance);
+    return &sInstance;
   }
 };
 
@@ -77,7 +73,7 @@ struct StaticTypeId<T&> : public StaticTypeId<T>
 template <typename T>
 struct StaticTypeId<const T> : public StaticTypeId<T>
 {
-  static BoundType*& GetBoundType()
+  static BoundType* GetBoundType()
   {
     return StaticTypeId<T>::GetBoundType();
   }
@@ -85,7 +81,7 @@ struct StaticTypeId<const T> : public StaticTypeId<T>
 template <typename T>
 struct StaticTypeId<const T*> : public StaticTypeId<T>
 {
-  static BoundType*& GetBoundType()
+  static BoundType* GetBoundType()
   {
     return StaticTypeId<T*>::GetBoundType();
   }
@@ -93,7 +89,7 @@ struct StaticTypeId<const T*> : public StaticTypeId<T>
 template <typename T>
 struct StaticTypeId<const T&> : public StaticTypeId<T>
 {
-  static BoundType*& GetBoundType()
+  static BoundType* GetBoundType()
   {
     return StaticTypeId<T&>::GetBoundType();
   }
@@ -103,15 +99,16 @@ struct StaticTypeId<const T&> : public StaticTypeId<T>
 template <template <typename...> typename ContainerType, typename ... ParamTypes>
 struct StaticTypeId< ContainerType<ParamTypes...> >
 {
-  static BoundType* Create()
+  static BoundType Initialize()
   {
     RecursiveStaticTypeId<ParamTypes...>::Recurse();
-    return AllocateBoundType<ContainerType<ParamTypes...>>();
+    BoundType boundType = InitializeNativeBoundType<ContainerType<ParamTypes...>>();
+    return boundType;
   }
-  static BoundType*& GetBoundType()
+  static BoundType* GetBoundType()
   {
-    static BoundType* sInstance = Create();
-    return sInstance;
+    static BoundType sInstance = Initialize();
+    return &sInstance;
   }
 };
 

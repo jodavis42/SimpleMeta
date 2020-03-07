@@ -2,6 +2,8 @@ target_sources(UnitTests
   PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/AnyTests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/AnyTests.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundTypeReflectionLibraryLifetimeTests.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/BoundTypeReflectionLibraryLifetimeTests.hpp
     ${CMAKE_CURRENT_LIST_DIR}/CallTests.cpp
     ${CMAKE_CURRENT_LIST_DIR}/CallTests.hpp
     ${CMAKE_CURRENT_LIST_DIR}/GetSetTests.cpp

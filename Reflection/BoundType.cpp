@@ -11,9 +11,17 @@ namespace SimpleReflection
 
 BoundType::~BoundType()
 {
+  Destruct();
+}
+
+void BoundType::Destruct()
+{
   delete mDefaultConstructor;
+  mDefaultConstructor = nullptr;
   delete mCopyConstructor;
+  mCopyConstructor = nullptr;
   delete mDestructor;
+  mDestructor = nullptr;
 
   for(Field* field : mFields)
     delete field;
@@ -31,6 +39,9 @@ BoundType::~BoundType()
     }
   }
   mFunctionMap.clear();
+
+  mIsSetup = false;
+  mIsRegistered = false;
 }
 
 FieldRange BoundType::GetFields()

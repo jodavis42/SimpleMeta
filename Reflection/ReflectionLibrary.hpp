@@ -38,6 +38,7 @@ struct ReflectionLibrary
 struct ReflectionProject
 {
   ~ReflectionProject();
+  void Shutdown();
 
   static ReflectionProject* GetInstance();
   static ReflectionLibrary& CreateLibrary(const std::string& name);
@@ -49,6 +50,7 @@ struct ReflectionProject
 
   ReflectionLibrary* mCurrentLibrary = nullptr;
   std::vector<ReflectionLibrary*> mLibraries;
+  bool mShutdown = false;
 };
 
 }//namespace SimpleReflection

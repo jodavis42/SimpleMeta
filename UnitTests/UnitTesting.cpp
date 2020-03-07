@@ -1,6 +1,7 @@
 #include "UnitTesting.hpp"
 
 #include "AnyTests.hpp"
+#include "BoundTypeReflectionLibraryLifetimeTests.hpp"
 #include "CallTests.hpp"
 #include "GetSetTests.hpp"
 #include "BinaryStream.hpp"
@@ -33,6 +34,7 @@ void DummyBind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::B
 
 void RunUnitTests()
 {
+  RunBoundTypeReflectionLibraryLifetimesTests();
   RunAnyTests();
   RunCallTests();
   RunGetSetTests();

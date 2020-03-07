@@ -19,6 +19,8 @@ struct BoundType : public ReflectionComposition
 {
   ~BoundType();
 
+  void Destruct();
+
   std::string mName;
   TypeId mId;
 
@@ -37,6 +39,9 @@ struct BoundType : public ReflectionComposition
   Function* mDestructor = nullptr;
   bool mIsPointerType = false;
   bool mIsReferenceType = false;
+  bool mNative = false;
+  bool mIsRegistered = false;
+  bool mIsSetup = false;
 };
 
 }//namespace SimpleReflection
