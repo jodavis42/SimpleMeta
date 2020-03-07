@@ -2,6 +2,7 @@ target_sources(Reflection
   PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/Any.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Any.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/Asserts.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Asserts.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Bindings.hpp
     ${CMAKE_CURRENT_LIST_DIR}/BoundType.cpp

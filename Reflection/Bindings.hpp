@@ -52,7 +52,13 @@ template <typename ClassType, void (*BindingFn)(ReflectionLibrary& library, Boun
 BoundType* BindClassType(ReflectionLibrary& library, const std::string& className, int id)
 {
   BoundType* boundType = CreateBoundType<ClassType>(library, className, id);
-  ReflectionErrorIf(boundType->mIsSetup, "ClassType '%s' was bound twice. You can only bind a type once", className.c_str());
+  // Have to early out here to prevent memory leaks
+  if(boundType->mIsSetup)
+  {
+    ReflectionErrorIf(boundType->mIsSetup, "ClassType '%s' was bound twice. You can only bind a type once", className.c_str());
+    return boundType;
+  }
+  
   BindingFn(library, *boundType);
   boundType->mDefaultConstructor = FromConstructor<ClassType>();
   boundType->mCopyConstructor = FromCopyConstructor<ClassType>();

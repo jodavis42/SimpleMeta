@@ -41,9 +41,7 @@ void RunBoundTypeReflectionLibraryLifetimesTests()
     SimpleReflection::ReflectionLibrary& lifetimeTestLibrary = SimpleReflection::ReflectionProject::CreateLibrary(stream.str());
     lifetimeTestLibrary.AddDependency(coreLibrary);
     // Create some native bound types
-    //BindPrimitiveType(lifetimeTestLibrary, float, 'flot');
     BindType(lifetimeTestLibrary, SubStruct, 'ss');
-    //BindType(lifetimeTestLibrary, SubStruct, 'sss');
     BindType(lifetimeTestLibrary, LifetimeTest, 'ltt');
     // Create a dynamic bound type (lifetime owned by the library)
     BoundType* boundType = new BoundType();
@@ -53,5 +51,34 @@ void RunBoundTypeReflectionLibraryLifetimesTests()
     
     lifetimeTestLibrary.Finalize();
     SimpleReflection::ReflectionProject::DestroyLibrary(lifetimeTestLibrary);
+  }
+
+  {
+    SimpleReflection::ScopedAssertHandler handler;
+  
+    SimpleReflection::ReflectionLibrary& library = SimpleReflection::ReflectionProject::CreateLibrary("DoublePrimitive");
+    library.AddDependency(coreLibrary);
+    // Try to double bind a primitive type (from a dependent library)
+    BindPrimitiveType(library, float, 'flot');
+    library.Finalize();
+  
+    handler.StopListening();
+    ReflectionErrorIf(handler.mAsserts.size() == 0, "Expected asserts");
+    SimpleReflection::ReflectionProject::DestroyLibrary(library);
+  }
+  
+  {
+    SimpleReflection::ScopedAssertHandler handler;
+  
+    SimpleReflection::ReflectionLibrary& library = SimpleReflection::ReflectionProject::CreateLibrary("DoubleType");
+    library.AddDependency(coreLibrary);
+    // Try to double bind a type
+    BindType(library, SubStruct, 'ss');
+    BindType(library, SubStruct, 'ss');
+    library.Finalize();
+  
+    handler.StopListening();
+    ReflectionErrorIf(handler.mAsserts.size() == 0, "Expected asserts");
+    SimpleReflection::ReflectionProject::DestroyLibrary(library);
   }
 }

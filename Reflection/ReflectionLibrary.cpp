@@ -19,7 +19,11 @@ ReflectionLibrary::~ReflectionLibrary()
 
 void ReflectionLibrary::AddBoundType(BoundType* boundType)
 {
-  ReflectionErrorIf(mIsFinalized, "Can't add to a finalized library");
+  if(mIsFinalized)
+  {
+    ReflectionErrorIf(mIsFinalized, "Can't add to a finalized library");
+    return;
+  }
 
   // Already queued to register, skip
   if(mBoundTypesToRegister.find(boundType) != mBoundTypesToRegister.end())
@@ -29,7 +33,11 @@ void ReflectionLibrary::AddBoundType(BoundType* boundType)
   if(boundType->mId.mId != TypeId::sInvalidId && FindBoundType(boundType->mId) != nullptr)
     return;
 
-  ReflectionErrorIf(boundType->mIsRegistered, "BoundType '%s' is already registered but is not in a dependent library", boundType->mName.c_str());
+  if(boundType->mIsRegistered)
+  {
+    ReflectionErrorIf(boundType->mIsRegistered, "BoundType '%s' is already registered but is not in a dependent library", boundType->mName.c_str());
+    return;
+  }
 
   mBoundTypesToRegister.insert(boundType);
 }
