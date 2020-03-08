@@ -41,6 +41,8 @@ struct BoundType : public ReflectionComposition
   Function* mDefaultConstructor = nullptr;
   Function* mCopyConstructor = nullptr;
   Function* mDestructor = nullptr;
+  std::vector<Function*> mConstructors;
+
   bool mIsPointerType = false;
   bool mIsReferenceType = false;
   bool mNative = false;

@@ -111,6 +111,14 @@ static Function* FromFunction(ReflectionLibrary& library, BoundType& owner, cons
   return function;
 }
 
+template <typename ClassType, typename ... Args>
+static Function* FromClassConstructor(ReflectionLibrary& library, BoundType& owner)
+{
+  Function* function = FromConstructor<ClassType, Args...>();
+  owner.mConstructors.push_back(function);
+  return function;
+}
+
 template <typename ClassType>
 static Function* FromClassDefaultConstructor(ReflectionLibrary& library, BoundType& owner)
 {

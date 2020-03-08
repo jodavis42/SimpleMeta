@@ -24,6 +24,10 @@ void BoundType::Destruct()
   delete mDestructor;
   mDestructor = nullptr;
 
+  for(Function* function : mConstructors)
+    delete function;
+  mConstructors.clear();
+
   for(Field* field : mFields)
     delete field;
   mFields.clear();
