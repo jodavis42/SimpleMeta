@@ -15,17 +15,22 @@ struct Any;
 template <typename T>
 struct CallHelper
 {
-  static T Get(Call& call, int index)
+  static T GetChecked(Call& call, int index)
   {
     using ArgType = UnqualifiedType<T>::type;
     char* location = call.GetLocationChecked(index, StaticTypeId<ArgType>::GetBoundType());
     return *reinterpret_cast<ArgType*>(location);
   }
 
-  static void Set(Call& call, int index, const T& data)
+  static void SetChecked(Call& call, int index, const T& data)
   {
     using ArgType = UnqualifiedType<T>::type;
-    char* location = call.GetLocationChecked(index, StaticTypeId<ArgType>::GetBoundType());
+    call.CheckLocationType(index, StaticTypeId<ArgType>::GetBoundType());
+    call.SetInternal(index, data, sizeof(data));
+  }
+
+  static void SetUnchecked(Call& call, int index, const T& data)
+  {
     call.SetInternal(index, data, sizeof(data));
   }
 };
@@ -35,17 +40,23 @@ struct CallHelper
 template <typename T>
 struct CallHelper<T&> : public CallHelper<T>
 {
-  static T& Get(Call& call, int index)
+  using ArgType = typename UnqualifiedType<T>::type;
+  using RefType = ArgType&;
+
+  static T& GetChecked(Call& call, int index)
   {
-    using ArgType = UnqualifiedType<T>::type;
-    char* location = call.GetLocationUnChecked(index);
+    char* location = call.GetLocationChecked(index, StaticTypeId<RefType>::GetBoundType());
     return **reinterpret_cast<ArgType**>(location);
   }
 
-  static void Set(Call& call, int index, const T& data)
+  static void SetChecked(Call& call, int index, const T& data)
   {
-    using ArgType = UnqualifiedType<T>::type;
-    char* location = call.GetLocationUnChecked(index);
+    call.CheckLocationType(index, StaticTypeId<RefType>::GetBoundType());
+    call.SetInternal(index, &data, sizeof(&data));
+  }
+
+  static void SetUnchecked(Call& call, int index, const T& data)
+  {
     call.SetInternal(index, &data, sizeof(&data));
   }
 };
@@ -72,7 +83,7 @@ struct Call
   template <typename T>
   T Get(int index)
   {
-    return CallHelper<T>::Get(*this, index);
+    return CallHelper<T>::GetChecked(*this, index);
   }
 
   template <typename T>
@@ -83,11 +94,24 @@ struct Call
     // template params (e.g. passing in a float& will always just be float)
     BoundType* expectedType = GetLocationType(index);
     if(expectedType->mIsReferenceType)
-      CallHelper<T&>::Set(*this, index, data);
+      CallHelper<T&>::SetChecked(*this, index, data);
     else
-      CallHelper<T>::Set(*this, index, data);
+      CallHelper<T>::SetChecked(*this, index, data);
   }
 
+  template <typename T>
+  void SetUnchecked(int index, T& data)
+  {
+    // Choose to set this as a reference or a value type based upon the parameter type.
+    // This is done because types passed in by reference will not actually be reference
+    // template params (e.g. passing in a float& will always just be float)
+    BoundType* expectedType = GetLocationType(index);
+    if(expectedType->mIsReferenceType)
+      CallHelper<T&>::SetUnchecked(*this, index, data);
+    else
+      CallHelper<T>::SetUnchecked(*this, index, data);
+
+  }
   template <typename T>
   void SetInternal(int index, const T& data, size_t sizeInBytes)
   {
@@ -106,7 +130,7 @@ struct Call
   char* GetLocationUnChecked(int index);
   size_t GetLocationOffset(int index) const;
   BoundType* GetLocationType(int index) const;
-  
+  bool CheckLocationType(int index, const BoundType* givenType) const;
 
 private:
   Call(const Call&) {}

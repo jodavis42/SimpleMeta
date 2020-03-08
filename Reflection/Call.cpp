@@ -64,8 +64,7 @@ void Call::Set(int index, Any& any)
 
 char* Call::GetLocationChecked(int index, BoundType* boundType)
 {
-  BoundType* expectedType = GetLocationType(index);
-  ReflectionErrorIf(boundType != expectedType, "Invalid expected type");
+  CheckLocationType(index, boundType);
   return GetLocationUnChecked(index);
 }
 
@@ -97,6 +96,14 @@ BoundType* Call::GetLocationType(int index) const
   else
     expectedType = mFunction->GetParamType(index);
   return expectedType;
+}
+
+bool Call::CheckLocationType(int index, const BoundType* givenType) const
+{
+  BoundType* expectedType = GetLocationType(index);
+  bool isSameBoundType = givenType == expectedType;
+  ReflectionErrorIf(!isSameBoundType, "Invalid expected type");
+  return isSameBoundType;
 }
 
 bool Call::Invoke()
