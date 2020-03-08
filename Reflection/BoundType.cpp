@@ -5,6 +5,7 @@
 #include "Field.hpp"
 #include "GetterSetter.hpp"
 #include "Function.hpp"
+#include "Call.hpp"
 
 namespace SimpleReflection
 {
@@ -66,6 +67,53 @@ bool BoundType::FindFunctions(const std::string& fnName, std::vector<Function*>&
   if(recursive && mBaseType != nullptr)
     return mBaseType->FindFunctions(fnName, functions, recursive);
   return false;
+}
+
+void* BoundType::GenericDefaultConstruct() const
+{
+  void* self = malloc(mSizeInBytes);
+  if(mDefaultConstructor == nullptr)
+  {
+    // Clear the data for safety (could be removed for performance)
+    memset(self, 0, mSizeInBytes);
+  }
+  else
+  {
+    Call call(mDefaultConstructor);
+    call.SetPointerUnchecked(Call::This, self);
+    call.Invoke();
+  }
+  return self;
+}
+
+void* BoundType::GenericCopyConstruct(void* data) const
+{
+  void* self = malloc(mSizeInBytes);
+  // Invoke the bound copy constructor if it exists, otherwise just copy the memory
+  if(mCopyConstructor != nullptr)
+  {
+    Call call(mCopyConstructor);
+    call.SetPointerUnchecked(Call::This, self);
+    call.SetInternal(0, data, sizeof(data));
+    call.Invoke();
+  }
+  else
+  {
+    memcpy(self, data, mSizeInBytes);
+  }
+  return self;
+}
+
+void BoundType::GenericDestruct(void* self) const
+{
+  // Invoke the bound destructor if one exists
+  if(mDestructor != nullptr)
+  {
+    Call call(mDestructor);
+    call.SetPointerUnchecked(Call::This, self);
+    call.Invoke();
+  }
+  free(self);
 }
 
 }//namespace SimpleReflection

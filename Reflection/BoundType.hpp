@@ -28,6 +28,10 @@ struct BoundType : public ReflectionComposition
   GetterSetterRange GetGetterSetters();
   bool FindFunctions(const std::string& fnName, std::vector<Function*>& functions, bool recursive);
 
+  void* GenericDefaultConstruct() const;
+  void* GenericCopyConstruct(void* data) const;
+  void GenericDestruct(void* self) const;
+
   BoundType* mBaseType = nullptr;
   std::vector<Field*> mFields;
   std::vector<GetterSetter*> mGetterSetters;

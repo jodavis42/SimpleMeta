@@ -60,9 +60,6 @@ BoundType* BindClassType(ReflectionLibrary& library, const std::string& classNam
   }
   
   BindingFn(library, *boundType);
-  boundType->mDefaultConstructor = FromConstructor<ClassType>();
-  boundType->mCopyConstructor = FromCopyConstructor<ClassType>();
-  boundType->mDestructor = FromDestructor<ClassType>();
   DefaultTypeSetup<ClassType>(library, *boundType);
   boundType->mIsSetup = true;
   return boundType;
@@ -114,6 +111,36 @@ static Function* FromFunction(ReflectionLibrary& library, BoundType& owner, cons
   return function;
 }
 
+template <typename ClassType>
+static Function* FromClassDefaultConstructor(ReflectionLibrary& library, BoundType& owner)
+{
+  if(owner.mDefaultConstructor != nullptr)
+    delete owner.mDefaultConstructor;
+  Function* function = FromConstructor<ClassType>();  
+  owner.mDefaultConstructor = function;
+  return function;
+}
+
+template <typename ClassType>
+static Function* FromClassCopyConstructor(ReflectionLibrary& library, BoundType& owner)
+{
+  if(owner.mCopyConstructor != nullptr)
+    delete owner.mCopyConstructor;
+  Function* function = FromCopyConstructor<ClassType>();
+  owner.mCopyConstructor = function;
+  return function;
+}
+
+template <typename ClassType>
+static Function* FromClassDestructor(ReflectionLibrary& library, BoundType& owner)
+{
+  if(owner.mDestructor != nullptr)
+    delete owner.mDestructor;
+  Function* function = FromDestructor<ClassType>();
+  owner.mDestructor = function;
+  return function;
+}
+
 template <typename PrimitiveType>
 BoundType* BindPrimitiveTypeToLibrary(ReflectionLibrary& library, const std::string& className, size_t id)
 {
@@ -160,6 +187,10 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function) SimpleReflection::FromFunction<decltype(&ClassType::Function), &ClassType::Function>(Library, BoundType, FunctionName, &ClassType::Function)
 #define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, #Function, Function)
+
+#define BindDefaultConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassDefaultConstructor<ClassType>(Library, BoundType)
+#define BindCopyConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassCopyConstructor<ClassType>(Library, BoundType)
+#define BindDestructor(Library, BoundType, ClassType) SimpleReflection::FromClassDestructor<ClassType>(Library, BoundType)
 
 #define BindBase(Library, BoundType, BaseType) SimpleReflection::BindBaseType<BaseType>(Library, BoundType)
 
