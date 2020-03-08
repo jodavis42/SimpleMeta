@@ -58,7 +58,7 @@ Function* FromConstructor()
 template <typename ClassType>
 void BoundCopyConstructor(Call& call)
 {
-  ClassType& arg0 = call.Get<ClassType>(0);
+  ClassType& arg0 = call.Get<ClassType&>(0);
   char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());
   char* self = *(char**)location;
   new (self) ClassType(arg0);
@@ -70,7 +70,7 @@ Function* FromCopyConstructor()
   Function* fn = new Function();
   fn->mBoundFunction = &BoundCopyConstructor<ClassType>;
   fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());
-  fn->SetParamType(0, StaticTypeId<const ClassType>::GetBoundType());
+  fn->SetParamType(0, StaticTypeId<const ClassType&>::GetBoundType());
   return fn;
 }
 

@@ -128,7 +128,7 @@ void GenerateBoundCopyConstructor(std::ofstream& stream)
   stream << "template <typename ClassType>" << std::endl;
   stream << "void BoundCopyConstructor(Call& call)" << std::endl;
   stream << "{" << std::endl;
-  stream << "  ClassType& arg0 = call.Get<ClassType>(0);" << std::endl;
+  stream << "  ClassType& arg0 = call.Get<ClassType&>(0);" << std::endl;
   stream << "  char* location = call.GetLocationChecked(Call::This, StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
   stream << "  char* self = *(char**)location;" << std::endl;
   stream << "  new (self) ClassType(arg0);" << std::endl;
@@ -207,7 +207,7 @@ void GenerateFromCopyConstructor(std::ofstream& stream)
   stream << "  Function* fn = new Function();" << std::endl;
   stream << "  fn->mBoundFunction = &BoundCopyConstructor<ClassType>;" << std::endl;
   stream << "  fn->SetThisType(StaticTypeId<ClassType*>::GetBoundType());" << std::endl;
-  stream << "  fn->SetParamType(0, StaticTypeId<const ClassType>::GetBoundType());" << std::endl;
+  stream << "  fn->SetParamType(0, StaticTypeId<const ClassType&>::GetBoundType());" << std::endl;
   stream << "  return fn;" << std::endl;
   stream << "}" << std::endl << std::endl;
 }
