@@ -73,6 +73,52 @@ struct Number
   float mValue;
 };
 
+struct ConstructionTests
+{
+  static void Bind(ReflectionLibrary& library, BoundType& boundType)
+  {
+    BindDefaultConstructor(library, boundType, ConstructionTests);
+    BindCopyConstructor(library, boundType, ConstructionTests);
+    BindDestructor(library, boundType, ConstructionTests);
+  }
+
+  ConstructionTests()
+    : mData(1.0f)
+    , mDataPtr(&mData)
+    , mDestructorCalled(nullptr)
+  {
+
+  }
+
+  explicit ConstructionTests(bool* destructorCalled)
+    : mData(1.0f)
+    , mDataPtr(&mData)
+    , mDestructorCalled(destructorCalled)
+  {
+    if(mDestructorCalled != nullptr)
+      *(mDestructorCalled) = true;
+  }
+
+  ConstructionTests(const ConstructionTests& rhs)
+    : mData(rhs.mData)
+    , mDataPtr(&mData)
+    , mDestructorCalled(rhs.mDestructorCalled)
+  {
+    if(mDestructorCalled != nullptr)
+      *(mDestructorCalled) = true;
+  }
+
+  ~ConstructionTests()
+  {
+    if(mDestructorCalled != nullptr)
+      *(mDestructorCalled) = true;
+  }
+
+  float mData;
+  float* mDataPtr;
+  bool* mDestructorCalled;
+};
+
 template <typename T, typename ClassType>
 void Compare(T result, ClassType& instance)
 {
@@ -225,6 +271,39 @@ void TestNumber()
   }
 }
 
+void TestConstructionDestruction()
+{
+  BoundType* boundType = StaticTypeId<ConstructionTests>::GetBoundType();
+  {
+    bool wasDestructed = false;
+    void* memory = malloc(sizeof(ConstructionTests));
+    ConstructionTests* test = new(memory) ConstructionTests(&wasDestructed);
+    boundType->GenericDestructNoFree(test);
+    ReflectionErrorIf(wasDestructed == false, "Destructor not invoked");
+    free(memory);
+  }
+  {
+    bool wasDestructed = false;
+    void* memory = malloc(sizeof(ConstructionTests));
+    ConstructionTests* test = new(memory) ConstructionTests(&wasDestructed);
+    boundType->GenericDestruct(test);
+    ReflectionErrorIf(wasDestructed == false, "Destructor not invoked");
+  }
+  {
+    ConstructionTests default;
+    ConstructionTests* test = static_cast<ConstructionTests*>(boundType->GenericDefaultConstruct());
+    ReflectionErrorIf(test->mData != default.mData, "Default construction wasn't valid");
+    boundType->GenericDestruct(test);
+  }
+  {
+    ConstructionTests default;
+    ConstructionTests* test = static_cast<ConstructionTests*>(boundType->GenericCopyConstruct(&default));
+    ReflectionErrorIf(test->mData != default.mData, "Copy construction didn't copy data");
+    ReflectionErrorIf(test->mDataPtr != &test->mData, "Copy construction deep copy");
+    boundType->GenericDestruct(test);
+  }
+}
+
 void RunCallTests()
 {
   ReflectionLibrary& callLibrary = ReflectionProject::CreateLibrary("Call");
@@ -232,8 +311,9 @@ void RunCallTests()
   BindTypeExternal(callLibrary, Number, 'numb', DummyBind);
   BindTypeExternal(callLibrary, SimpleGetterTest, 'sgt', DummyBind);
   BindTypeExternal(callLibrary, SimpleSetterTest, 'sst', DummyBind);
+  BindType(callLibrary, ConstructionTests, 'csts');
   
-
+  TestConstructionDestruction();
   TestSimpleGetters();
   TestSimpleSetters();
   TestNumber();

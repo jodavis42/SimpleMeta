@@ -29,8 +29,11 @@ struct BoundType : public ReflectionComposition
   bool FindFunctions(const std::string& fnName, std::vector<Function*>& functions, bool recursive);
 
   void* GenericDefaultConstruct() const;
+  void GenericDefaultConstruct(void* self) const;
   void* GenericCopyConstruct(void* data) const;
+  void GenericCopyConstruct(void* self, void* data) const;
   void GenericDestruct(void* self) const;
+  void GenericDestructNoFree(void* self) const;
 
   BoundType* mBaseType = nullptr;
   std::vector<Field*> mFields;

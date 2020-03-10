@@ -76,6 +76,12 @@ bool BoundType::FindFunctions(const std::string& fnName, std::vector<Function*>&
 void* BoundType::GenericDefaultConstruct() const
 {
   void* self = malloc(mSizeInBytes);
+  GenericDefaultConstruct(self);
+  return self;
+}
+
+void BoundType::GenericDefaultConstruct(void* self) const
+{
   if(mDefaultConstructor == nullptr)
   {
     // Clear the data for safety (could be removed for performance)
@@ -87,12 +93,17 @@ void* BoundType::GenericDefaultConstruct() const
     call.SetPointerUnchecked(Call::This, self);
     call.Invoke();
   }
-  return self;
 }
 
 void* BoundType::GenericCopyConstruct(void* data) const
 {
   void* self = malloc(mSizeInBytes);
+  GenericCopyConstruct(self, data);
+  return self;
+}
+
+void BoundType::GenericCopyConstruct(void* self, void* data) const
+{
   // Invoke the bound copy constructor if it exists, otherwise just copy the memory
   if(mCopyConstructor != nullptr)
   {
@@ -105,10 +116,15 @@ void* BoundType::GenericCopyConstruct(void* data) const
   {
     memcpy(self, data, mSizeInBytes);
   }
-  return self;
 }
 
 void BoundType::GenericDestruct(void* self) const
+{
+  GenericDestructNoFree(self);
+  free(self);
+}
+
+void BoundType::GenericDestructNoFree(void* self) const
 {
   // Invoke the bound destructor if one exists
   if(mDestructor != nullptr)
@@ -117,7 +133,6 @@ void BoundType::GenericDestruct(void* self) const
     call.SetPointerUnchecked(Call::This, self);
     call.Invoke();
   }
-  free(self);
 }
 
 }//namespace SimpleReflection
