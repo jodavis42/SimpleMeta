@@ -58,7 +58,7 @@ void AssertHandlers::Remove(ScopedAssertHandler* handler)
   }
 }
 
-bool AssertHandlers::Assert(const AssertData& assertData)
+bool AssertHandlers::HandleAssert(const AssertData& assertData)
 {
   bool shouldBreak = true;
   for(ScopedAssertHandler* handler : mHandlers)
@@ -81,7 +81,7 @@ bool SignalError(const char* expression, const char* file, size_t line, bool& ig
   data.mMessage = buffer;
   data.mLine = line;
   data.mExpression = expression;
-  return AssertHandlers::GetInstance().Assert(data);
+  return AssertHandlers::GetInstance().HandleAssert(data);
 }
 
 }//namespace SimpleReflection

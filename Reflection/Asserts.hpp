@@ -35,7 +35,7 @@ struct AssertHandlers
   void Add(ScopedAssertHandler* handler);
   void Remove(ScopedAssertHandler* handler);
 
-  bool Assert(const AssertData& assertData);
+  bool HandleAssert(const AssertData& assertData);
 
   std::vector<ScopedAssertHandler*> mHandlers;
 };
