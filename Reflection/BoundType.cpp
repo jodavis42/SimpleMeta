@@ -49,6 +49,31 @@ void BoundType::Destruct()
   mIsRegistered = false;
 }
 
+Function* BoundType::FindDefaultConstructor(bool checkInherited)
+{
+  if(mDefaultConstructor != nullptr)
+    return mDefaultConstructor;
+  if(mBaseType != nullptr)
+    return mBaseType->FindDefaultConstructor(checkInherited);
+  return nullptr;
+}
+
+Function* BoundType::FindConstructor(const FunctionType& functionType, bool checkInherited)
+{
+  if(mDefaultConstructor != nullptr && mDefaultConstructor->mFunctionType == functionType)
+    return mDefaultConstructor;
+
+  for(Function* function : mConstructors)
+  {
+    if(function->mFunctionType == functionType)
+      return function;
+  }
+
+  if(mBaseType != nullptr)
+    return mBaseType->FindConstructor(functionType, checkInherited);
+  return nullptr;
+}
+
 FieldRange BoundType::GetFields()
 {
   return FieldRange(this);

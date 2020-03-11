@@ -198,6 +198,7 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define BindDefaultConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassDefaultConstructor<ClassType>(Library, BoundType)
 #define BindCopyConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassCopyConstructor<ClassType>(Library, BoundType)
+#define BindConstructor(Library, BoundType, ClassType, ...) SimpleReflection::FromClassConstructor<ClassType, ##__VA_ARGS__>(Library, BoundType)
 #define BindDestructor(Library, BoundType, ClassType) SimpleReflection::FromClassDestructor<ClassType>(Library, BoundType)
 
 #define BindBase(Library, BoundType, BaseType) SimpleReflection::BindBaseType<BaseType>(Library, BoundType)

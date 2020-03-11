@@ -13,6 +13,7 @@ namespace SimpleReflection
 
 struct Field;
 struct Function;
+struct FunctionType;
 struct GetterSetter;
 
 struct BoundType : public ReflectionComposition
@@ -23,6 +24,9 @@ struct BoundType : public ReflectionComposition
 
   std::string mName;
   TypeId mId;
+
+  Function* FindDefaultConstructor(bool checkInherited = true);
+  Function* FindConstructor(const FunctionType& functionType, bool checkInherited = true);
 
   FieldRange GetFields();
   GetterSetterRange GetGetterSetters();

@@ -79,6 +79,7 @@ struct ConstructionTests
   {
     BindDefaultConstructor(library, boundType, ConstructionTests);
     BindCopyConstructor(library, boundType, ConstructionTests);
+    BindConstructor(library, boundType, ConstructionTests, bool*);
     BindDestructor(library, boundType, ConstructionTests);
   }
 
@@ -96,7 +97,7 @@ struct ConstructionTests
     , mDestructorCalled(destructorCalled)
   {
     if(mDestructorCalled != nullptr)
-      *(mDestructorCalled) = true;
+      *(mDestructorCalled) = false;
   }
 
   ConstructionTests(const ConstructionTests& rhs)
@@ -105,7 +106,7 @@ struct ConstructionTests
     , mDestructorCalled(rhs.mDestructorCalled)
   {
     if(mDestructorCalled != nullptr)
-      *(mDestructorCalled) = true;
+      *(mDestructorCalled) = false;
   }
 
   ~ConstructionTests()
@@ -274,6 +275,7 @@ void TestNumber()
 void TestConstructionDestruction()
 {
   BoundType* boundType = StaticTypeId<ConstructionTests>::GetBoundType();
+  // Check raw destructor invocation (no freeing)
   {
     bool wasDestructed = false;
     void* memory = malloc(sizeof(ConstructionTests));
@@ -282,6 +284,7 @@ void TestConstructionDestruction()
     ReflectionErrorIf(wasDestructed == false, "Destructor not invoked");
     free(memory);
   }
+  // Check raw destructor invocation (with freeing)
   {
     bool wasDestructed = false;
     void* memory = malloc(sizeof(ConstructionTests));
@@ -289,18 +292,40 @@ void TestConstructionDestruction()
     boundType->GenericDestruct(test);
     ReflectionErrorIf(wasDestructed == false, "Destructor not invoked");
   }
+  // Check default constructor
   {
     ConstructionTests default;
     ConstructionTests* test = static_cast<ConstructionTests*>(boundType->GenericDefaultConstruct());
     ReflectionErrorIf(test->mData != default.mData, "Default construction wasn't valid");
     boundType->GenericDestruct(test);
   }
+  // Check copy constructor
   {
     ConstructionTests default;
     ConstructionTests* test = static_cast<ConstructionTests*>(boundType->GenericCopyConstruct(&default));
     ReflectionErrorIf(test->mData != default.mData, "Copy construction didn't copy data");
     ReflectionErrorIf(test->mDataPtr != &test->mData, "Copy construction deep copy");
     boundType->GenericDestruct(test);
+  }
+  // Check finding a constructor of a specific signature
+  {
+    bool wasDestructed = true;
+    SimpleReflection::FunctionType constructorType;
+    constructorType.SetThisType(SimpleReflection::StaticTypeId<ConstructionTests*>::GetBoundType());
+    constructorType.SetParamType(0, SimpleReflection::StaticTypeId<bool*>::GetBoundType());
+    SimpleReflection::Function* constructor = boundType->FindConstructor(constructorType);
+    ReflectionErrorIf(constructor == nullptr, "Constructor not found");
+
+    void* memory = malloc(sizeof(ConstructionTests));
+    SimpleReflection::Call call(constructor);
+    call.SetPointerUnchecked(SimpleReflection::Call::This, memory);
+    call.SetPointerUnchecked(0, &wasDestructed);
+    call.Invoke();
+
+    // The constructor should set wasDestructed to false
+    ReflectionErrorIf(wasDestructed == true, "Constructor wasn't invoked");
+    boundType->GenericDestruct(memory);
+    ReflectionErrorIf(wasDestructed == false, "Destructor not invoked");
   }
 }
 

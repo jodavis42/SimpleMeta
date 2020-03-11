@@ -7,7 +7,7 @@
 namespace SimpleReflection
 {
 
-size_t Function::ComputeSizeRequired() const
+size_t FunctionType::ComputeSizeRequired() const
 {
   // This information could be baked into the fields/params. Worry about this if it matters
   size_t size = 0;
@@ -20,43 +20,105 @@ size_t Function::ComputeSizeRequired() const
   return size;
 }
 
-BoundType* Function::GetReturnType() const
+void FunctionType::ResizeParamCount(size_t count)
+{
+  mParams.resize(count);
+}
+
+BoundType* FunctionType::GetReturnType() const
 {
   return mReturnType;
 }
 
-void Function::SetReturnType(BoundType* boundType)
+void FunctionType::SetReturnType(BoundType* boundType)
 {
   mReturnType = boundType;
 }
 
-BoundType* Function::GetThisType() const
+BoundType* FunctionType::GetThisType() const
 {
   return mThisType;
 }
 
-void Function::SetThisType(BoundType* boundType)
+void FunctionType::SetThisType(BoundType* boundType)
 {
   mThisType = boundType;
 }
 
-BoundType* Function::GetParamType(size_t index) const
+BoundType* FunctionType::GetParamType(size_t index) const
 {
   if(index < mParams.size())
     return mParams[index];
   return nullptr;
 }
 
-void Function::SetParamType(size_t index, BoundType* boundType)
+void FunctionType::SetParamType(size_t index, BoundType* boundType)
 {
   if(index >= mParams.size())
     mParams.resize(index + 1);
   mParams[index] = boundType;
 }
 
-bool Function::IsStatic() const
+bool FunctionType::operator==(const FunctionType& rhs) const
+{
+  bool isSame = (mReturnType == rhs.mReturnType) && (mThisType == rhs.mThisType) && (mParams.size() == rhs.mParams.size());
+  if(!isSame)
+    return false;
+  
+  for(size_t i = 0; i < mParams.size(); ++i)
+  {
+    if(mParams[i] != rhs.mParams[i])
+    {
+      isSame = false;
+      break;
+    }
+  }
+  return isSame;
+}
+
+bool FunctionType::IsStatic() const
 {
   return mThisType == nullptr;
+}
+
+size_t Function::ComputeSizeRequired() const
+{
+  return mFunctionType.ComputeSizeRequired();
+}
+
+BoundType* Function::GetReturnType() const
+{
+  return mFunctionType.GetReturnType();
+}
+
+void Function::SetReturnType(BoundType* boundType)
+{
+  mFunctionType.SetReturnType(boundType);
+}
+
+BoundType* Function::GetThisType() const
+{
+  return mFunctionType.GetThisType();
+}
+
+void Function::SetThisType(BoundType* boundType)
+{
+  mFunctionType.SetThisType(boundType);
+}
+
+BoundType* Function::GetParamType(size_t index) const
+{
+  return mFunctionType.GetParamType(index);
+}
+
+void Function::SetParamType(size_t index, BoundType* boundType)
+{
+  mFunctionType.SetParamType(index, boundType);
+}
+
+bool Function::IsStatic() const
+{
+  return mFunctionType.IsStatic();
 }
 
 }//namespace SimpleReflection
