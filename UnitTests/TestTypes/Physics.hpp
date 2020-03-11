@@ -17,6 +17,8 @@ struct Collider
     SendsEventsBit = 1 << 1
   };
 
+  DeclareVirtualBoundType(Collider);
+
   bool operator==(const Collider& rhs) const
   {
     return IsEqual(rhs);
@@ -30,10 +32,6 @@ struct Collider
     return ColliderType::None;
   }
 
-  virtual BoundType* VirtualGetBoundType() const
-  {
-    return SimpleReflection::StaticTypeId<Collider>::GetBoundType();
-  }
   static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindProperty(library, boundType, Collider, mId);
@@ -70,6 +68,8 @@ struct Collider
 
 struct BoxCollider : public Collider
 {
+  DeclareVirtualBoundType(BoxCollider);
+
   virtual bool IsEqual(const Collider& rhs) const override
   {
     if(rhs.GetType() != GetType())
@@ -86,10 +86,6 @@ struct BoxCollider : public Collider
     return ColliderType::Box;
   }
 
-  virtual BoundType* VirtualGetBoundType() const
-  {
-    return SimpleReflection::StaticTypeId<BoxCollider>::GetBoundType();
-  }
   static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindBase(library, boundType, Collider);
@@ -101,6 +97,8 @@ struct BoxCollider : public Collider
 
 struct SphereCollider : public Collider
 {
+  DeclareVirtualBoundType(SphereCollider);
+
   virtual bool IsEqual(const Collider& rhs) const override
   {
     if(rhs.GetType() != GetType())
@@ -118,10 +116,6 @@ struct SphereCollider : public Collider
     return ColliderType::Sphere;
   }
 
-  virtual BoundType* VirtualGetBoundType() const
-  {
-    return SimpleReflection::StaticTypeId<SphereCollider>::GetBoundType();
-  }
   static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
     BindBase(library, boundType, Collider);

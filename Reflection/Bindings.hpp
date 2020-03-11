@@ -203,4 +203,10 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define BindBase(Library, BoundType, BaseType) SimpleReflection::BindBaseType<BaseType>(Library, BoundType)
 
+#define DeclareVirtualBoundType(ClassType)                           \
+virtual BoundType* VirtualGetBoundType() const                      \
+{                                                                   \
+  return SimpleReflection::StaticTypeId<ClassType>::GetBoundType(); \
+}
+
 }//namespace SimpleReflection
