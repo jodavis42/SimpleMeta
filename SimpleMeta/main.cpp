@@ -6,6 +6,7 @@
 #include "ReflectionLibrary.hpp"
 #include "StaticTypeId.hpp"
 #include "Bindings.hpp"
+#include "StandardLibraryCreation.hpp"
 #include "MetaSerialization.hpp"
 #include "Attributes.hpp"
 #include "TestTypes/Physics.hpp"
@@ -21,20 +22,14 @@ using namespace SimpleReflection;
 int main()
 {
   _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-  ReflectionLibrary& reflectionLibrary = ReflectionProject::CreateLibrary("Reflection");
-  CreateBoundType<ReflectionComponent>(reflectionLibrary, "ReflectionComponent", 'rcmp');
+  std::vector<ReflectionLibrary*> dependencies;
+  ReflectionLibrary& reflectionLibrary = *CreateReflectionLibrary(dependencies, false);
   CreateBoundType<Attribute>(reflectionLibrary, "Attribute", 'att');
   CreateBoundType<SerializedAttribute>(reflectionLibrary, "SerializedAttribute", 'attS');
   CreateBoundType<MetaSerialization>(reflectionLibrary, "MetaSerialization", 'mser');
 
-  ReflectionLibrary& coreLibrary = ReflectionProject::CreateLibrary("Core");
-  coreLibrary.AddDependency(&reflectionLibrary);
-  CreateBoundType<void>(coreLibrary, "void", 1, 0);
-  BindPrimitiveType(coreLibrary, bool, 2);
-  BindPrimitiveType(coreLibrary, char, 3);
-  BindPrimitiveType(coreLibrary, int, 4);
-  BindPrimitiveType(coreLibrary, float, 5);
-  BindPrimitiveType(coreLibrary, double, 6);
+  dependencies.push_back(&reflectionLibrary);
+  ReflectionLibrary& coreLibrary = *CreateCoreLibrary(dependencies, false);
   BindPrimitiveTypeAs(coreLibrary, std::string, "string", 7);
   BindType(coreLibrary, Vec2, 'vec2');
   BindType(coreLibrary, Vec3, 'vec3');
