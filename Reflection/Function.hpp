@@ -29,7 +29,8 @@ struct FunctionType
 
   bool IsStatic() const;
 
-  bool operator==(const FunctionType& rhs) const;
+  // Checks if this is a function of the given type (taking into account inheritance)
+  bool IsA(const FunctionType& baseType) const;
 
 private:
   BoundType* mReturnType = nullptr;

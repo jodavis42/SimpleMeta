@@ -60,12 +60,12 @@ Function* BoundType::FindDefaultConstructor(bool checkInherited)
 
 Function* BoundType::FindConstructor(const FunctionType& functionType, bool checkInherited)
 {
-  if(mDefaultConstructor != nullptr && mDefaultConstructor->mFunctionType == functionType)
+  if(mDefaultConstructor != nullptr && functionType.IsA(mDefaultConstructor->mFunctionType))
     return mDefaultConstructor;
 
   for(Function* function : mConstructors)
   {
-    if(function->mFunctionType == functionType)
+    if(functionType.IsA(function->mFunctionType))
       return function;
   }
 
@@ -96,6 +96,25 @@ bool BoundType::FindFunctions(const std::string& fnName, std::vector<Function*>&
   if(recursive && mBaseType != nullptr)
     return mBaseType->FindFunctions(fnName, functions, recursive);
   return false;
+}
+
+Function* BoundType::FindFunction(const std::string& fnName, const FunctionType& functionType, bool checkInherited)
+{
+  auto it = mFunctionMap.find(fnName);
+  // Check derived types before base types
+  if(it != mFunctionMap.end())
+  {
+    auto&& functions = it->second;
+    for(Function* function : functions)
+    {
+      if(function->mFunctionType.IsA(functionType))
+        return function;
+    }
+  }
+
+  if(checkInherited && mBaseType != nullptr)
+    return mBaseType->FindFunction(fnName, functionType, checkInherited);
+  return nullptr;
 }
 
 void* BoundType::GenericDefaultConstruct() const
@@ -158,6 +177,35 @@ void BoundType::GenericDestructNoFree(void* self) const
     call.SetPointerUnchecked(Call::This, self);
     call.Invoke();
   }
+}
+
+bool BoundType::IsIndirectionType() const
+{
+  return mIsPointerType || mIsReferenceType;
+}
+
+bool BoundType::IsA(const BoundType* derrivedType, const BoundType* baseType)
+{
+  if(derrivedType == baseType)
+    return true;
+
+  // Handle null cases (if they're both null, we would've returned true above)
+  if(derrivedType == nullptr || baseType == nullptr)
+    return false;
+
+  if(derrivedType->IsIndirectionType())
+    derrivedType = derrivedType->mBaseType;
+  if(baseType->IsIndirectionType())
+    baseType = baseType->mBaseType;
+
+
+  while(derrivedType != nullptr)
+  {
+    if(derrivedType == baseType)
+      return true;
+    derrivedType = derrivedType->mBaseType;
+  }
+  return false;
 }
 
 }//namespace SimpleReflection

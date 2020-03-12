@@ -59,15 +59,17 @@ void FunctionType::SetParamType(size_t index, BoundType* boundType)
   mParams[index] = boundType;
 }
 
-bool FunctionType::operator==(const FunctionType& rhs) const
+bool FunctionType::IsA(const FunctionType& baseType) const
 {
-  bool isSame = (mReturnType == rhs.mReturnType) && (mThisType == rhs.mThisType) && (mParams.size() == rhs.mParams.size());
+  bool isSame = BoundType::IsA(mReturnType, baseType.mReturnType);
+  isSame &= BoundType::IsA(mThisType, baseType.mThisType);
+  isSame &= mParams.size() == baseType.mParams.size();
   if(!isSame)
     return false;
   
   for(size_t i = 0; i < mParams.size(); ++i)
   {
-    if(mParams[i] != rhs.mParams[i])
+    if(BoundType::IsA(mParams[i], baseType.mParams[i]) == false)
     {
       isSame = false;
       break;

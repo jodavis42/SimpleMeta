@@ -31,6 +31,7 @@ struct BoundType : public ReflectionComposition
   FieldRange GetFields();
   GetterSetterRange GetGetterSetters();
   bool FindFunctions(const std::string& fnName, std::vector<Function*>& functions, bool recursive);
+  Function* FindFunction(const std::string& fnName, const FunctionType& functionType, bool checkInherited = true);
 
   void* GenericDefaultConstruct() const;
   void GenericDefaultConstruct(void* self) const;
@@ -38,6 +39,11 @@ struct BoundType : public ReflectionComposition
   void GenericCopyConstruct(void* self, void* data) const;
   void GenericDestruct(void* self) const;
   void GenericDestructNoFree(void* self) const;
+
+  bool IsIndirectionType() const;
+
+  // Checks if a bound type is the same or inherited from the given base type
+  static bool IsA(const BoundType* derrivedType, const BoundType* baseType);
 
   BoundType* mBaseType = nullptr;
   std::vector<Field*> mFields;
