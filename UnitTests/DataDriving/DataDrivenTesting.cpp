@@ -225,7 +225,8 @@ void RunDataDrivenFile(const std::filesystem::path& filePath, ReflectionLibrary&
   binaryOutFilePath.replace_extension("out.bin");
   SaveBinary(binaryOutFilePath, boundType, loadedJsonData);
   char* binaryData = LoadBinary(binaryOutFilePath, boundType);
-  memcmp(binaryData, loadedJsonData, boundType->mSizeInBytes);
+  bool isEqual = memcmp(binaryData, loadedJsonData, boundType->mSizeInBytes);
+  ReflectionErrorIf(!isEqual, "Data driven file test failed");
 }
 
 void RunDataDrivenFolder(const std::filesystem::path& folderPath, SimpleReflection::ReflectionLibrary& dataDrivenLibrary)
