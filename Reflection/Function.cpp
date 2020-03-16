@@ -45,6 +45,11 @@ void FunctionType::SetThisType(BoundType* boundType)
   mThisType = boundType;
 }
 
+size_t FunctionType::GetParamCount() const
+{
+  return mParams.size();
+}
+
 BoundType* FunctionType::GetParamType(size_t index) const
 {
   if(index < mParams.size())
@@ -106,6 +111,11 @@ BoundType* Function::GetThisType() const
 void Function::SetThisType(BoundType* boundType)
 {
   mFunctionType.SetThisType(boundType);
+}
+
+size_t Function::GetParamCount() const
+{
+  return mFunctionType.GetParamCount();
 }
 
 BoundType* Function::GetParamType(size_t index) const

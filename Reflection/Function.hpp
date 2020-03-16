@@ -24,6 +24,7 @@ struct FunctionType
   BoundType* GetThisType() const;
   void SetThisType(BoundType* boundType);
 
+  size_t GetParamCount() const;
   BoundType* GetParamType(size_t index) const;
   void SetParamType(size_t index, BoundType* boundType);
 
@@ -39,7 +40,7 @@ private:
 };
 
 /// Runtime reflection information about a bound function. Used to actually invoke functions at runtime
-struct Function
+struct Function : public ReflectionComposition
 {
   size_t ComputeSizeRequired() const;
 
@@ -49,6 +50,7 @@ struct Function
   BoundType* GetThisType() const;
   void SetThisType(BoundType* boundType);
 
+  size_t GetParamCount() const;
   BoundType* GetParamType(size_t index) const;
   void SetParamType(size_t index, BoundType* boundType);
 
