@@ -36,7 +36,7 @@ struct Collider
   {
     BindProperty(library, boundType, Collider, mId);
     BindGetterSetter(library, boundType, Collider, Ghost);
-    BindGetterSetterAs(library, boundType, Collider, "SendsEvents", GetSendsEvents, SetSendsEvents);
+    BindGetterSetterAs(library, boundType, Collider, GetSendsEvents, SetSendsEvents, "SendsEvents");
   }
 
   bool GetGhost() const

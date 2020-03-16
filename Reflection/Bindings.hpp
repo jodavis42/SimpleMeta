@@ -180,19 +180,19 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define FullBindGetterSetterAs(Library, boundType, Owner, GetPointer, GetOverloadResolution, SetPointer, SetOverloadResolution, FieldName) \
   SimpleReflection::FromGetterSetter<decltype(GetOverloadResolution GetPointer), GetPointer, decltype(SetOverloadResolution SetPointer), SetPointer, Owner>(library, boundType, FieldName, GetOverloadResolution(GetPointer), SetOverloadResolution(SetPointer))
-#define BindGetterSetterAs(Library, boundType, Owner, FieldName, Getter, Setter) \
+#define BindGetterSetterAs(Library, boundType, Owner, Getter, Setter, FieldName) \
   FullBindGetterSetterAs(Library, boundType, Owner, &Owner::Getter, ReflectionNoOverload, &Owner::Setter, ReflectionNoOverload, FieldName)
-#define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, #FieldName, Get##FieldName, Set##FieldName)
+#define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, Get##FieldName, Set##FieldName, #FieldName)
 
 #define FullBindGetterAs(Library, boundType, Owner, FnPointer, FnOverloadResolution, FieldName)\
   SimpleReflection::FromGetter<decltype(FnOverloadResolution FnPointer), FnPointer, decltype(nullptr), nullptr, Owner>(library, boundType, FieldName, FnOverloadResolution(FnPointer), nullptr)
-#define BindGetterAs(Library, boundType, Owner, FieldName, Getter) FullBindGetterAs(Library, boundType, Owner, &Owner::Getter, ReflectionNoOverload, FieldName)
-#define BindGetter(Library, boundType, Owner, FieldName) BindGetterAs(Library, boundType, Owner, #FieldName, Get##FieldName)
+#define BindGetterAs(Library, boundType, Owner, Getter, FieldName) FullBindGetterAs(Library, boundType, Owner, &Owner::Getter, ReflectionNoOverload, FieldName)
+#define BindGetter(Library, boundType, Owner, FieldName) BindGetterAs(Library, boundType, Owner, Get##FieldName, #FieldName)
 
 #define FullBindSetterAs(Library, boundType, Owner, FnPointer, FnOverloadResolution, FieldName)\
     SimpleReflection::FromSetter<decltype(nullptr), nullptr, decltype(FnOverloadResolution FnPointer), FnPointer, Owner>(library, boundType, FieldName, nullptr, FnOverloadResolution(FnPointer))
-#define BindSetterAs(Library, boundType, Owner, FieldName, Setter) FullBindSetterAs(Library, boundType, Owner, &Owner::Setter, ReflectionNoOverload, FieldName)
-#define BindSetter(Library, boundType, Owner, FieldName) BindSetterAs(Library, boundType, Owner, #FieldName, Set##FieldName)
+#define BindSetterAs(Library, boundType, Owner, Setter, FieldName) FullBindSetterAs(Library, boundType, Owner, &Owner::Setter, ReflectionNoOverload, FieldName)
+#define BindSetter(Library, boundType, Owner, FieldName) BindSetterAs(Library, boundType, Owner, Set##FieldName, #FieldName)
 
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName, Id) SimpleReflection::BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName, Id)
 #define BindPrimitiveType(Library, PrimitiveType, Id) BindPrimitiveTypeAs(Library, PrimitiveType, #PrimitiveType, Id)
