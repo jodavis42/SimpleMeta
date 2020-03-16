@@ -37,7 +37,7 @@ BoundType* CreateBoundType(ReflectionLibrary& library, const std::string& classN
 }
 
 template <typename FieldPointer, FieldPointer field, typename ClassType, typename FieldType>
-static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType ClassType::*dummy, size_t offset)
+static Field* FromField(ReflectionLibrary& library, BoundType& owner, const std::string& name, FieldType ClassType::* dummy, size_t offset)
 {
   Field* f = new Field();
   f->mName = name;
@@ -66,7 +66,7 @@ BoundType* BindClassType(ReflectionLibrary& library, const std::string& classNam
 }
 
 template <typename GetterType, GetterType getter, typename SetterType, SetterType setter, typename ClassType, typename GetType, typename SetType>
-static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& owner, const std::string& name, GetType(ClassType::*dummyGetter)()const, void (ClassType::*dummySetter)(SetType))
+static GetterSetter* FromGetterSetter(ReflectionLibrary& library, BoundType& owner, const std::string& name, GetType(ClassType::* dummyGetter)()const, void (ClassType::* dummySetter)(SetType))
 {
   auto getSet = new GetterSetter();
   getSet->mType = StaticTypeId<GetType>::GetBoundType();
@@ -124,7 +124,7 @@ static Function* FromClassDefaultConstructor(ReflectionLibrary& library, BoundTy
 {
   if(owner.mDefaultConstructor != nullptr)
     delete owner.mDefaultConstructor;
-  Function* function = FromConstructor<ClassType>();  
+  Function* function = FromConstructor<ClassType>();
   owner.mDefaultConstructor = function;
   return function;
 }
@@ -203,7 +203,7 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define BindBase(Library, BoundType, BaseType) SimpleReflection::BindBaseType<BaseType>(Library, BoundType)
 
-#define DeclareVirtualBoundType(ClassType)                           \
+#define DeclareVirtualBoundType(ClassType)                          \
 virtual BoundType* VirtualGetBoundType() const                      \
 {                                                                   \
   return SimpleReflection::StaticTypeId<ClassType>::GetBoundType(); \
