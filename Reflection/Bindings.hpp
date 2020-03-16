@@ -165,6 +165,12 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
   derrivedType.mBaseType = baseType;
 }
 
+/// Macros to aid in overload resolution for functions
+#define ReflectionNoOverload
+#define ReflectionStaticOverload(ReturnType, ...) (ReturnType (*)(__VA_ARGS__))
+#define ReflectionInstanceOverload(ClassType, ReturnType, ...) (ReturnType (ClassType::*)(__VA_ARGS__))
+#define ReflectionConstInstanceOverload(ClassType, ReturnType, ...) (ReturnType (ClassType::*)(__VA_ARGS__) const)
+
 #define BindFieldAs(Library, boundType, Owner, FieldMember, FieldName) \
   SimpleReflection::FromField<decltype(&Owner::FieldMember), &Owner::FieldMember>(library, boundType, FieldName, &Owner::FieldMember, offsetof(Owner, FieldMember))
 #define BindField(Library, boundType, Owner, FieldMember) BindFieldAs(Library, boundType, Owner, FieldMember, #FieldMember)
@@ -172,16 +178,20 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 #define BindPropertyAs(Library, boundType, Owner, FieldMember, FieldName) BindFieldAs(Library, boundType, Owner, FieldMember, FieldName)
 #define BindProperty(Library, boundType, Owner, FieldMember) BindPropertyAs(Library, boundType, Owner, FieldMember, #FieldMember)
 
+#define FullBindGetterSetterAs(Library, boundType, Owner, GetPointer, GetOverloadResolution, SetPointer, SetOverloadResolution, FieldName) \
+  SimpleReflection::FromGetterSetter<decltype(GetOverloadResolution GetPointer), GetPointer, decltype(SetOverloadResolution SetPointer), SetPointer, Owner>(library, boundType, FieldName, GetOverloadResolution(GetPointer), SetOverloadResolution(SetPointer))
 #define BindGetterSetterAs(Library, boundType, Owner, FieldName, Getter, Setter) \
-  SimpleReflection::FromGetterSetter<decltype(&Owner::Getter), &Owner::Getter, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, &Owner::Getter, &Owner::Setter)
+  FullBindGetterSetterAs(Library, boundType, Owner, &Owner::Getter, ReflectionNoOverload, &Owner::Setter, ReflectionNoOverload, FieldName)
 #define BindGetterSetter(Library, boundType, Owner, FieldName) BindGetterSetterAs(Library, boundType, Owner, #FieldName, Get##FieldName, Set##FieldName)
 
-#define BindGetterAs(Library, boundType, Owner, FieldName, Getter) \
-  SimpleReflection::FromGetter<decltype(&Owner::Getter), &Owner::Getter, decltype(nullptr), nullptr, Owner>(library, boundType, FieldName, &Owner::Getter, nullptr)
+#define FullBindGetterAs(Library, boundType, Owner, FnPointer, FnOverloadResolution, FieldName)\
+  SimpleReflection::FromGetter<decltype(FnOverloadResolution FnPointer), FnPointer, decltype(nullptr), nullptr, Owner>(library, boundType, FieldName, FnOverloadResolution(FnPointer), nullptr)
+#define BindGetterAs(Library, boundType, Owner, FieldName, Getter) FullBindGetterAs(Library, boundType, Owner, &Owner::Getter, ReflectionNoOverload, FieldName)
 #define BindGetter(Library, boundType, Owner, FieldName) BindGetterAs(Library, boundType, Owner, #FieldName, Get##FieldName)
 
-#define BindSetterAs(Library, boundType, Owner, FieldName, Setter) \
-  SimpleReflection::FromSetter<decltype(nullptr), nullptr, decltype(&Owner::Setter), &Owner::Setter, Owner>(library, boundType, FieldName, nullptr, &Owner::Setter)
+#define FullBindSetterAs(Library, boundType, Owner, FnPointer, FnOverloadResolution, FieldName)\
+    SimpleReflection::FromSetter<decltype(nullptr), nullptr, decltype(FnOverloadResolution FnPointer), FnPointer, Owner>(library, boundType, FieldName, nullptr, FnOverloadResolution(FnPointer))
+#define BindSetterAs(Library, boundType, Owner, FieldName, Setter) FullBindSetterAs(Library, boundType, Owner, &Owner::Setter, ReflectionNoOverload, FieldName)
 #define BindSetter(Library, boundType, Owner, FieldName) BindSetterAs(Library, boundType, Owner, #FieldName, Set##FieldName)
 
 #define BindPrimitiveTypeAs(Library, PrimitiveType, PrimitiveTypeName, Id) SimpleReflection::BindPrimitiveTypeToLibrary<PrimitiveType>(Library, PrimitiveTypeName, Id)
@@ -193,7 +203,9 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 #define BindTypeExternalAs(Library, ClassType, ClassTypeName, Id, BindingFn) SimpleReflection::BindClassType<ClassType, BindingFn>(Library, ClassTypeName, Id)
 #define BindTypeExternal(Library, ClassType, Id, BindingFn) BindTypeExternalAs(Library, ClassType, #ClassType, Id, BindingFn)
 
-#define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function) SimpleReflection::FromFunction<decltype(&ClassType::Function), &ClassType::Function>(Library, BoundType, FunctionName, &ClassType::Function)
+#define FullBindFunctionAs(Library, BoundType, FnPointer, FnOverloadResolution, FunctionName)\
+  SimpleReflection::FromFunction<decltype(FnOverloadResolution FnPointer), FnPointer>(Library, BoundType, FunctionName, FnOverloadResolution(FnPointer))
+#define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function)  FullBindFunctionAs(Library, BoundType, &ClassType::Function, ReflectionNoOverload, FunctionName)
 #define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, #Function, Function)
 
 #define BindDefaultConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassDefaultConstructor<ClassType>(Library, BoundType)

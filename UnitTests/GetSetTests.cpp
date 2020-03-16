@@ -54,6 +54,49 @@ struct GetSetTest
   Vec3 mValue3;
 };
 
+struct FullGetSetTest
+{
+  FullGetSetTest()
+  {
+
+  }
+  FullGetSetTest(const float& scalar)
+    : mScalar(scalar)
+  {
+
+  }
+
+  float GetScalar() const
+  {
+    return mScalar;
+  }
+  void SetScalar(float scalar)
+  {
+    mScalar = scalar;
+  }
+  // Simple functions to force overload resolution to be necesarry
+  float GetScalar(float multiplier) const
+  {
+    return mScalar * multiplier;
+  }
+  void SetScalar(float scalar, float multiplier)
+  {
+    mScalar = scalar * multiplier;
+  }
+
+  static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
+  {
+    FullBindGetterAs(library, boundType, FullGetSetTest, &FullGetSetTest::GetScalar, ReflectionConstInstanceOverload(FullGetSetTest, float), "Scalar");
+    FullBindSetterAs(library, boundType, FullGetSetTest, &FullGetSetTest::SetScalar, ReflectionInstanceOverload(FullGetSetTest, void, float), "Scalar");
+    FullBindGetterSetterAs(library, boundType, FullGetSetTest,
+      &FullGetSetTest::GetScalar, ReflectionConstInstanceOverload(FullGetSetTest, float),
+      &FullGetSetTest::SetScalar, ReflectionInstanceOverload(FullGetSetTest, void, float),
+      "Scalar2");
+  }
+
+  float mScalar = 0;
+};
+
 SimpleReflection::GetterSetter* FindGetterSetter(SimpleReflection::BoundType* boundType, const std::string& name)
 {
   for(auto range = boundType->GetGetterSetters(); !range.Empty(); range.PopFront())
@@ -105,6 +148,47 @@ void TestGetSets()
   ReflectionErrorIf(!(getData == test.mValue3), "Getter failed");
 }
 
+void TestFullGets()
+{
+  FullGetSetTest test(1);
+  SimpleReflection::BoundType* boundType = StaticTypeId<FullGetSetTest>::GetBoundType();
+  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "Scalar");
+
+  Any any = getSet->Get(&test);
+  float getData = any.Get<float>();
+  ReflectionErrorIf(!(getData == test.mScalar), "Getter failed");
+}
+
+void TestFullSets()
+{
+  FullGetSetTest test(1);
+  SimpleReflection::BoundType* boundType = StaticTypeId<FullGetSetTest>::GetBoundType();
+  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "Scalar");
+
+  float setData = -1;
+  Any any;
+  any.Set(setData);
+  getSet->Set(&test, any);
+  ReflectionErrorIf(!(setData == test.mScalar), "Setter failed");
+}
+
+void TestFullGetSets()
+{
+  FullGetSetTest test(0);
+  SimpleReflection::BoundType* boundType = StaticTypeId<FullGetSetTest>::GetBoundType();
+  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "Scalar2");
+
+  float setData = 3;
+  Any any;
+  any.Set(setData);
+  getSet->Set(&test, any);
+  ReflectionErrorIf(!(setData == test.mScalar), "Setter failed");
+
+  any = getSet->Get(&test);
+  float getData = any.Get<float>();
+  ReflectionErrorIf(!(getData == test.mScalar), "Getter failed");
+}
+
 void RunGetSetTests()
 {
   ReflectionLibrary& getSetLibrary = ReflectionProject::CreateLibrary("GetSet");
@@ -115,6 +199,10 @@ void RunGetSetTests()
   TestGets();
   TestSets();
   TestGetSets();
+
+  TestFullGets();
+  TestFullSets();
+  TestFullGetSets();
 
   ReflectionProject::DestroyLibrary(getSetLibrary);
 }
