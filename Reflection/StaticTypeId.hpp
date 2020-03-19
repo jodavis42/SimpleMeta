@@ -159,4 +159,6 @@ struct UnqualifiedType
   using type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 };
 
+#define ReflectionBoundTypeOf(Type) SimpleReflection::StaticTypeId<Type>::GetBoundType()
+
 }//namespace SimpleReflection
