@@ -16,6 +16,8 @@ target_sources(Reflection
     ${CMAKE_CURRENT_LIST_DIR}/Function.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Function.hpp
     ${CMAKE_CURRENT_LIST_DIR}/Functions.inl
+    ${CMAKE_CURRENT_LIST_DIR}/FunctionContainers.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/FunctionContainers.hpp
     ${CMAKE_CURRENT_LIST_DIR}/ConstructorsDestructors.inl
     ${CMAKE_CURRENT_LIST_DIR}/FunctionBinding.hpp
     ${CMAKE_CURRENT_LIST_DIR}/GetterSetter.cpp

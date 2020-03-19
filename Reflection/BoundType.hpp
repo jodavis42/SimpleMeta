@@ -7,6 +7,7 @@
 #include "TypeId.hpp"
 #include "ReflectionComposition.hpp"
 #include "BoundTypeRanges.hpp"
+#include "FunctionContainers.hpp"
 
 namespace SimpleReflection
 {
@@ -48,7 +49,7 @@ struct BoundType : public ReflectionComposition
   BoundType* mBaseType = nullptr;
   std::vector<Field*> mFields;
   std::vector<GetterSetter*> mGetterSetters;
-  std::unordered_map<std::string, std::vector<Function*>> mFunctionMap;
+  FunctionMultiMap mFunctionMap;
   size_t mSizeInBytes = 0;
   
   Function* mDefaultConstructor = nullptr;

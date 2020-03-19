@@ -36,14 +36,7 @@ void BoundType::Destruct()
     delete getSet;
   mGetterSetters.clear();
 
-  for(auto&& pair : mFunctionMap)
-  {
-    for(Function* function : pair.second)
-    {
-      delete function;
-    }
-  }
-  mFunctionMap.clear();
+  mFunctionMap.DeleteAll();
 
   mIsSetup = false;
   mIsRegistered = false;
@@ -100,17 +93,9 @@ bool BoundType::FindFunctions(const std::string& fnName, std::vector<Function*>&
 
 Function* BoundType::FindFunction(const std::string& fnName, const FunctionType& functionType, bool checkInherited)
 {
-  auto it = mFunctionMap.find(fnName);
-  // Check derived types before base types
-  if(it != mFunctionMap.end())
-  {
-    auto&& functions = it->second;
-    for(Function* function : functions)
-    {
-      if(function->mFunctionType.IsA(functionType))
-        return function;
-    }
-  }
+  Function* function = mFunctionMap.FindFunction(fnName, functionType);
+  if(function != nullptr)
+    return function;
 
   if(checkInherited && mBaseType != nullptr)
     return mBaseType->FindFunction(fnName, functionType, checkInherited);
