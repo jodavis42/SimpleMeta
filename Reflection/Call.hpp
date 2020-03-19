@@ -128,6 +128,7 @@ struct Call
   
   char* GetLocationChecked(int index, BoundType* boundType);
   char* GetLocationUnChecked(int index);
+  char* GetDereferencedLocationUnChecked(int index);
   size_t GetLocationOffset(int index) const;
   BoundType* GetLocationType(int index) const;
   bool CheckLocationType(int index, const BoundType* givenType) const;

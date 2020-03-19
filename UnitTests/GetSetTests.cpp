@@ -86,12 +86,12 @@ struct FullGetSetTest
 
   static void Bind(SimpleReflection::ReflectionLibrary& library, SimpleReflection::BoundType& boundType)
   {
-    FullBindGetterAs(library, boundType, FullGetSetTest, &FullGetSetTest::GetScalar, ReflectionConstInstanceOverload(FullGetSetTest, float), "Scalar");
-    FullBindSetterAs(library, boundType, FullGetSetTest, &FullGetSetTest::SetScalar, ReflectionInstanceOverload(FullGetSetTest, void, float), "Scalar");
+    FullBindGetterAs(library, boundType, FullGetSetTest, &FullGetSetTest::GetScalar, ReflectionConstInstanceOverload(FullGetSetTest, float), "ScalarG");
+    FullBindSetterAs(library, boundType, FullGetSetTest, &FullGetSetTest::SetScalar, ReflectionInstanceOverload(FullGetSetTest, void, float), "ScalarS");
     FullBindGetterSetterAs(library, boundType, FullGetSetTest,
       &FullGetSetTest::GetScalar, ReflectionConstInstanceOverload(FullGetSetTest, float),
       &FullGetSetTest::SetScalar, ReflectionInstanceOverload(FullGetSetTest, void, float),
-      "Scalar2");
+      "ScalarGS");
   }
 
   float mScalar = 0;
@@ -152,7 +152,7 @@ void TestFullGets()
 {
   FullGetSetTest test(1);
   SimpleReflection::BoundType* boundType = StaticTypeId<FullGetSetTest>::GetBoundType();
-  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "Scalar");
+  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "ScalarG");
 
   Any any = getSet->Get(&test);
   float getData = any.Get<float>();
@@ -163,7 +163,7 @@ void TestFullSets()
 {
   FullGetSetTest test(1);
   SimpleReflection::BoundType* boundType = StaticTypeId<FullGetSetTest>::GetBoundType();
-  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "Scalar");
+  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "ScalarS");
 
   float setData = -1;
   Any any;
@@ -176,7 +176,7 @@ void TestFullGetSets()
 {
   FullGetSetTest test(0);
   SimpleReflection::BoundType* boundType = StaticTypeId<FullGetSetTest>::GetBoundType();
-  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "Scalar2");
+  SimpleReflection::GetterSetter* getSet = FindGetterSetter(boundType, "ScalarGS");
 
   float setData = 3;
   Any any;
@@ -194,6 +194,7 @@ void RunGetSetTests()
   ReflectionLibrary& getSetLibrary = ReflectionProject::CreateLibrary("GetSet");
   getSetLibrary.AddDependency(ReflectionProject::FindLibrary("Core"));
   BindType(getSetLibrary, GetSetTest, 'gst');
+  BindType(getSetLibrary, FullGetSetTest, 'fgst');
   getSetLibrary.Finalize();
 
   TestGets();

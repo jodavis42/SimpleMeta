@@ -53,12 +53,12 @@ void Call::Set(int index, Any& any)
   if(expectedType->mIsReferenceType)
   {
     char* location = GetLocationUnChecked(index);
-    SetInternal(index, rawData, expectedType->mSizeInBytes);
+    SetValueUnchecked(index, &rawData, expectedType->mSizeInBytes);
   }
   else
   {
     char* location = GetLocationUnChecked(index);
-    SetInternal(index, *rawData, expectedType->mSizeInBytes);
+    SetValueUnchecked(index, rawData, expectedType->mSizeInBytes);
   }
 }
 
@@ -72,6 +72,12 @@ char* Call::GetLocationUnChecked(int index)
 {
   size_t offset = GetLocationOffset(index);
   return mBuffer + offset;
+}
+
+char* Call::GetDereferencedLocationUnChecked(int index)
+{
+  char* location = GetLocationUnChecked(index);
+  return *reinterpret_cast<char**>(location);
 }
 
 size_t Call::GetLocationOffset(int index) const
