@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include "BoundType.hpp"
+#include "FunctionContainers.hpp"
 
 namespace SimpleReflection
 {
@@ -20,8 +21,9 @@ struct ReflectionLibrary
   void Finalize();
   bool Validate();
 
-  BoundType* FindBoundType(const std::string& name, bool recursive = true);
-  BoundType* FindBoundType(const TypeId& id, bool recursive = true);
+  BoundType* FindBoundType(const std::string& name, bool recursive = true) const;
+  BoundType* FindBoundType(const TypeId& id, bool recursive = true) const;
+  Function* FindExtensionFunction(const BoundType* owner, const std::string& fnName, const FunctionType& fnType, bool recursive = true) const;
 
   std::string mName;
   std::vector<ReflectionLibrary*> mDependencies;
@@ -29,6 +31,7 @@ struct ReflectionLibrary
   std::unordered_map<std::string, BoundType*> mBoundTypeNameMap;
   std::unordered_map<size_t, BoundType*> mBoundTypeIdMap;
   std::unordered_set<BoundType*> mBoundTypesToRegister;
+  ExtensionFunctionMultiMap mExtensionFunctions;
 
   // For a library to be finalized, it's only able to accept new ref/pointer types, but no new actual direct bound types.
   bool mIsFinalized = false;

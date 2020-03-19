@@ -15,6 +15,7 @@ ReflectionLibrary::~ReflectionLibrary()
     if(!boundType->mNative)
       delete boundType;
   }
+  mExtensionFunctions.DeleteAll();
 }
 
 void ReflectionLibrary::AddBoundType(BoundType* boundType)
@@ -80,7 +81,7 @@ bool ReflectionLibrary::Validate()
   return true;
 }
 
-BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recursive)
+BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recursive) const
 {
   auto it = mBoundTypeNameMap.find(name);
   if(it != mBoundTypeNameMap.end())
@@ -99,7 +100,7 @@ BoundType* ReflectionLibrary::FindBoundType(const std::string& name, bool recurs
   return nullptr;
 }
 
-BoundType* ReflectionLibrary::FindBoundType(const TypeId& id, bool recursive)
+BoundType* ReflectionLibrary::FindBoundType(const TypeId& id, bool recursive) const
 {
   auto it = mBoundTypeIdMap.find(id.mId);
   if(it != mBoundTypeIdMap.end())
@@ -116,6 +117,21 @@ BoundType* ReflectionLibrary::FindBoundType(const TypeId& id, bool recursive)
   }
 
   return nullptr;
+}
+
+Function* ReflectionLibrary::FindExtensionFunction(const BoundType* owner, const std::string& fnName, const FunctionType& fnType, bool recursive) const
+{
+  Function* result = mExtensionFunctions.FindFunction(owner, fnName, fnType);
+  if(result != nullptr)
+    return result;
+
+  for(ReflectionLibrary* dependency : mDependencies)
+  {
+    result = dependency->FindExtensionFunction(owner, fnName, fnType, recursive);
+    if(result != nullptr)
+      return result;
+  }
+  return result;
 }
 
 void ReflectionLibrary::AddDependency(ReflectionLibrary* dependency)

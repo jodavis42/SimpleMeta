@@ -3,6 +3,7 @@
 #include "AnyTests.hpp"
 #include "BoundTypeReflectionLibraryLifetimeTests.hpp"
 #include "CallTests.hpp"
+#include "ExtensionFunctionTests.hpp"
 #include "GetSetTests.hpp"
 #include "BinaryStream.hpp"
 #include "JsonSerializers.hpp"
@@ -38,6 +39,7 @@ void RunUnitTests()
   RunAnyTests();
   RunCallTests();
   RunGetSetTests();
+  RunExtensionFunctionTests();
 
   {
     Mesh outMesh;

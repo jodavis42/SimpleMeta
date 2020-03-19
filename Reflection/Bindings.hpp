@@ -111,6 +111,14 @@ static Function* FromFunction(ReflectionLibrary& library, BoundType& owner, cons
   return function;
 }
 
+template <typename FunctionType, FunctionType FunctionToBind>
+static Function* FromExtensionFunction(ReflectionLibrary& library, BoundType& boundType, const std::string& name, FunctionType)
+{
+  Function* function = FromExtensionMethod<FunctionType, FunctionToBind>(FunctionToBind);
+  library.mExtensionFunctions[&boundType][name].push_back(function);
+  return function;
+}
+
 template <typename ClassType, typename ... Args>
 static Function* FromClassConstructor(ReflectionLibrary& library, BoundType& owner)
 {
@@ -207,6 +215,11 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
   SimpleReflection::FromFunction<decltype(FnOverloadResolution FnPointer), FnPointer>(Library, BoundType, FunctionName, FnOverloadResolution(FnPointer))
 #define BindFunctionAs(Library, BoundType, ClassType, Function, FunctionName)  FullBindFunctionAs(Library, BoundType, &ClassType::Function, ReflectionNoOverload, FunctionName)
 #define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, Function, #Function)
+
+#define FullBindExtensionFunctionAs(Library, ClassType, FnPointer, FnOverloadResolution, FunctionName) \
+  SimpleReflection::FromExtensionFunction<decltype(FnOverloadResolution FnPointer), FnPointer>(Library, *SimpleReflection::StaticTypeId<ClassType>::GetBoundType(), FunctionName, FnOverloadResolution(FnPointer))
+#define BindExtensionFunctionAs(Library, ClassType, FnPointer, FunctionName)  FullBindExtensionFunctionAs(Library, ClassType, FnPointer, ReflectionNoOverload, FunctionName)
+#define BindExtensionFunction(Library, ClassType, Function)  BindExtensionFunctionAs(Library, ClassType, Function, #Function)
 
 #define BindDefaultConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassDefaultConstructor<ClassType>(Library, BoundType)
 #define BindCopyConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassCopyConstructor<ClassType>(Library, BoundType)
