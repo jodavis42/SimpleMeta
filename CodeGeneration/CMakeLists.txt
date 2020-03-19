@@ -10,8 +10,6 @@ target_include_directories(CodeGeneration
 )
 Set_Common_TargetCompileOptions(CodeGeneration)
 target_link_libraries(CodeGeneration
-                      Reflection
-                      Serialization
 )
 
 add_definitions(-DGENERATION_FOLDER="${ReflectionLocation}")
