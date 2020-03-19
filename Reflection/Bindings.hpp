@@ -205,8 +205,8 @@ void BindBaseType(ReflectionLibrary& library, BoundType& derrivedType)
 
 #define FullBindFunctionAs(Library, BoundType, FnPointer, FnOverloadResolution, FunctionName)\
   SimpleReflection::FromFunction<decltype(FnOverloadResolution FnPointer), FnPointer>(Library, BoundType, FunctionName, FnOverloadResolution(FnPointer))
-#define BindFunctionAs(Library, BoundType, ClassType, FunctionName, Function)  FullBindFunctionAs(Library, BoundType, &ClassType::Function, ReflectionNoOverload, FunctionName)
-#define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, #Function, Function)
+#define BindFunctionAs(Library, BoundType, ClassType, Function, FunctionName)  FullBindFunctionAs(Library, BoundType, &ClassType::Function, ReflectionNoOverload, FunctionName)
+#define BindFunction(Library, BoundType, ClassType, Function) BindFunctionAs(Library, BoundType, ClassType, Function, #Function)
 
 #define BindDefaultConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassDefaultConstructor<ClassType>(Library, BoundType)
 #define BindCopyConstructor(Library, BoundType, ClassType) SimpleReflection::FromClassCopyConstructor<ClassType>(Library, BoundType)
