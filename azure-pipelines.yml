@@ -5,7 +5,7 @@
 
 trigger:
 - master
-- ADO
+- Ado
 
 pool:
   vmImage: 'windows-2019'
@@ -28,13 +28,13 @@ steps:
     displayName: CMake Build
     workingDirectory: 'CMake'
     cmakeArgs: '--build ./bin --config $(Configuration)'
-- task: PublishSymbols@2
-  inputs:
-    SearchPattern: '**/bin/**/*.pdb'
-    SymbolServerType: 'TeamServices'
+#- task: PublishSymbols@2
+#  inputs:
+#    SearchPattern: '**/bin/**/*.pdb'
+#    SymbolServerType: 'TeamServices'
 - task: CopyFiles@2
   inputs:
-    sourceFolder: 'CMake/bin/Reflection/$(Configuration)'
+    sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
     contents: '?(*.exe|*.dll|*.pdb|*.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1
