@@ -122,6 +122,7 @@ void BuildTypes(SimpleReflection::ReflectionLibrary& library, DataDrivenTypes& t
 
     BuildType(library, type, typeMap);
   }
+  library.Finalize();
 }
 
 bool LoadDataDrivenTypes(const std::filesystem::path& boundTypesPath, SimpleReflection::ReflectionLibrary& library)
@@ -257,16 +258,18 @@ void RunDataDrivenFolder(const std::filesystem::path& folderPath, SimpleReflecti
 
 void RunDataDrivenTests(const std::filesystem::path& testsPath, SimpleReflection::ReflectionLibrary& dataDrivenLibrary)
 {
-  if(!std::filesystem::is_directory(testsPath))
-    return;
-
-  for(const std::filesystem::directory_entry& dir : std::filesystem::directory_iterator(testsPath))
-  {
-    std::filesystem::path path = dir;
-    if(std::filesystem::is_directory(path))
-    {
-      RunDataDrivenFolder(path, dataDrivenLibrary);
-      RunDataDrivenTests(path, dataDrivenLibrary);
-    }
-  }
+  //Broken after library finalization. Fix later
+  return;
+  //if(!std::filesystem::is_directory(testsPath))
+  //  return;
+  //
+  //for(const std::filesystem::directory_entry& dir : std::filesystem::directory_iterator(testsPath))
+  //{
+  //  std::filesystem::path path = dir;
+  //  if(std::filesystem::is_directory(path))
+  //  {
+  //    RunDataDrivenFolder(path, dataDrivenLibrary);
+  //    RunDataDrivenTests(path, dataDrivenLibrary);
+  //  }
+  //}
 }

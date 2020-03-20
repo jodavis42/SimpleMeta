@@ -18,3 +18,5 @@ target_link_libraries(SimpleMeta
 
 add_custom_command(TARGET SimpleMeta POST_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/DataDrivenTests/ $<TARGET_FILE_DIR:SimpleMeta>/DataDrivenTests)
+add_custom_command(TARGET SimpleMeta POST_BUILD
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/DataDrivenTests/ DataDrivenTests)
