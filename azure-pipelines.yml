@@ -41,7 +41,7 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
-    artifactName: '$(Configuration)''
+    artifactName: '$(Configuration)'
 - task: CmdLine@2
   inputs:
     displayName: Run Tests
