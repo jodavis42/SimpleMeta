@@ -12,8 +12,8 @@ pool:
 
 strategy:
   matrix:
-    Release:
-      Configuration: Release
+    #Release:
+    #  Configuration: Release
     Debug:
       Configuration: Debug
 
@@ -34,16 +34,17 @@ steps:
 #    SymbolServerType: 'TeamServices'
 - task: CopyFiles@2
   inputs:
-    sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
+    workingDirectory: 'CMake'
+    sourceFolder: './bin/SimpleMeta/$(Configuration)'
     contents: '?(*.exe|*.dll|*.pdb|*.json)'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
 - task: PublishBuildArtifacts@1
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: drop
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
+    artifactName: '$(Configuration)''
 - task: CmdLine@2
   inputs:
     displayName: Run Tests
     workingDirectory: 'CMake'
-    #script: '$(Build.ArtifactStagingDirectory)/SimpleMeta.exe'
-    script: 'CMake/bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
+    #script: '$(Build.ArtifactStagingDirectory)/$(Configuration)/SimpleMeta.exe'
+    script: './bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
