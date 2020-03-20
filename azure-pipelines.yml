@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- ADO
 
 pool:
   vmImage: 'windows-2019'
@@ -29,7 +30,7 @@ steps:
 - task: CopyFiles@2
   inputs:
     #sourceFolder: '$(Build.SourcesDirectory)'
-    sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
+    sourceFolder: 'CMake/bin/Reflection/$(Configuration)'
     contents: '?(*.exe|*.dll|*.pdb|*.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
 - task: PublishBuildArtifacts@1
