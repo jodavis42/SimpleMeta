@@ -44,5 +44,6 @@ steps:
 - task: CmdLine@2
   inputs:
     displayName: Run Tests
+    workingDirectory: 'CMake'
     #script: '$(Build.ArtifactStagingDirectory)/SimpleMeta.exe'
     script: 'CMake/bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
