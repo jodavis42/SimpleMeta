@@ -8,7 +8,9 @@ trigger:
 
 pool:
   vmImage: 'windows-2019'
-
+variables:
+  Configuration: Release
+  
 steps:
 - task: CMake@1
   inputs:
@@ -24,3 +26,17 @@ steps:
   inputs:
     SearchPattern: '**/bin/**/*.pdb'
     SymbolServerType: 'TeamServices'
+- task: CopyFiles@2
+  inputs:
+    #sourceFolder: '$(Build.SourcesDirectory)'
+    sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
+    contents: '?(*.exe|*.dll|*.pdb|*.json)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: drop
+- task: CmdLine@2
+  inputs:
+    displayName: Run Tests
+    script: '$(Build.ArtifactStagingDirectory)/SimpleMeta.exe'
