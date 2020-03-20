@@ -27,7 +27,7 @@ steps:
   inputs:
     displayName: CMake Build
     workingDirectory: 'CMake'
-    cmakeArgs: '--build ./bin --config $(Configuration)'
+    cmakeArgs: '--build ./bin --config $(Configuration) --parallel'
 #- task: PublishSymbols@2
 #  inputs:
 #    SearchPattern: '**/bin/**/*.pdb'
@@ -35,7 +35,7 @@ steps:
 - task: CopyFiles@2
   inputs:
     sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
-    contents: '**'
+    contents: '**\?(*.exe|*.dll|*.pdb|*.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
 - task: PublishBuildArtifacts@1
   inputs:
