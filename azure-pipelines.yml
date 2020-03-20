@@ -34,8 +34,7 @@ steps:
 #    SymbolServerType: 'TeamServices'
 - task: CopyFiles@2
   inputs:
-    workingDirectory: 'CMake'
-    sourceFolder: './bin/SimpleMeta/$(Configuration)'
+    sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
     contents: '?(*.exe|*.dll|*.pdb|*.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
 - task: PublishBuildArtifacts@1
@@ -45,6 +44,5 @@ steps:
 - task: CmdLine@2
   inputs:
     displayName: Run Tests
-    workingDirectory: 'CMake'
     #script: '$(Build.ArtifactStagingDirectory)/$(Configuration)/SimpleMeta.exe'
-    script: './bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
+    script: 'CMake/bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
