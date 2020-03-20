@@ -35,25 +35,12 @@ steps:
 - task: CopyFiles@2
   inputs:
     sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
-    contents: '?(*.exe|*.dll|*.pdb|*.json)'
+    contents: '?(*.exe|*.dll|*.pdb|**/*.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
     artifactName: '$(Configuration)'
-- task: CmdLine@2
-  inputs:
-    displayName: Run Tests
-    continueOnError: true
-    workingDirectory: 'CMake/bin/SimpleMeta/$(Configuration)'
-    #script: '$(Build.ArtifactStagingDirectory)/$(Configuration)/SimpleMeta.exe'
-    script: 'SimpleMeta.exe'
-- task: CmdLine@2
-  inputs:
-    displayName: Run Tests
-    continueOnError: true
-    #script: '$(Build.ArtifactStagingDirectory)/$(Configuration)/SimpleMeta.exe'
-    script: 'CMake/bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
 - task: CmdLine@2
   inputs:
     displayName: Run Tests
