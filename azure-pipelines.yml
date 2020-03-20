@@ -12,8 +12,8 @@ pool:
 
 strategy:
   matrix:
-    #Release:
-    #  Configuration: Release
+    Release:
+      Configuration: Release
     Debug:
       Configuration: Debug
 
@@ -28,10 +28,10 @@ steps:
     displayName: CMake Build
     workingDirectory: 'CMake'
     cmakeArgs: '--build ./bin --config $(Configuration) --parallel'
-#- task: PublishSymbols@2
-#  inputs:
-#    SearchPattern: '**/bin/**/*.pdb'
-#    SymbolServerType: 'TeamServices'
+- task: PublishSymbols@2
+  inputs:
+    SearchPattern: '**/bin/**/*.pdb'
+    SymbolServerType: 'TeamServices'
 - task: CopyFiles@2
   inputs:
     sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
