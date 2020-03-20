@@ -14,8 +14,8 @@ strategy:
   matrix:
     Release:
       Configuration: Release
-    #Debug:
-    #  Configuration: Debug
+    Debug:
+      Configuration: Debug
 
 steps:
 - task: CMake@1
@@ -44,4 +44,5 @@ steps:
 - task: CmdLine@2
   inputs:
     displayName: Run Tests
-    script: '$(Build.ArtifactStagingDirectory)/SimpleMeta.exe'
+    #script: '$(Build.ArtifactStagingDirectory)/SimpleMeta.exe'
+    script: 'CMake/bin/SimpleMeta/$(Configuration)/SimpleMeta.exe'
