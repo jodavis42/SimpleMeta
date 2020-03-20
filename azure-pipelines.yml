@@ -35,7 +35,7 @@ steps:
 - task: CopyFiles@2
   inputs:
     sourceFolder: 'CMake/bin/SimpleMeta/$(Configuration)'
-    contents: '?(*.exe|*.dll|*.pdb|**/*.json)'
+    contents: '?(*.exe|*.dll|*.pdb|**.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/$(Configuration)'
 - task: PublishBuildArtifacts@1
   inputs:
