@@ -9,9 +9,14 @@ trigger:
 
 pool:
   vmImage: 'windows-2019'
-variables:
-  Configuration: Release
-  
+
+strategy:
+  matrix:
+    Release:
+      Configuration: Release
+    #Debug:
+    #  Configuration: Debug
+
 steps:
 - task: CMake@1
   inputs:
@@ -22,14 +27,13 @@ steps:
   inputs:
     displayName: CMake Build
     workingDirectory: 'CMake'
-    cmakeArgs: '--build ./bin'
+    cmakeArgs: '--build ./bin --config $(Configuration)'
 - task: PublishSymbols@2
   inputs:
     SearchPattern: '**/bin/**/*.pdb'
     SymbolServerType: 'TeamServices'
 - task: CopyFiles@2
   inputs:
-    #sourceFolder: '$(Build.SourcesDirectory)'
     sourceFolder: 'CMake/bin/Reflection/$(Configuration)'
     contents: '?(*.exe|*.dll|*.pdb|*.json)'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
